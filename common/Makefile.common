@@ -1,0 +1,153 @@
+
+#directories
+
+BIN_DIR=$(BASE_DIR)/bin
+COMMON_DIR=$(BASE_DIR)/common
+
+#configure compilers and linkers
+
+CILKC=cilkc
+OMPC=mcc
+CC=gcc
+
+#configue compiler and linker flags
+
+OPT_FLAGS=-O3 -Wall
+
+CC_FLAGS=
+OMPC_FLAGS=
+CILKC_FLAGS=
+
+CLINK_FLAGS=
+OMPLINK_FLAGS=
+CILKLINK_FLAGS=
+
+
+# Don't change below this line
+##############################
+
+# Compile commands
+
+OMPC_COMPILE=$(OMPC) -c -I$(COMMON_DIR) $(OPT_FLAGS) $(OMPC_FLAGS) $(APP_FLAGS)
+CC_COMPILE=$(CC) -c -I$(COMMON_DIR) $(OPT_FLAGS) $(CC_FLAGS) $(APP_FLAGS)
+
+# Link commands
+
+OMPC_LINK=$(OMPC) $(OPT_FLAGS) $(OMPLINK_FLAGS) $(APP_FLAGS)
+CC_LINK=$(CC) $(OPT_FLAGS) $(CLINK_FLAGS) $(APP_FLAGS)
+
+# generic rules
+
+ifndef PROGRAM
+	PROGRAM = $(shell basename `pwd`)
+endif
+
+ifndef PROGRAM_OBJS
+	PROGRAM_OBJS = $(PROGRAM).o
+endif
+
+COMMON_OBJS = $(COMMON_DIR)/nbs_common.o
+
+
+ifeq ($(VERSION),omp-tasks)
+
+TARGETS = $(BIN_DIR)/$(PROGRAM).$(VERSION)
+
+ifdef CUTOFF_VERSIONS
+	TARGETS += $(CUTOFF_VERSIONS:%=$(BIN_DIR)/$(PROGRAM).$(VERSION)-%)
+
+	MANUAL_PROGRAM_OBJS := $(PROGRAM_OBJS:%.o=%-manual.o)
+	IF_PROGRAM_OBJS := $(PROGRAM_OBJS:%.o=%-if.o)
+
+	MANUAL_FLAGS = -DMANUAL_CUTOFF
+	IF_FLAGS = -DIF_CUTOFF
+endif
+
+ifdef TIED_VERSIONS
+	TIED_TARGETS := $(TARGETS:%=%-tied)
+	TARGETS += $(TIED_TARGETS)
+
+	TIED_PROGRAM_OBJS := $(PROGRAM_OBJS:%.o=%-tied.o)
+	TIED_MANUAL_PROGRAM_OBJS := $(MANUAL_PROGRAM_OBJS:%.o=%-tied.o)
+	TIED_IF_PROGRAM_OBJS := $(IF_PROGRAM_OBJS:%.o=%-tied.o)
+
+	TIED_FLAGS = -DFORCE_TIED_TASKS
+endif
+
+
+all: $(TARGETS)
+
+.c.o: Makefile $(COMMON_DIR)/Makefile.common 
+	$(OMPC_COMPILE) -o $@ $<
+
+%-if.o: %.c Makefile $(COMMON_DIR)/Makefile.common 
+	$(OMPC_COMPILE) $(IF_FLAGS) -o $@ $<
+
+%-manual.o: %.c Makefile $(COMMON_DIR)/Makefile.common 
+	$(OMPC_COMPILE) $(MANUAL_FLAGS) -o $@ $<
+
+# we remove the untied clause with sed.
+# For this to work it must be the first clause of the task directive
+# Ugly... but there's no easy solutions because it is a pragma
+
+%-tied.o: %.c Makefile $(COMMON_DIR)/Makefile.common
+	cat $< | sed -e "s/task \+untied/task/i" > tied-$< ;\
+	$(OMPC_COMPILE) $(TIED_FLAGS) -o $@ tied-$<;\
+	rm tied-$<
+
+%-if-tied.o: %.c Makefile $(COMMON_DIR)/Makefile.common
+	cat $< | sed -e "s/task \+untied/task/i" > tied-$< ;\
+	$(OMPC_COMPILE) $(IF_FLAGS) $(TIED_FLAGS) -o $@ $<;\
+	rm tied-$<
+
+%-manual-tied.o: %.c Makefile $(COMMON_DIR)/Makefile.common
+	cat $< | sed -e "s/task \+untied/task/i" > tied-$< ;\
+	$(OMPC_COMPILE) $(MANUAL_FLAGS) $(TIED_FLAGS) -o $@ $<;\
+	rm tied-$<
+
+main.o: $(COMMON_DIR)/nbs_main.c app-desc.h
+	$(OMPC_COMPILE) -I. -o $@ $<
+
+main-if.o: $(COMMON_DIR)/nbs_main.c app-desc.h
+	$(OMPC_COMPILE) $(IF_FLAGS) -I. -o $@ $<
+
+main-manual.o: $(COMMON_DIR)/nbs_main.c app-desc.h
+	$(OMPC_COMPILE) $(MANUAL_FLAGS) -I. -o $@ $<
+
+main-tied.o: $(COMMON_DIR)/nbs_main.c app-desc.h
+	$(OMPC_COMPILE) $(TIED_FLAGS) -I. -o $@ $<
+
+main-if-tied.o: $(COMMON_DIR)/nbs_main.c app-desc.h
+	$(OMPC_COMPILE) $(TIED_FLAGS) $(IF_FLAGS) -I. -o $@ $<
+
+main-manual-tied.o: $(COMMON_DIR)/nbs_main.c app-desc.h
+	$(OMPC_COMPILE) $(TIED_FLAGS) $(MANUAL_FLAGS) -I. -o $@ $<
+
+
+$(BIN_DIR)/$(PROGRAM).$(VERSION): main.o $(PROGRAM_OBJS) Makefile $(COMMON_DIR)/Makefile.common $(COMMON_OBJS)
+	$(OMPC_LINK) -o $@ main.o $(PROGRAM_OBJS) $(LIBS) $(COMMON_OBJS)
+
+$(BIN_DIR)/$(PROGRAM).$(VERSION)-manual: main-manual.o $(MANUAL_PROGRAM_OBJS) Makefile $(COMMON_DIR)/Makefile.common $(COMMON_OBJS)
+	$(OMPC_LINK) -o $@ main-manual.o $(MANUAL_PROGRAM_OBJS) $(LIBS) $(COMMON_OBJS)
+
+$(BIN_DIR)/$(PROGRAM).$(VERSION)-if_clause: main-if.o $(IF_PROGRAM_OBJS) Makefile $(COMMON_DIR)/Makefile.common $(COMMON_OBJS) 
+	$(OMPC_LINK) -o $@ main-if.o $(IF_PROGRAM_OBJS) $(LIBS) $(COMMON_OBJS)
+
+$(BIN_DIR)/$(PROGRAM).$(VERSION)-tied: main-tied.o $(TIED_PROGRAM_OBJS) Makefile $(COMMON_DIR)/Makefile.common $(COMMON_OBJS)
+	$(OMPC_LINK) -o $@ main-tied.o $(TIED_PROGRAM_OBJS) $(LIBS) $(COMMON_OBJS)
+
+$(BIN_DIR)/$(PROGRAM).$(VERSION)-manual-tied: main-manual-tied.o $(TIED_MANUAL_PROGRAM_OBJS) Makefile $(COMMON_DIR)/Makefile.common $(COMMON_OBJS)
+	$(OMPC_LINK) -o $@ main-manual-tied.o $(TIED_MANUAL_PROGRAM_OBJS) $(LIBS) $(COMMON_OBJS)
+
+$(BIN_DIR)/$(PROGRAM).$(VERSION)-if_clause-tied: main-if-tied.o $(TIED_IF_PROGRAM_OBJS) Makefile $(COMMON_DIR)/Makefile.common $(COMMON_OBJS)
+	$(OMPC_LINK) -o $@ main-if-tied.o $(TIED_IF_PROGRAM_OBJS) $(LIBS) $(COMMON_OBJS)
+
+
+endif
+
+
+clean:
+	rm -fr *.o
+
+dist-clean: clean
+
