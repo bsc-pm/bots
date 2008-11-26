@@ -194,6 +194,7 @@ void sparselu_par_call(float *BENCH[])
 #pragma omp parallel
 {
 #pragma omp single
+#pragma omp task untied
 {
    for (kk=0; kk<nbs_arg_size_1; kk++) 
    {
