@@ -1,0 +1,8 @@
+versions=all
+cpus=1,2..all/2
+
+[fib]
+inputs=20
+
+[alignment]
+inputs=alignment20.aa

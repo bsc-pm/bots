@@ -1,3 +1,5 @@
+DEF_CPUS=all
+DEF_VERSIONS=all
 
 print_help()
 {
@@ -10,17 +12,139 @@ parse_args ()
 {
 	while [ "$1" ]; do
 		case $1 in
-			"-c")   shift; ARG_CPUS=$(echo $1 | tr , ' ')
+			"-c")   shift; ARG_CPUS=$1
+				;;
+			"-f")	shift; ARG_SUITE=$1
 				;;
 			"-h") 	print_help $0; exit 
 				;;
-			"-i")   shift; ARG_INPUTS=$(echo $1 | tr , ' ')
+			"-i")   shift; ARG_INPUTS=$1
 				;;
-			"-v")   shift; ARG_VERSIONS=$(echo $1 | tr , ' ')
+			"-v")   shift; ARG_VERSIONS=$1
+				;;
+			*)
+				echo "Unkown option $1"; print_help $0; exit
 				;;
 		esac	
 	shift
 	done
+}
+
+parse_suite ()
+{
+	local file=$1
+	local scope=
+	local key value
+
+	while read line; do
+		if [ "${line:0:1}" = "[" ]; then
+			local n=${#line}
+			scope=${line:1:n-2}
+		elif [ -z "$scope" -o "$scope" = "$APP" ]; then
+			key=${line%=*}
+			value=${line#*=}
+	
+			case $key in
+				versions) SUITE_VERSIONS=$value;;
+				cpus) SUITE_CPUS=$value;;
+				sizes) SUITE_INPUTS=$value;;
+				inputs) SUITE_INPUTS=$value;;
+			esac
+		fi
+	done < $file
+}
+
+compute_max_cpus ()
+{
+#TODO: this probably only works in linux
+	max_cpus=$(cat /proc/cpuinfo  | grep ^processor | wc -l)
+}
+
+
+expand_cpus ()
+{
+	local tmp=$(echo $CPUS | tr , ' ' )
+
+	CPUS=
+	for cpus in $tmp; do
+		if echo $cpus | egrep "^[0-9]+$" > /dev/null; then
+			#is a number
+			CPUS="$CPUS $cpus"
+		elif echo $cpus | grep "\.\." > /dev/null; then
+			#is a range, range format is low..upper[/step]
+
+			low=${cpus%..*}
+			upper=${cpus#*..}
+
+			if echo $upper | grep / > /dev/null; then
+				step=${upper#*/}
+				upper=${upper%/*}
+			else
+				step=1
+			fi
+
+			if [ "$upper" = "all" ]; then
+				compute_max_cpus
+				upper=$max_cpus
+			fi
+
+			CPUS="$CPUS $(seq $low $step $upper)"
+			
+		elif [ "$cpus" = "all" ]; then
+			compute_max_cpus
+			CPUS="$CPUS $max_cpus"
+		fi
+	done
+
+	
+}
+
+expand_versions ()
+{
+	if [ "$VERSIONS" = "all" ]; then
+		VERSIONS=$(ls $BIN/$APP* | sed "s|$BIN/$APP.||g")
+	else
+		VERSIONS=$(echo $VERSIONS | tr , '  ')
+	fi
+}
+
+expand_inputs ()
+{
+	INPUTS=$(echo $INPUTS | tr , '  ')
+}
+
+set_values ()
+{
+	if [ "$ARG_SUITE" ]; then
+		parse_suite $ARG_SUITE
+	fi
+
+	if [ "$ARG_CPUS" ]; then
+		CPUS=$ARG_CPUS
+	elif [ "$SUITE_CPUS" ]; then
+		CPUS=$SUITE_CPUS
+	else
+		CPUS=$DEF_CPUS
+	fi 
+	expand_cpus
+
+	if [ "$ARG_VERSIONS" ]; then
+		VERSIONS=$ARG_VERSIONS
+	elif [ "$SUITE_VERSIONS" ]; then
+		VERSIONS=$SUITE_VERSIONS
+	else
+		VERSIONS=$DEF_VERSIONS
+	fi 
+	expand_versions
+
+	if [ "$ARG_INPUTS" ]; then
+		INPUTS=$ARG_INPUTS
+	elif [ "$SUITE_INPUTS" ]; then
+		INPUTS=$SUITE_INPUTS
+	else
+		INPUTS=$DEF_INPUTS
+	fi 
+	expand_inputs
 }
 
 exec_omp ()
@@ -34,11 +158,16 @@ exec_omp ()
 
 exec_all_sizes ()
 {
+
+#echo "cpus: $CPUS"
+#echo "versions: $VERSIONS"
+#echo "inputs: $INPUTS"
+
 for cpu in $CPUS; do
 for version in $VERSIONS; do
-for size in $SIZES; do
+for size in $INPUTS; do
 
-(echo $version | grep omp) && exec_omp $APP.$version $cpu -n $size
+(echo $version | grep omp) > /dev/null && exec_omp $APP.$version $cpu -n $size
 
 done
 done
