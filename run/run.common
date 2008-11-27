@@ -174,8 +174,39 @@ done
 done
 }
 
+exec_all_files ()
+{
+
+#echo "cpus: $CPUS"
+#echo "versions: $VERSIONS"
+#echo "inputs: $INPUTS"
+
+for cpu in $CPUS; do
+for version in $VERSIONS; do
+for file in $INPUTS; do
+
+if [ ! -e $file ]; then
+	if [ -e $INPUTS_DIR/$APP/$file ]; then
+		file=$INPUTS_DIR/$APP/$file
+	else
+		echo "Warning: Unknown input $file (skipping)"
+		continue
+	fi
+fi 
+
+(echo $version | grep omp) > /dev/null && exec_omp $APP.$version $cpu -f $file
+
+done
+done
+done
+}
 
 if [ -z "$APP" ]; then
 	APP=$(basename $0 | sed "s/run-\(.*\).sh/\1/")
 fi
+
+BIN=$BASE_DIR/bin
+RUN=$BASE_DIR/run
+INPUTS_DIR=$BASE_DIR/inputs
+
 

@@ -1,6 +1,6 @@
 #defaults
 
-DEF_INPUTS=10
+DEF_INPUTS=prot.100.aa
 
 #don't modify from here
 
@@ -9,5 +9,5 @@ source $BASE_DIR/run/run.common
 
 parse_args $*
 set_values
-exec_all_sizes
+exec_all_files
 

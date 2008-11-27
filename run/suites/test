@@ -5,4 +5,4 @@ cpus=1,2..all/2
 inputs=20
 
 [alignment]
-inputs=alignment20.aa
+inputs=prot.20.aa
