@@ -5,6 +5,8 @@
 #define NBS_APP_PARAMETERS_LIST ,nbs_arg_size_1,nbs_arg_size_1,nbs_arg_size_2,nbs_arg_size_2
 
 #define NBS_APP_CHECKING_NEEDS_SEQ
+#define NBS_APP_CHECK_USES_SEQ_RESULT
+#define NBS_APP_SELF_TIMING
 
 #define NBS_APP_USES_ARG_SIZE_1
 #define NBS_APP_DEF_ARG_SIZE_1 50
@@ -14,10 +16,7 @@
 #define NBS_APP_DEF_ARG_SIZE_2 100
 #define NBS_APP_DESC_ARG_SIZE_2 "Submatrix Size"
 
-#define NBS_APP_INIT float **SEQ,**BENCH;\
-   SEQ   = (float **) malloc(nbs_arg_size_1*nbs_arg_size_1*sizeof(float *));\
-   BENCH = (float **) malloc(nbs_arg_size_1*nbs_arg_size_1*sizeof(float *));\
-   genmat(SEQ); genmat(BENCH);
+#define NBS_APP_INIT float **SEQ,**BENCH;
 
 int checkmat (float *M, float *N);
 void genmat (float *M[]);
@@ -27,20 +26,17 @@ void lu0(float *diag);
 void bdiv(float *diag, float *row);
 void bmod(float *row, float *col, float *inner);
 void fwd(float *diag, float *col);
-void sparselu_seq_call(float *SEQ[]);
-void sparselu_par_call(float *BENCH[]);
+double sparselu_seq_call(float ***SEQ);
+double sparselu_par_call(float ***BENCH);
 int sparselu_check(float **SEQ, float **BENCH);
 
-#define KERNEL_INIT if (nbs_verbose_mode) print_structure("benchmark", BENCH);
-#define KERNEL_CALL sparselu_par_call(BENCH);
-#define KERNEL_FINI if (nbs_verbose_mode) print_structure("benchmark", BENCH);
+#define KERNEL_INIT
+#define KERNEL_CALL sparselu_par_call(&BENCH);
+#define KERNEL_FINI
 
-#define KERNEL_SEQ_INIT if (nbs_verbose_mode) print_structure("sequential", SEQ);
-#define KERNEL_SEQ_CALL sparselu_seq_call(SEQ);
-#define KERNEL_SEQ_FINI if (nbs_verbose_mode) print_structure("sequential", SEQ);
-
+#define KERNEL_SEQ_INIT
+#define KERNEL_SEQ_CALL sparselu_seq_call(&SEQ);
+#define KERNEL_SEQ_FINI
 
 #define KERNEL_CHECK sparselu_check(SEQ,BENCH);
-
-#define NBS_APP_CHECK_USES_SEQ_RESULT
 

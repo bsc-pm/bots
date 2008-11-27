@@ -1,6 +1,8 @@
 #LIBS = 
 #PROGRAM_OBJS=
 
+TIED_VERSIONS = yes
+
 BASE_DIR = ../../
 
 #

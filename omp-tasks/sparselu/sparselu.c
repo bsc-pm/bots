@@ -120,14 +120,15 @@ float * allocate_clean_block()
  **********************************************************************/
 void lu0(float *diag)
 {
-	int i, j, k;
+   int i, j, k;
 
-        for (k=0; k<nbs_arg_size_2; k++)
-           for (i=k+1; i<nbs_arg_size_2; i++) {
-              diag[i*nbs_arg_size_2+k] = diag[i*nbs_arg_size_2+k] / diag[k*nbs_arg_size_2+k];
-              for (j=k+1; j<nbs_arg_size_2; j++)
-            	 diag[i*nbs_arg_size_2+j] = diag[i*nbs_arg_size_2+j] - diag[i*nbs_arg_size_2+k] * diag[k*nbs_arg_size_2+j];
-	      }
+   for (k=0; k<nbs_arg_size_2; k++)
+      for (i=k+1; i<nbs_arg_size_2; i++)
+      {
+         diag[i*nbs_arg_size_2+k] = diag[i*nbs_arg_size_2+k] / diag[k*nbs_arg_size_2+k];
+         for (j=k+1; j<nbs_arg_size_2; j++)
+            diag[i*nbs_arg_size_2+j] = diag[i*nbs_arg_size_2+j] - diag[i*nbs_arg_size_2+k] * diag[k*nbs_arg_size_2+j];
+      }
 }
 
 /***********************************************************************
@@ -166,18 +167,37 @@ void fwd(float *diag, float *col)
          for (i=k+1; i<nbs_arg_size_2; i++)
             col[i*nbs_arg_size_2+j] = col[i*nbs_arg_size_2+j] - diag[i*nbs_arg_size_2+k]*col[k*nbs_arg_size_2+j];
 }
-void sparselu_seq_call(float *SEQ[])
+double sparselu_seq_call_old(float ***pSEQ)
 {
    int ii, jj, kk;
-   printf ("s1=%d,s2=%d\n",nbs_arg_size_1, nbs_arg_size_2);
+   long start, end;
+   double time;
+   float **SEQ  = (float **) malloc(nbs_arg_size_1*nbs_arg_size_1*sizeof(float *));
+   *pSEQ = SEQ;
+
+   genmat(SEQ);
+   if (nbs_verbose_mode) print_structure("sequential", SEQ);
+
+   start = nbs_usecs();
    for (kk=0; kk<nbs_arg_size_1; kk++) 
    {
       lu0(SEQ[kk*nbs_arg_size_1+kk]);
       for (jj=kk+1; jj<nbs_arg_size_1; jj++)
-         if (SEQ[kk*nbs_arg_size_1+jj] != NULL) fwd(SEQ[kk*nbs_arg_size_1+kk], SEQ[kk*nbs_arg_size_1+jj]);
+      {
+         if (SEQ[kk*nbs_arg_size_1+jj] != NULL)
+         {
+            fwd(SEQ[kk*nbs_arg_size_1+kk], SEQ[kk*nbs_arg_size_1+jj]);
+         }
+      }
       for (ii=kk+1; ii<nbs_arg_size_1; ii++) 
-         if (SEQ[ii*nbs_arg_size_1+kk] != NULL) bdiv (SEQ[kk*nbs_arg_size_1+kk], SEQ[ii*nbs_arg_size_1+kk]);
+      {
+         if (SEQ[ii*nbs_arg_size_1+kk] != NULL)
+         {
+            bdiv (SEQ[kk*nbs_arg_size_1+kk], SEQ[ii*nbs_arg_size_1+kk]);
+         }
+      }
       for (ii=kk+1; ii<nbs_arg_size_1; ii++)
+      {
          if (SEQ[ii*nbs_arg_size_1+kk] != NULL)
             for (jj=kk+1; jj<nbs_arg_size_1; jj++)
                if (SEQ[kk*nbs_arg_size_1+jj] != NULL)
@@ -185,44 +205,104 @@ void sparselu_seq_call(float *SEQ[])
                   if (SEQ[ii*nbs_arg_size_1+jj]==NULL) SEQ[ii*nbs_arg_size_1+jj] = allocate_clean_block();
                   bmod(SEQ[ii*nbs_arg_size_1+kk], SEQ[kk*nbs_arg_size_1+jj], SEQ[ii*nbs_arg_size_1+jj]);
                }
+      }
    }  
+   end = nbs_usecs();
+   time = ((double)(end-start))/1000000;
+   if (nbs_verbose_mode) print_structure("sequential", SEQ);
+   return time;
 }
-void sparselu_par_call(float *BENCH[])
+double sparselu_seq_call(float ***pBENCH)
 {
    int ii, jj, kk;
-   printf ("s1=%d,s2=%d\n",nbs_arg_size_1, nbs_arg_size_2);
-#pragma omp parallel
-{
-#pragma omp single
-#pragma omp task untied
-{
+   long start, end;
+   double time;
+   float **BENCH = (float **) malloc(nbs_arg_size_1*nbs_arg_size_1*sizeof(float *));
+   *pBENCH = BENCH;
+
+   genmat(BENCH);
+   if (nbs_verbose_mode) print_structure("sequential", BENCH);
+   start = nbs_usecs();
    for (kk=0; kk<nbs_arg_size_1; kk++) 
    {
       lu0(BENCH[kk*nbs_arg_size_1+kk]);
       for (jj=kk+1; jj<nbs_arg_size_1; jj++)
          if (BENCH[kk*nbs_arg_size_1+jj] != NULL)
-#pragma omp task untied firstprivate(kk, jj) shared(BENCH)
+         {
             fwd(BENCH[kk*nbs_arg_size_1+kk], BENCH[kk*nbs_arg_size_1+jj]);
+         }
       for (ii=kk+1; ii<nbs_arg_size_1; ii++) 
          if (BENCH[ii*nbs_arg_size_1+kk] != NULL)
-#pragma omp task untied firstprivate(kk, ii) shared(BENCH)
+         {
             bdiv (BENCH[kk*nbs_arg_size_1+kk], BENCH[ii*nbs_arg_size_1+kk]);
-#pragma omp taskwait
+         }
       for (ii=kk+1; ii<nbs_arg_size_1; ii++)
          if (BENCH[ii*nbs_arg_size_1+kk] != NULL)
             for (jj=kk+1; jj<nbs_arg_size_1; jj++)
                if (BENCH[kk*nbs_arg_size_1+jj] != NULL)
                {
-                  #pragma omp task untied firstprivate(kk, jj, ii) shared(BENCH)
-                  {
-                  if (BENCH[ii*nbs_arg_size_1+jj]==NULL) BENCH[ii*nbs_arg_size_1+jj] = allocate_clean_block();
-                  bmod(BENCH[ii*nbs_arg_size_1+kk], BENCH[kk*nbs_arg_size_1+jj], BENCH[ii*nbs_arg_size_1+jj]);
-                  }
+                     if (BENCH[ii*nbs_arg_size_1+jj]==NULL) BENCH[ii*nbs_arg_size_1+jj] = allocate_clean_block();
+                     bmod(BENCH[ii*nbs_arg_size_1+kk], BENCH[kk*nbs_arg_size_1+jj], BENCH[ii*nbs_arg_size_1+jj]);
                }
-#pragma omp taskwait
+
    }
+
+   end = nbs_usecs();
+   time = ((double)(end-start))/1000000;
+   if (nbs_verbose_mode) print_structure("sequential", BENCH);
+   return time;
 }
-}
+double sparselu_par_call(float ***pBENCH)
+{
+   int ii, jj, kk;
+   long start, end;
+   double time;
+   float **BENCH = (float **) malloc(nbs_arg_size_1*nbs_arg_size_1*sizeof(float *));
+   *pBENCH = BENCH;
+
+   genmat(BENCH);
+   if (nbs_verbose_mode) print_structure("benchmark", BENCH);
+   start = nbs_usecs();
+#pragma omp parallel
+#pragma omp single
+#pragma omp task untied
+   {
+   for (kk=0; kk<nbs_arg_size_1; kk++) 
+   {
+      lu0(BENCH[kk*nbs_arg_size_1+kk]);
+      for (jj=kk+1; jj<nbs_arg_size_1; jj++)
+         if (BENCH[kk*nbs_arg_size_1+jj] != NULL)
+            #pragma omp task untied firstprivate(kk, jj) shared(BENCH)
+         {
+            fwd(BENCH[kk*nbs_arg_size_1+kk], BENCH[kk*nbs_arg_size_1+jj]);
+         }
+      for (ii=kk+1; ii<nbs_arg_size_1; ii++) 
+         if (BENCH[ii*nbs_arg_size_1+kk] != NULL)
+            #pragma omp task untied firstprivate(kk, ii) shared(BENCH)
+         {
+            bdiv (BENCH[kk*nbs_arg_size_1+kk], BENCH[ii*nbs_arg_size_1+kk]);
+         }
+
+      #pragma omp taskwait
+
+      for (ii=kk+1; ii<nbs_arg_size_1; ii++)
+         if (BENCH[ii*nbs_arg_size_1+kk] != NULL)
+            for (jj=kk+1; jj<nbs_arg_size_1; jj++)
+               if (BENCH[kk*nbs_arg_size_1+jj] != NULL)
+               #pragma omp task untied firstprivate(kk, jj, ii) shared(BENCH)
+               {
+                     if (BENCH[ii*nbs_arg_size_1+jj]==NULL) BENCH[ii*nbs_arg_size_1+jj] = allocate_clean_block();
+                     bmod(BENCH[ii*nbs_arg_size_1+kk], BENCH[kk*nbs_arg_size_1+jj], BENCH[ii*nbs_arg_size_1+jj]);
+               }
+
+      #pragma omp taskwait
+   }
+   }
+
+   end = nbs_usecs();
+   time = ((double)(end-start))/1000000;
+   if (nbs_verbose_mode) print_structure("benchmark", BENCH);
+   return time;
 }
 int sparselu_check(float **SEQ, float **BENCH)
 {
