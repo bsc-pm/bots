@@ -1,0 +1,52 @@
+
+print_help()
+{
+	echo "$0 [options]"
+	echo "Where options are:"
+	echo "TODO"
+}
+
+parse_args ()
+{
+	while [ "$1" ]; do
+		case $1 in
+			"-c")   shift; ARG_CPUS=$(echo $1 | tr , ' ')
+				;;
+			"-h") 	print_help $0; exit 
+				;;
+			"-i")   shift; ARG_INPUTS=$(echo $1 | tr , ' ')
+				;;
+			"-v")   shift; ARG_VERSIONS=$(echo $1 | tr , ' ')
+				;;
+		esac	
+	shift
+	done
+}
+
+exec_omp ()
+{
+	command=$1
+	cpus=$2
+	shift 2
+
+	OMP_NUM_THREADS=$cpus $BIN/$command $*
+}
+
+exec_all_sizes ()
+{
+for cpu in $CPUS; do
+for version in $VERSIONS; do
+for size in $SIZES; do
+
+(echo $version | grep omp) && exec_omp $APP.$version $cpu -n $size
+
+done
+done
+done
+}
+
+
+if [ -z "$APP" ]; then
+	APP=$(basename $0 | sed "s/run-\(.*\).sh/\1/")
+fi
+
