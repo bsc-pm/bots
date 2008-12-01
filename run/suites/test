@@ -6,3 +6,9 @@ inputs=20
 
 [alignment]
 inputs=prot.20.aa
+
+[nqueens]
+inputs=12
+
+[sort]
+inputs=8388608
