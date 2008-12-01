@@ -156,6 +156,35 @@ exec_omp ()
 	OMP_NUM_THREADS=$cpus $BIN/$command $*
 }
 
+exec_app ()
+{
+	app=$1
+	version=$2
+	cpus=$3
+
+	shift 3
+
+	(echo $version | grep omp) > /dev/null && exec_omp $app.$version $cpu $*
+}
+
+exec_all_verbatim ()
+{
+
+#echo "cpus: $CPUS"
+#echo "versions: $VERSIONS"
+#echo "inputs: $INPUTS"
+
+for cpu in $CPUS; do
+for version in $VERSIONS; do
+for args in $INPUTS; do
+
+exec_app $APP $version $cpus $args
+
+done
+done
+done
+}
+
 exec_all_sizes ()
 {
 
@@ -167,7 +196,7 @@ for cpu in $CPUS; do
 for version in $VERSIONS; do
 for size in $INPUTS; do
 
-(echo $version | grep omp) > /dev/null && exec_omp $APP.$version $cpu -n $size
+exec_app $APP $version $cpus -n $size
 
 done
 done
@@ -194,7 +223,7 @@ if [ ! -e $file ]; then
 	fi
 fi 
 
-(echo $version | grep omp) > /dev/null && exec_omp $APP.$version $cpu -f $file
+exec_app $APP $version $cpus -f $file
 
 done
 done
