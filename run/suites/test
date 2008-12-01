@@ -12,3 +12,12 @@ inputs=12
 
 [sort]
 inputs=8388608
+
+[floorplan]
+inputs=input.5
+
+[fft]
+inputs=10485760
+
+[strassen]
+inputs=1024
