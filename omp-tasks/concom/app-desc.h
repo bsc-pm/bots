@@ -1,6 +1,6 @@
 #include "omp-tasks-app.h"
 
-#define NBS_APP_NAME "Coneted Components"
+#define NBS_APP_NAME "Connected Components"
 #define NBS_APP_PARAMETERS_DESC "N=%d,L=%d,M=%d"
 #define NBS_APP_PARAMETERS_LIST ,nbs_arg_size,nbs_arg_size_2,nbs_arg_size_1
 

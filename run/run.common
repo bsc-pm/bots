@@ -28,6 +28,7 @@ parse_args ()
 			"-v")   shift; ARG_VERSIONS=$1
 				;;
 			"-verify") shift; 
+				;;
 			*)
 				echo "Unkown option $1"; print_help $0; exit
 				;;
