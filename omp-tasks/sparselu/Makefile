@@ -1,15 +1,19 @@
-#LIBS = 
-#PROGRAM_OBJS=
+DIRS=sparselu_single sparselu_for
 
-TIED_VERSIONS = yes
+RECURSIVE=all-recursive clean-recursive dist-clean-recursive
 
-BASE_DIR = ../../
+all: all-recursive
+clean: clean-recursive
+dist-clean: dist-clean-recursive
 
-#
-# Don't change below here 
-#
+$(RECURSIVE): 
+	@failcom='exit 1';\
+        target=`echo $@ | sed s/-recursive//`; \
+        for subdir in $(DIRS); do \
+                (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$target) \
+          || eval $$failcom; \
+        done;
 
-include ../Makefile.version
-include $(BASE_DIR)/common/Makefile.common
-
+dist: dist-clean
+	echo "TODO"
 
