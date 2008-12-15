@@ -29,6 +29,7 @@ extern char nbs_cutoff[];
 extern int  nbs_cutoff_value;
 extern int  nbs_verbose_mode;
 
+extern int nbs_arg_size;
 extern int nbs_arg_size_1;
 extern int nbs_arg_size_2;
 

@@ -110,7 +110,7 @@ int  nbs_cutoff_value=NBS_CUTOFF_DEF_VALUE;
 #define NBS_MODEL_DESC "Unknown"
 #endif
 
-/* FIXME: remove arg size, use only arg_size_1 and arg_size_2 */
+/* FIXME: remove arg size to arg_size_0, use only arg_size_1 and arg_size_2 */
 #ifdef NBS_APP_USES_ARG_SIZE
 #ifndef NBS_APP_DEF_ARG_SIZE
 #error "Default vaule for argument size must be specified (#define NBS_APP_DEF_ARG_SIZE)"
@@ -139,6 +139,16 @@ int nbs_arg_size_1 = NBS_APP_DEF_ARG_SIZE_1;
 #error "Help description for argument size must be specified (#define NBS_APP_DESC_ARG_SIZE_2)"
 #endif
 int nbs_arg_size_2 = NBS_APP_DEF_ARG_SIZE_2;
+#endif
+
+#ifdef NBS_APP_USES_ARG_REPETITIONS
+#ifndef NBS_APP_DEF_ARG_REPETITIONS
+#error "Default vaule for argument repetitions must be specified (#define NBS_APP_DEF_ARG_REPETITIONS)"
+#endif
+#ifndef NBS_APP_DESC_ARG_REPETITIONS
+#error "Help description for argument repetitions must be specified (#define NBS_APP_DESC_ARG_REPETITIONS)"
+#endif
+int nbs_arg_repetitions = NBS_APP_DEF_ARG_REPETITIONS;
 #endif
 
 #ifdef NBS_APP_USES_ARG_FILE
@@ -180,6 +190,12 @@ void nbs_print_usage()
    fprintf(stderr, "Where options are:\n");
 #ifdef NBS_APP_USES_ARG_SIZE
    fprintf(stderr, "  -n <size>: "NBS_APP_DESC_ARG_SIZE"\n");
+#endif
+#ifdef NBS_APP_USES_ARG_SIZE
+   fprintf(stderr, "  -m <size>: "NBS_APP_DESC_ARG_SIZE_1"\n");
+#endif
+#ifdef NBS_APP_USES_ARG_SIZE
+   fprintf(stderr, "  -l <size>: "NBS_APP_DESC_ARG_SIZE_2"\n");
 #endif
 #ifdef NBS_APP_USES_ARG_FILE
    fprintf(stderr, "  -f <file>: "NBS_APP_DESC_ARG_FILE"\n");
@@ -241,7 +257,7 @@ nbs_get_params_common(int argc, char **argv)
                break;
 #endif
 #ifdef NBS_APP_USES_ARG_SIZE
-            case 'n': /* read argument size */
+            case 'n': /* read argument size 0 */
                argv[i][1] = '*';
                i++;
                if (argc == i) { nbs_print_usage(); exit(100); }
@@ -249,7 +265,7 @@ nbs_get_params_common(int argc, char **argv)
                break;
 #endif
 #ifdef NBS_APP_USES_ARG_SIZE_1
-            case 'N': /* read argument size 2 */
+            case 'm': /* read argument size 1 */
                argv[i][1] = '*';
                i++;
                if (argc == i) { nbs_print_usage(); exit(100); }
@@ -257,7 +273,7 @@ nbs_get_params_common(int argc, char **argv)
                break;
 #endif
 #ifdef NBS_APP_USES_ARG_SIZE_2
-            case 'M': /* read argument size 2 */
+            case 'l': /* read argument size 2 */
                argv[i][1] = '*';
                i++;
                if (argc == i) { nbs_print_usage(); exit(100); }
@@ -273,12 +289,14 @@ nbs_get_params_common(int argc, char **argv)
                if (argc == i) { nbs_print_usage(); exit(100); }
                nbs_output_format = atoi(argv[i]);
                break;
-            case 'r': /* set/unset header mode */
+#ifdef NBS_APP_USES_REPETITIONS
+            case 'r': /* set number of repetitions */
                argv[i][1] = '*';
                i++;
                if (argc == i) { nbs_print_usage(); exit(100); }
-               nbs_print_header = atoi(argv[i]);
+               nbs_arg_repetition = atoi(argv[i]);
                break;
+#endif
 #ifdef KERNEL_SEQ_CALL
             case 's': /* set/unset sequential execution */
                argv[i][1] = '*';
@@ -367,8 +385,10 @@ void nbs_set_info ()
 int
 main(int argc, char* argv[])
 {
+#ifndef NBS_APP_SELF_TIMING
    long nbs_t_start;
    long nbs_t_end;
+#endif
 
    nbs_get_params(argc,argv);
    nbs_set_info();
@@ -385,7 +405,7 @@ main(int argc, char* argv[])
       nbs_sequential_flag = 1;
       KERNEL_SEQ_INIT;
 #ifdef NBS_APP_SELF_TIMING
-      nbs_time_sequential = KERNEL_CALL;
+      nbs_time_sequential = KERNEL_SEQ_CALL;
 #else
       nbs_t_start = nbs_usecs();
       KERNEL_SEQ_CALL;

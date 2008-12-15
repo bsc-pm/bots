@@ -207,7 +207,7 @@ Comp Date;Comp Time;Comp Message;CC;CFLAGS;LD;LDFLAGS\n");
 	 fflush(stdout);
          break;
       case 1:
-         fprintf(stdout,"%s;%s;%s;%s;%s;%s", 
+         fprintf(stdout,"%s;%s;%s;%s;%s;%s;", 
               str_name, 
               str_parameters, 
               str_model, 
@@ -238,6 +238,7 @@ Comp Date;Comp Time;Comp Message;CC;CFLAGS;LD;LDFLAGS\n");
               str_ld,
               str_ldflags
          );
+         fprintf(stdout,"\n");
          break;
       default:
          nbs_error(NBS_ERROR,"No valid output format\n");
