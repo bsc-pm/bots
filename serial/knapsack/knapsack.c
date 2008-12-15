@@ -74,8 +74,7 @@ int read_input(const char *filename, struct item *items, int *capacity, int *n)
  * return the optimal solution for n items (first is e) and
  * capacity c. Value so far is v.
  */
-#if defined(IF_CUTOFF)
-void knapsack_par(struct item *e, int c, int n, int v, int *sol, int l)
+void knapsack(struct item *e, int c, int n, int v, int *sol)
 {
      int with, without, best;
      double ub;
@@ -104,73 +103,10 @@ void knapsack_par(struct item *e, int c, int n, int v, int *sol, int l)
      /* 
       * compute the best solution without the current item in the knapsack 
       */
-     #pragma omp task untied firstprivate(e,c,n,v,l) shared(without) if (l < nbs_cutoff_value)
-     knapsack_par(e + 1, c, n - 1, v, &without,l+1);
+     knapsack(e + 1, c, n - 1, v, &without);
 
      /* compute the best solution with the current item in the knapsack */
-     #pragma omp task untied firstprivate(e,c,n,v,l) shared(with)  if (l < nbs_cutoff_value)
-     knapsack_par(e + 1, c - e->weight, n - 1, v + e->value, &with,l+1);
-
-     #pragma omp taskwait
-     best = with > without ? with : without;
-
-     /* 
-      * notice the race condition here. The program is still
-      * correct, in the sense that the best solution so far
-      * is at least best_so_far. Moreover best_so_far gets updated
-      * when returning, so eventually it should get the right
-      * value. The program is highly non-deterministic.
-      */
-     if (best > best_so_far) best_so_far = best;
-
-     *sol = best;
-}
-#elif defined (MANUAL_CUTOFF)
-void knapsack_par(struct item *e, int c, int n, int v, int *sol, int l)
-{
-     int with, without, best;
-     double ub;
-
-     /* base case: full knapsack or no items */
-     if (c < 0)
-     {
-         *sol = INT_MIN;
-         return;
-     }
-
-     /* feasible solution, with value v */
-     if (n == 0 || c == 0)
-     {
-         *sol = v;
-         return;
-     }
-
-     ub = (double) v + c * e->value / e->weight;
-
-     if (ub < best_so_far) {
-	  /* prune ! */
-          *sol = INT_MIN;
-          return;
-     }
-     if (l < nbs_cutoff_value)
-     {
-        /* compute the best solution without the current item in the knapsack */
-        #pragma omp task untied firstprivate(e,c,n,v,l) shared(without)
-        knapsack_par(e + 1, c, n - 1, v, &without,l+1);
-
-        /* compute the best solution with the current item in the knapsack */
-        #pragma omp task untied firstprivate(e,c,n,v,l) shared(with)
-        knapsack_par(e + 1, c - e->weight, n - 1, v + e->value, &with,l+1);
-
-        #pragma omp taskwait
-     }
-     else
-     {
-        /* compute the best solution without the current item in the knapsack */
-        knapsack_seq(e + 1, c, n - 1, v, &without);
-        /* compute the best solution with the current item in the knapsack */
-        knapsack_seq(e + 1, c - e->weight, n - 1, v + e->value, &with);
-     }
+     knapsack(e + 1, c - e->weight, n - 1, v + e->value, &with);
 
      best = with > without ? with : without;
 
@@ -185,125 +121,9 @@ void knapsack_par(struct item *e, int c, int n, int v, int *sol, int l)
 
      *sol = best;
 }
-#else
-void knapsack_par(struct item *e, int c, int n, int v, int *sol, int l)
-{
-     int with, without, best;
-     double ub;
-
-     /* base case: full knapsack or no items */
-     if (c < 0)
-     {
-         *sol = INT_MIN;
-         return;
-     }
-
-     /* feasible solution, with value v */
-     if (n == 0 || c == 0)
-     {
-         *sol = v;
-         return;
-     }
-
-     ub = (double) v + c * e->value / e->weight;
-
-     if (ub < best_so_far) {
-	  /* prune ! */
-          *sol = INT_MIN;
-          return;
-     }
-     /* 
-      * compute the best solution without the current item in the knapsack 
-      */
-     #pragma omp task untied firstprivate(e,c,n,v,l) shared(without)
-     knapsack_par(e + 1, c, n - 1, v, &without,l+1);
-
-     /* compute the best solution with the current item in the knapsack */
-     #pragma omp task untied firstprivate(e,c,n,v,l) shared(with)
-     knapsack_par(e + 1, c - e->weight, n - 1, v + e->value, &with,l+1);
-
-     #pragma omp taskwait
-     best = with > without ? with : without;
-
-     /* 
-      * notice the race condition here. The program is still
-      * correct, in the sense that the best solution so far
-      * is at least best_so_far. Moreover best_so_far gets updated
-      * when returning, so eventually it should get the right
-      * value. The program is highly non-deterministic.
-      */
-     if (best > best_so_far) best_so_far = best;
-
-     *sol = best;
-}
-#endif
-void knapsack_seq(struct item *e, int c, int n, int v, int *sol)
-{
-     int with, without, best;
-     double ub;
-
-     /* base case: full knapsack or no items */
-     if (c < 0)
-     {
-         *sol = INT_MIN;
-         return;
-     }
-
-     /* feasible solution, with value v */
-     if (n == 0 || c == 0)
-     {
-         *sol = v;
-         return;
-     }
-
-     ub = (double) v + c * e->value / e->weight;
-
-     if (ub < best_so_far) {
-	  /* prune ! */
-          *sol = INT_MIN;
-          return;
-     }
-     /* 
-      * compute the best solution without the current item in the knapsack 
-      */
-     knapsack_seq(e + 1, c, n - 1, v, &without);
-
-     /* compute the best solution with the current item in the knapsack */
-     knapsack_seq(e + 1, c - e->weight, n - 1, v + e->value, &with);
-
-     best = with > without ? with : without;
-
-     /* 
-      * notice the race condition here. The program is still
-      * correct, in the sense that the best solution so far
-      * is at least best_so_far. Moreover best_so_far gets updated
-      * when returning, so eventually it should get the right
-      * value. The program is highly non-deterministic.
-      */
-     if (best > best_so_far) best_so_far = best;
-
-     *sol = best;
-}
-void knapsack_main_par (struct item *e, int c, int n, int v, int *sol)
+void knapsack_main(struct item *e, int c, int n, int v, int *sol)
 {
      best_so_far = INT_MIN;
-
-     #pragma omp parallel
-     #pragma omp single
-     #pragma omp task untied
-     knapsack_par(e, c, n, 0, sol, 0);
-
-     if (nbs_verbose_mode) printf("Best value for parallel execution is %d\n\n", *sol);
-}
-void knapsack_main_seq (struct item *e, int c, int n, int v, int *sol)
-{
-     best_so_far = INT_MIN;
-     knapsack_seq(e, c, n, 0, sol);
-     if (nbs_verbose_mode) printf("Best value for sequential execution is %d\n\n", *sol);
-}
-
-int  knapsack_check (int sol_seq, int sol_par)
-{
-   if (sol_seq == sol_par) return NBS_RESULT_SUCCESSFUL;
-   else return NBS_RESULT_UNSUCCESSFUL;
+     knapsack(e, c, n, 0, sol);
+     if (nbs_verbose_mode) printf("Best value is %d\n\n", *sol);
 }
