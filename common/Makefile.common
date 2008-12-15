@@ -39,7 +39,7 @@ CC_ALL_FLAGS=-c -I$(COMMON_DIR) $(OPT_FLAGS) $(CC_FLAGS) $(APP_FLAGS)
 # Link commands
 
 OMPLINK_ALL_FLAGS=$(OPT_FLAGS) $(OMPLINK_FLAGS) $(APP_FLAGS)
-CC_ALL_FLAGS=$(OPT_FLAGS) $(CC_FLAGS) $(APP_FLAGS)
+CLINK_ALL_FLAGS=$(OPT_FLAGS) $(CC_FLAGS) $(APP_FLAGS)
 
 # generic rules
 
@@ -53,6 +53,25 @@ endif
 
 COMMON_OBJS = $(COMMON_DIR)/nbs_common.o
 
+
+ifeq ($(VERSION),serial)
+
+TARGETS = $(BIN_DIR)/$(PROGRAM).$(VERSION)
+
+all: $(TARGETS)
+
+.c.o: Makefile $(COMMON_DIR)/Makefile.common 
+	$(CC) $(CC_ALL_FLAGS) -o $@ $<
+
+INFO_FLAGS=-DCDATE="\"$(TODAY)\"" -DCC="\"$(CC)\"" -DLD="\"$(CLINK)\"" -DLDFLAGS="\"$(CLINK_ALL_FLAGS) $(LIBS)\""
+
+main.o: $(COMMON_DIR)/nbs_main.c app-desc.h Makefile $(COMMON_DIR)/Makefile.common
+	$(CC) $(CC_ALL_FLAGS) -I. -o $@ $< $(INFO_FLAGS) -DCFLAGS="\"$(CC_ALL_FLAGS) -I.\""
+
+$(BIN_DIR)/$(PROGRAM).$(VERSION): main.o $(PROGRAM_OBJS) Makefile $(COMMON_DIR)/Makefile.common $(COMMON_OBJS)
+	$(CLINK) $(CLINK_ALL_FLAGS) -o $@ main.o $(PROGRAM_OBJS) $(LIBS) $(COMMON_OBJS)
+
+endif
 
 ifeq ($(VERSION),omp-tasks)
 
