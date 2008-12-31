@@ -73,6 +73,8 @@ static int par_res, seq_res;
 
 void fib0 (int n)
 {
+	#pragma omp parallel
+	#pragma omp single
 	par_res = fib(n);
 	printf("Fibonacci result for %d is %d\n",n,par_res);
 }
