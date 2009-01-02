@@ -191,10 +191,10 @@ void nbs_print_usage()
 #ifdef NBS_APP_USES_ARG_SIZE
    fprintf(stderr, "  -n <size>: "NBS_APP_DESC_ARG_SIZE"\n");
 #endif
-#ifdef NBS_APP_USES_ARG_SIZE
+#ifdef NBS_APP_USES_ARG_SIZE_1
    fprintf(stderr, "  -m <size>: "NBS_APP_DESC_ARG_SIZE_1"\n");
 #endif
-#ifdef NBS_APP_USES_ARG_SIZE
+#ifdef NBS_APP_USES_ARG_SIZE_2
    fprintf(stderr, "  -l <size>: "NBS_APP_DESC_ARG_SIZE_2"\n");
 #endif
 #ifdef NBS_APP_USES_ARG_FILE
