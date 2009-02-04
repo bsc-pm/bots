@@ -203,11 +203,31 @@ set_values ()
 
 exec_omp ()
 {
-	command=$1
-	cpus=$2
+	command=$2
+	cpus=$1
 	shift 2
 
-	OMP_NUM_THREADS=$cpus $BIN/$command $*
+	OMP_NUM_THREADS=$cpus $command $*
+}
+
+exec_external ()
+{
+	local cpus=$1
+	local app=$2
+	local version=$3
+	shift 3
+
+	local bin=$BIN/$app.$version
+	local args="$*"
+
+	local EXEC=$EXEC_MANAGER
+	EXEC=$(echo $EXEC | sed s/%app%/$app/ | sed s/%cpus%/$cpus/ | sed s/%version%/$version/ )
+	EXEC=$(echo $EXEC | sed s@%bin%@$bin@ | sed "s@%args%@$args@" | sed "s@%command%@$bin $args@" )
+	if [ "$file" -o "$size" ]; then
+		EXEC=$(echo $EXEC | sed s@%input%@${file}${size}@ )
+	fi
+
+	$EXEC
 }
 
 exec_app ()
@@ -215,10 +235,10 @@ exec_app ()
 	app=$1
 	version=$2
 	cpus=$3
-
 	shift 3
 
-	(echo $version | grep omp) > /dev/null && exec_omp $app.$version $cpu $* && return 
+	[ "$EXEC_MANAGER" ] && exec_external $cpus $app $version $* && return
+	(echo $version | grep omp) > /dev/null && exec_omp $cpus $app.$version $* && return
 
 	echo "FATAL ERROR: Don't know how to execute $version"
 	exit 1
@@ -249,7 +269,7 @@ exec_all_sizes ()
 #echo "versions: $VERSIONS"
 #echo "inputs: $INPUTS"
 
-for cpu in $CPUS; do
+for cpus in $CPUS; do
 for version in $VERSIONS; do
 for size in $INPUTS; do
 
@@ -268,7 +288,7 @@ exec_all_files ()
 #echo "versions: $VERSIONS"
 #echo "inputs: $INPUTS"
 
-for cpu in $CPUS; do
+for cpus in $CPUS; do
 for version in $VERSIONS; do
 for file in $INPUTS; do
 
