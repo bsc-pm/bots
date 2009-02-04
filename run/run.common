@@ -5,12 +5,14 @@ print_help()
 {
 	echo "$0 [options]"
 	echo "Where options are:"
-	echo "-c cpus_list	List of number of cpus to use for executions"
-	echo "-f suite		Suite file to define benchmarks execution"
-	echo "-h		Prints this help"
-	echo "-i inputs_list	List of inputs to use for executions"
-	echo "-v versions_list	List of versions of the benchmark to use for execution"
-	echo "-verify		Enable verification (TODO)"
+	echo "-c cpus_list		List of number of cpus to use for executions"
+	echo "-C class_list		List of execution classes to use (TODO)"
+	echo "-f suite			Suite file to define benchmarks execution"
+	echo "-h			Prints this help"
+	echo "-i inputs_list		List of inputs to use for executions"
+	echo "-v versions_list		List of versions of the benchmark to use for execution"
+	echo "-verify			Enable verification (TODO)"
+	echo "-verbose			Show extra messages (TODO)"
 }
 
 parse_args ()
@@ -18,6 +20,8 @@ parse_args ()
 	while [ "$1" ]; do
 		case $1 in
 			"-c")   shift; ARG_CPUS=$1
+				;;
+			"-C")   shift; ARG_CLASSES=$1
 				;;
 			"-f")	shift; ARG_SUITE=$1
 				;;
@@ -27,7 +31,9 @@ parse_args ()
 				;;
 			"-v")   shift; ARG_VERSIONS=$1
 				;;
-			"-verify") shift; 
+			"-verify")  
+				;;
+			"-verbose") VERBOSE=yes
 				;;
 			*)
 				echo "Unkown option $1"; print_help $0; exit
@@ -37,16 +43,50 @@ parse_args ()
 	done
 }
 
+parse_class_file ()
+{
+	local file=$SUITE_DIR/$1
+	shift
+
+	while read line; do
+		if [ "${line:0:1}" = "[" ]; then
+			local n=${#line}
+			class=${line:1:n-2}
+
+			# is one of the class definitions we want to load?
+			# otherwise skip
+			skip=true
+			for c in $*; do
+				if [ $c = $class ]; then
+					skip=
+					break
+				fi	
+			done
+		else
+			[ "$skip" ] && break
+			key=${line%=*}
+			value=${line#*=}
+	
+			case $key in
+				sizes) CLASS_INPUTS="$CLASS_INPUTS $value";;
+				inputs) CLASS_INPUTS="$CLASS_INPUTS $value";;
+			esac
+		fi
+	done < $file
+}
+
 parse_suite ()
 {
 	local file=$1
 	local scope=
 	local key value
+	local found=no
 
 	while read line; do
 		if [ "${line:0:1}" = "[" ]; then
 			local n=${#line}
 			scope=${line:1:n-2}
+			[ "$scope" = "$APP" ] && found=yes;	
 		elif [ -z "$scope" -o "$scope" = "$APP" ]; then
 			key=${line%=*}
 			value=${line#*=}
@@ -59,6 +99,7 @@ parse_suite ()
 			esac
 		fi
 	done < $file
+	[ "$found" = "no" ] && echo "Application $APP not in suite" && exit
 }
 
 compute_max_cpus ()
@@ -122,8 +163,12 @@ expand_inputs ()
 
 set_values ()
 {
-	if [ "$ARG_SUITE" ]; then
-		parse_suite $ARG_SUITE
+#	if [ "$ARG_SUITE" ]; then
+#		parse_suite $ARG_SUITE
+#	fi
+
+	if [ "$ARG_CLASSES" ]; then
+		parse_class_file $APP $(echo $ARG_CLASSES | tr , ' ')
 	fi
 
 	if [ "$ARG_CPUS" ]; then
@@ -146,6 +191,8 @@ set_values ()
 
 	if [ "$ARG_INPUTS" ]; then
 		INPUTS=$ARG_INPUTS
+	elif [ "$CLASS_INPUTS" ]; then
+		INPUTS=$CLASS_INPUTS
 	elif [ "$SUITE_INPUTS" ]; then
 		INPUTS=$SUITE_INPUTS
 	else
@@ -171,7 +218,10 @@ exec_app ()
 
 	shift 3
 
-	(echo $version | grep omp) > /dev/null && exec_omp $app.$version $cpu $*
+	(echo $version | grep omp) > /dev/null && exec_omp $app.$version $cpu $* && return 
+
+	echo "FATAL ERROR: Don't know how to execute $version"
+	exit 1
 }
 
 exec_all_verbatim ()
@@ -203,6 +253,7 @@ for cpu in $CPUS; do
 for version in $VERSIONS; do
 for size in $INPUTS; do
 
+[ "$VERBOSE" ] && echo "Executing $APP($version) with $cpus CPUS and size $size"
 exec_app $APP $version $cpus -n $size
 
 done
@@ -230,6 +281,7 @@ if [ ! -e $file ]; then
 	fi
 fi 
 
+[ "$VERBOSE" ] && echo "Executing $APP($version) with $cpus CPUS and input file $file"
 exec_app $APP $version $cpus -f $file
 
 done
@@ -243,6 +295,8 @@ fi
 
 BIN=$BASE_DIR/bin
 RUN=$BASE_DIR/run
+CLASS_DIR=$RUN/class
+SUITE_DIR=$RUN/suites
 INPUTS_DIR=$BASE_DIR/inputs
 
 
