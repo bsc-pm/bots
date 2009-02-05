@@ -1,8 +1,9 @@
 versions=all
 cpus=1,2..all/2
+class=test
 
-[fib]
-inputs=20
+
+include fib
 
 [alignment]
 inputs=prot.20.aa

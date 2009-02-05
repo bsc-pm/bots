@@ -1,0 +1,12 @@
+[test]
+inputs=20
+
+[small]
+inputs=40
+
+[medium]
+inputs=50
+
+[large]
+inputs=53
+

@@ -1,6 +1,6 @@
 #defaults
 
-DEF_INPUTS=10
+DEF_INPUTS=20
 
 #don't modify from here
 
