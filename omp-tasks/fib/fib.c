@@ -13,16 +13,16 @@ int fib_seq (int n)
 
 #if defined(IF_CUTOFF)
 
-int fib (int n)
+int fib (int n,int d)
 {
 	int x, y;
 	if (n < 2) return n;
 
-	#pragma omp task untied shared(x) firstprivate(n) if(n < nbs_cutoff_value)
-	x = fib(n - 1);
+	#pragma omp task untied shared(x) firstprivate(n) if(d < nbs_cutoff_value)
+	x = fib(n - 1,d+1);
 
-	#pragma omp task untied shared(y) firstprivate(n) if(n < nbs_cutoff_value)
-	y = fib(n - 2);
+	#pragma omp task untied shared(y) firstprivate(n) if(d < nbs_cutoff_value)
+	y = fib(n - 2,d+1);
 
 	#pragma omp taskwait
 	return x + y;
@@ -30,17 +30,17 @@ int fib (int n)
 
 #elif defined(MANUAL_CUTOFF)
 
-int fib (int n)
+int fib (int n, int d)
 {
 	int x, y;
 	if (n < 2) return n;
 
-	if ( n < nbs_cutoff_value ) {
+	if ( d < nbs_cutoff_value ) {
 		#pragma omp task untied shared(x) firstprivate(n)
-		x = fib(n - 1);
+		x = fib(n - 1,d+1);
 
 		#pragma omp task untied shared(y) firstprivate(n)
-		y = fib(n - 2);
+		y = fib(n - 2,d+1);
 
 		#pragma omp taskwait
 	} else {
@@ -75,7 +75,11 @@ void fib0 (int n)
 {
 	#pragma omp parallel
 	#pragma omp single
+#if defined(MANUAL_CUTOFF) || defined(IF_CUTOFF)
+	par_res = fib(n,0);
+#else
 	par_res = fib(n);
+#endif
 	printf("Fibonacci result for %d is %d\n",n,par_res);
 }
 
