@@ -63,7 +63,7 @@ parse_class_file ()
 				fi	
 			done
 		else
-			[ "$skip" ] && break
+			[ "$skip" ] && continue
 			key=${line%=*}
 			value=${line#*=}
 	
@@ -203,7 +203,7 @@ set_values ()
 
 exec_omp ()
 {
-	command=$2
+	command=$BIN/$2
 	cpus=$1
 	shift 2
 
