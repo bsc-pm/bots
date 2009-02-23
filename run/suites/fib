@@ -1,8 +1,8 @@
 [test]
-inputs=20
+inputs=35
 
 [small]
-inputs=40
+inputs=45
 
 [medium]
 inputs=50

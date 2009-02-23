@@ -1,0 +1,9 @@
+[test]
+inputs=512
+
+[small]
+inputs=2048
+
+[medium]
+inputs=8192
+

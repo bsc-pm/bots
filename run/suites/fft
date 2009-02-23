@@ -8,4 +8,5 @@ inputs=33554432
 inputs=134217728
 
 [large]
-inputs=536870912
+inputs=268435456
+
