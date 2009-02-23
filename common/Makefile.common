@@ -67,6 +67,10 @@ endif
 
 COMMON_OBJS = $(COMMON_DIR)/nbs_common.o
 
+ifeq ($(VERSION),common)
+.c.o: Makefile $(COMMON_DIR)/Makefile.common
+	$(CC) $(CC_ALL_FLAGS) -o $@ $<
+endif
 
 ifeq ($(VERSION),serial)
 

@@ -5,6 +5,7 @@
 #include <time.h>
 #include <sys/time.h>
 #include <sys/utsname.h>
+#include <sys/resource.h>
 
 #include "nbs_common.h"
 #include "nbs_main.h"
@@ -119,6 +120,9 @@ void nbs_print_results()
    char str_ld[128];
    char str_ldflags[128];
    char str_cutoff[128];
+   struct rusage usage;
+
+   getrusage(RUSAGE_SELF,&usage);
 
    /* compute output strings */
    sprintf(str_name, "%s", nbs_name);
@@ -190,12 +194,13 @@ Comp Date;Comp Time;Comp Message;CC;CFLAGS;LD;LDFLAGS\n");
          fprintf(stdout, "Parameters          = %s\n", str_parameters); /*fix*/
          fprintf(stdout, "Model               = %s\n", str_model); 
          fprintf(stdout, "Embedded cut-off    = %s\n", str_cutoff); 
-         fprintf(stdout, "Resources           = %s\n", str_resources);
+         fprintf(stdout, "# of Threads        = %s\n", str_resources);
          fprintf(stdout, "Verification        = %s\n", str_result);
 
          fprintf(stdout, "Time Program        = %s seconds\n", str_time_program);
          fprintf(stdout, "Time Sequential     = %s seconds\n", str_time_sequential);
          fprintf(stdout, "Speed-up            = %s\n", str_speed_up);
+	 fprintf(stdout, "Memory usage        = %ld\n", usage.ru_idrss );
 
          fprintf(stdout, "Tasks               = %s\n", str_number_of_tasks);
          fprintf(stdout, "Tasks/Sec           = %s\n", str_number_of_tasks_per_second);
