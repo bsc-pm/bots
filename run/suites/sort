@@ -1,0 +1,11 @@
+[test]
+inputs=8388608
+
+[small]
+inputs=33554432
+
+[medium]
+inputs=104857600
+
+[large]
+inputs=314572800

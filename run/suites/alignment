@@ -1,0 +1,9 @@
+[test]
+inputs=prot.20.aa
+
+[small]
+inputs=prot.20.aa
+
+[medium]
+inputs=prot.100.aa
+

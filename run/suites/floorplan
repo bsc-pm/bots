@@ -1,0 +1,9 @@
+[test]
+inputs=input.5
+
+[small]
+inputs=input.15
+
+[medium]
+inputs=input.20
+
