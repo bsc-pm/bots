@@ -37,3 +37,6 @@ extern int nbs_arg_size_2;
 #define NBS_RESULT_SUCCESSFUL 1
 #define NBS_RESULT_UNSUCCESSFUL 2
 
+#define FALSE 0
+#define TRUE 1
+

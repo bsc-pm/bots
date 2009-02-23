@@ -21,13 +21,6 @@
 #define CMESSAGE ""
 #endif
 
-#ifndef FALSE
-#define FALSE (0)
-#endif
-#ifndef TRUE
-#define TRUE (1)
-#endif
-
 #define NBS_ERROR                         0
 #define NBS_ERROR_NOT_ENOUGH_MEMORY       1
 #define NBS_ERROR_UNRECOGNIZED_PARAMETER  2

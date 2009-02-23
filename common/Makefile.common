@@ -1,24 +1,33 @@
-
-#directories
-
-BIN_DIR=$(BASE_DIR)/bin
-COMMON_DIR=$(BASE_DIR)/common
-
 #configure compilers and linkers
 
-CILKC=cilkc
-OMPC=mcc 
-CC=gcc
+ifndef CILKC
+CILKC := cilkc
+endif
 
+ifndef OMPC
+OMPC=mcc
+endif
+
+ifndef CC
+CC=gcc
+endif
+
+ifndef OMPLINK
 OMPLINK=mcc
+endif
+
+ifndef CLIK
 CLINK=gcc
+endif
 
 #configue compiler and linker flags
 
+ifndef OPT_FLAGS
 OPT_FLAGS=-O3 
+endif
 
-CC_FLAGS=-Wall
-OMPC_FLAGS=-Wall
+CC_FLAGS=-Wall 
+OMPC_FLAGS=-Wall 
 CILKC_FLAGS=
 
 CLINK_FLAGS=
@@ -28,6 +37,11 @@ CILKLINK_FLAGS=
 
 # Don't change below this line
 ##############################
+
+#directories
+
+BIN_DIR=$(BASE_DIR)/bin
+COMMON_DIR=$(BASE_DIR)/common
 
 TODAY := $(shell date "+%Y/%m/%d;%H:%M")
 

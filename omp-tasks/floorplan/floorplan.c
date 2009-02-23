@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <omp.h>
+#include "app-desc.h"
 
 #define ROWS 64
 #define COLS 64
@@ -38,7 +39,7 @@ coor MIN_FOOTPRINT;
 int N;
 
 /* compute all possible locations for nw corner for cell */
-int starts(int id, int shape, coor *NWS, struct cell *cells) {
+static int starts(int id, int shape, coor *NWS, struct cell *cells) {
   int i, n, top, bot, lhs, rhs;
   int rows, cols, left, above;
 
@@ -100,7 +101,7 @@ int starts(int id, int shape, coor *NWS, struct cell *cells) {
    by the cells top, bottom, left, and right edges. If the cell can
    not be layed down, return 0; else 1.
 */
-int lay_down(int id, ibrd board, struct cell *cells) {
+static int lay_down(int id, ibrd board, struct cell *cells) {
   int  i, j, top, bot, lhs, rhs;
 
   top = cells[id].top;
@@ -110,7 +111,7 @@ int lay_down(int id, ibrd board, struct cell *cells) {
 
   for (i = top; i <= bot; i++) {
   for (j = lhs; j <= rhs; j++) {
-      if (board[i][j] == 0) board[i][j] = id;
+      if (board[i][j] == 0) board[i][j] = (char)id;
       else                  return(0);
   } }
 
@@ -118,7 +119,7 @@ int lay_down(int id, ibrd board, struct cell *cells) {
 }
 
 
-void read_inputs() {
+static void read_inputs() {
   int i, j, n;
 
   fscanf(inputFile, "%d", &n);
@@ -153,7 +154,7 @@ void read_inputs() {
 }
 
 
-void write_outputs() {
+static void write_outputs() {
   int i, j;
 
   printf("Minimum area = %d\n\n", MIN_AREA);
@@ -167,7 +168,7 @@ void write_outputs() {
 } }
 
 
-void add_cell_ser (int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS) {
+static void add_cell_ser (int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS) {
   int  i, j, nn, area;
 
   ibrd board;
@@ -232,7 +233,7 @@ _end:;
   }
 
 
-void add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS,int level) {
+static void add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS,int level) {
   int  i, j, nn, area;
 
   ibrd board;
@@ -245,7 +246,7 @@ void add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS,int level) 
 /* for all possible locations */
       for (j = 0; j < nn; j++) {
 #pragma omp task default(none) untied private(board, footprint,area) \
-firstprivate(NWS,i,j,id,nn) \
+firstprivate(NWS,i,j,id,nn,level) shared(max_level) \
 shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD) 
 {
 	  struct cell cells[N+1];
@@ -330,7 +331,7 @@ void floorplan_init (char *filename)
     
 }
 
-void compute_floorplan ()
+void compute_floorplan (void)
 {
     coor footprint;
     /* footprint of initial board is zero */
