@@ -32,6 +32,9 @@
 #include "nbs.h"
 
 int best_so_far;
+int number_of_tasks;
+
+#pragma omp threadprivate(number_of_tasks)
 
 int compare(struct item *a, struct item *b)
 {
@@ -80,6 +83,7 @@ void knapsack_par(struct item *e, int c, int n, int v, int *sol, int l)
      int with, without, best;
      double ub;
 
+     number_of_tasks++;
      /* base case: full knapsack or no items */
      if (c < 0)
      {
@@ -131,6 +135,7 @@ void knapsack_par(struct item *e, int c, int n, int v, int *sol, int l)
      int with, without, best;
      double ub;
 
+     number_of_tasks++;
      /* base case: full knapsack or no items */
      if (c < 0)
      {
@@ -191,6 +196,7 @@ void knapsack_par(struct item *e, int c, int n, int v, int *sol, int l)
      int with, without, best;
      double ub;
 
+     number_of_tasks++;
      /* base case: full knapsack or no items */
      if (c < 0)
      {
@@ -242,6 +248,7 @@ void knapsack_seq(struct item *e, int c, int n, int v, int *sol)
      int with, without, best;
      double ub;
 
+     number_of_tasks++;
      /* base case: full knapsack or no items */
      if (c < 0)
      {
@@ -289,16 +296,26 @@ void knapsack_main_par (struct item *e, int c, int n, int v, int *sol)
      best_so_far = INT_MIN;
 
      #pragma omp parallel
-     #pragma omp single
-     #pragma omp task untied
-     knapsack_par(e, c, n, 0, sol, 0);
+     {
+        number_of_tasks = 0;
+        #pragma omp single
+        #pragma omp task untied
+        {
+           knapsack_par(e, c, n, 0, sol, 0);
+        }
 
+        #pragma omp critical
+        nbs_number_of_tasks += number_of_tasks;
+     }
      if (nbs_verbose_mode) printf("Best value for parallel execution is %d\n\n", *sol);
 }
 void knapsack_main_seq (struct item *e, int c, int n, int v, int *sol)
 {
      best_so_far = INT_MIN;
+     number_of_tasks = 0;
+
      knapsack_seq(e, c, n, 0, sol);
+
      if (nbs_verbose_mode) printf("Best value for sequential execution is %d\n\n", *sol);
 }
 

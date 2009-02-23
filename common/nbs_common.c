@@ -106,6 +106,8 @@ void nbs_print_results()
    char str_time_program[15];
    char str_time_sequential[15];
    char str_speed_up[15];
+   char str_number_of_tasks[15];
+   char str_number_of_tasks_per_second[15];
    char str_exec_date[15];
    char str_exec_message[128];
    char str_architecture[128];
@@ -145,6 +147,10 @@ void nbs_print_results()
    if (nbs_sequential_flag)
    sprintf(str_speed_up, "%3.2f", nbs_time_sequential/nbs_time_program);
    else sprintf(str_speed_up, "n/a");
+
+   sprintf(str_number_of_tasks, "%3.2f", (float) nbs_number_of_tasks);
+   sprintf(str_number_of_tasks_per_second, "%3.2f", (float) nbs_number_of_tasks/nbs_time_program);
+
    sprintf(str_exec_date, "%s", nbs_exec_date);
    sprintf(str_exec_message, "%s", nbs_exec_message);
    nbs_get_architecture(str_architecture);
@@ -190,6 +196,9 @@ Comp Date;Comp Time;Comp Message;CC;CFLAGS;LD;LDFLAGS\n");
          fprintf(stdout, "Time Program        = %s seconds\n", str_time_program);
          fprintf(stdout, "Time Sequential     = %s seconds\n", str_time_sequential);
          fprintf(stdout, "Speed-up            = %s\n", str_speed_up);
+
+         fprintf(stdout, "Tasks               = %s\n", str_number_of_tasks);
+         fprintf(stdout, "Tasks/Sec           = %s\n", str_number_of_tasks_per_second);
 
          fprintf(stdout, "Execution Date      = %s\n", str_exec_date);
          fprintf(stdout, "Execution Message   = %s\n", str_exec_message);

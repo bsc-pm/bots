@@ -5,13 +5,14 @@
 #define NBS_APP_PARAMETERS_LIST ,nbs_arg_file
 
 #define NBS_APP_CHECK_USES_SEQ_RESULT
+
 //#define NBS_APP_SELF_TIMING
 
 #define NBS_APP_USES_ARG_FILE
 #define NBS_APP_DEF_ARG_FILE "Input filename"
 #define NBS_APP_DESC_ARG_FILE
 
-#define NBS_CUTOFF_DEF_VALUE 3
+#define NBS_CUTOFF_DEF_VALUE 24
 
 /* every item in the knapsack has a weight and a value */
 #define MAX_ITEMS 256

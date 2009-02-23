@@ -24,6 +24,7 @@ extern char nbs_ldflags[];
 /* time variables */
 extern double nbs_time_program;
 extern double nbs_time_sequential;
+extern int    nbs_number_of_tasks;
 
 extern char nbs_cutoff[];
 extern int  nbs_cutoff_value;

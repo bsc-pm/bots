@@ -57,6 +57,7 @@ char nbs_cutoff[128];
 /* time variables */
 double nbs_time_program = 0.0;
 double nbs_time_sequential = 0.0;
+int    nbs_number_of_tasks = 0;
 
 #if defined(MANUAL_CUTOFF) || defined(IF_CUTOFF)
 int  nbs_cutoff_value=NBS_CUTOFF_DEF_VALUE;
