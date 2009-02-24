@@ -31,7 +31,8 @@ parse_args ()
 				;;
 			"-v")   shift; ARG_VERSIONS=$1
 				;;
-			"-verify")  
+			"-verify")
+			        VERIFY="-c 1"
 				;;
 			"-verbose") VERBOSE=yes
 				;;
@@ -221,10 +222,11 @@ exec_external ()
 	local args="$*"
 
 	local EXEC=$EXEC_MANAGER
+	[ "$file" ] && local basefile=$(basename $file | tr -d .)
 	EXEC=$(echo $EXEC | sed s/%app%/$app/ | sed s/%cpus%/$cpus/ | sed s/%version%/$version/ )
 	EXEC=$(echo $EXEC | sed s@%bin%@$bin@ | sed "s@%args%@$args@" | sed "s@%command%@$bin $args@" )
 	if [ "$file" -o "$size" ]; then
-		EXEC=$(echo $EXEC | sed s@%input%@${file}${size}@ )
+		EXEC=$(echo $EXEC | sed s@%input%@${basefile}${size}@ )
 	fi
 
 	$EXEC
@@ -274,7 +276,7 @@ for version in $VERSIONS; do
 for size in $INPUTS; do
 
 [ "$VERBOSE" ] && echo "Executing $APP($version) with $cpus CPUS and size $size"
-exec_app $APP $version $cpus -n $size
+exec_app $APP $version $cpus -n $size $VERIFY
 
 done
 done
@@ -302,7 +304,7 @@ if [ ! -e $file ]; then
 fi 
 
 [ "$VERBOSE" ] && echo "Executing $APP($version) with $cpus CPUS and input file $file"
-exec_app $APP $version $cpus -f $file
+exec_app $APP $version $cpus -f $file $VERIFY
 
 done
 done
