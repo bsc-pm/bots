@@ -1,0 +1,12 @@
+[test]
+inputs=knapsack-016.input
+
+[small]
+inputs=knapsack-036.input
+
+[medium]
+inputs=knapsack-040.input
+
+[large]
+inputs=knapsack-044.input
+
