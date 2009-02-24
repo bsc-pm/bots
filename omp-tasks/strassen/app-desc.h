@@ -2,13 +2,13 @@
 
 #define NBS_APP_NAME "Strassen"
 #define NBS_APP_PARAMETERS_DESC "N=%d"
-#define NBS_APP_PARAMETERS_LIST ,nbs_arg_size_1
+#define NBS_APP_PARAMETERS_LIST ,nbs_arg_size
 
 #define NBS_APP_CHECKING_NEEDS_SEQ
 
-#define NBS_APP_USES_ARG_SIZE_1
-#define NBS_APP_DEF_ARG_SIZE_1 1024
-#define NBS_APP_DESC_ARG_SIZE_1 "Matrix Size"
+#define NBS_APP_USES_ARG_SIZE
+#define NBS_APP_DEF_ARG_SIZE 1024
+#define NBS_APP_DESC_ARG_SIZE "Matrix Size"
 
 #define NBS_APP_USES_ARG_BLOCK
 #define NBS_APP_DEF_ARG_BLOCK 32
@@ -50,27 +50,27 @@ void strassen_main_seq(REAL *A, REAL *B, REAL *C, int n);
 
 #define NBS_APP_INIT\
     double *A, *B, *C, *D;\
-    if ((nbs_arg_size_1 & (nbs_arg_size_1 - 1)) != 0 || (nbs_arg_size_1 % 16) != 0) {\
-        printf("Error: matrix size (%d) must be a power of 2 and a multiple of %d\n", nbs_arg_size_1, 16);\
+    if ((nbs_arg_size & (nbs_arg_size - 1)) != 0 || (nbs_arg_size % 16) != 0) {\
+        printf("Error: matrix size (%d) must be a power of 2 and a multiple of %d\n", nbs_arg_size, 16);\
         exit (1);\
     }\
-    A = (double *) malloc (nbs_arg_size_1 * nbs_arg_size_1 * sizeof(double));\
-    B = (double *) malloc (nbs_arg_size_1 * nbs_arg_size_1 * sizeof(double));\
-    C = (double *) malloc (nbs_arg_size_1 * nbs_arg_size_1 * sizeof(double));\
-    D = (double *) malloc (nbs_arg_size_1 * nbs_arg_size_1 * sizeof(double));\
-    init_matrix(nbs_arg_size_1,A,nbs_arg_size_1);\
-    init_matrix(nbs_arg_size_1,B,nbs_arg_size_1);
+    A = (double *) malloc (nbs_arg_size * nbs_arg_size * sizeof(double));\
+    B = (double *) malloc (nbs_arg_size * nbs_arg_size * sizeof(double));\
+    C = (double *) malloc (nbs_arg_size * nbs_arg_size * sizeof(double));\
+    D = (double *) malloc (nbs_arg_size * nbs_arg_size * sizeof(double));\
+    init_matrix(nbs_arg_size,A,nbs_arg_size);\
+    init_matrix(nbs_arg_size,B,nbs_arg_size);
 
 //#define KERNEL_INIT
-#define KERNEL_CALL strassen_main_par(C,A,B,nbs_arg_size_1);
+#define KERNEL_CALL strassen_main_par(C,A,B,nbs_arg_size);
 //#define KERNEL_FINI
 
 //#define KERNEL_SEQ_INIT
-#define KERNEL_SEQ_CALL strassen_main_seq(D,A,B,nbs_arg_size_1);
+#define KERNEL_SEQ_CALL strassen_main_seq(D,A,B,nbs_arg_size);
 //#define KERNEL_SEQ_FINI
 
 
-#define KERNEL_CHECK compare_matrix(nbs_arg_size_1,C,nbs_arg_size_1,D,nbs_arg_size_1);
+#define KERNEL_CHECK compare_matrix(nbs_arg_size,C,nbs_arg_size,D,nbs_arg_size);
 
 #define NBS_APP_CHECK_USES_SEQ_RESULT
 
