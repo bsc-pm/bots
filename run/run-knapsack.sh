@@ -1,6 +1,6 @@
 #defaults
 
-DEF_INPUTS=knapsack-example2.input
+DEF_INPUTS=knapsack-036.input
 
 #don't modify from here
 
