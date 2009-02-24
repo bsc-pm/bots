@@ -225,8 +225,8 @@ exec_external ()
 	[ "$file" ] && local basefile=$(basename $file | tr -d .)
 	EXEC=$(echo $EXEC | sed s/%app%/$app/ | sed s/%cpus%/$cpus/ | sed s/%version%/$version/ )
 	EXEC=$(echo $EXEC | sed s@%bin%@$bin@ | sed "s@%args%@$args@" | sed "s@%command%@$bin $args@" )
-	if [ "$file" -o "$size" ]; then
-		EXEC=$(echo $EXEC | sed s@%input%@${basefile}${size}@ )
+	if [ "$file" -o "$size" -o "$pair" ]; then
+		EXEC=$(echo $EXEC | sed s@%input%@${basefile}${size}${pair}@ )
 	fi
 
 	$EXEC
@@ -305,6 +305,22 @@ fi
 
 [ "$VERBOSE" ] && echo "Executing $APP($version) with $cpus CPUS and input file $file"
 exec_app $APP $version $cpus -f $file $VERIFY
+
+done
+done
+done
+}
+
+exec_all_pairs ()
+{
+for cpus in $CPUS; do
+for version in $VERSIONS; do
+for pair in $INPUTS; do
+
+[ "$VERBOSE" ] && echo "Executing $APP($version) with $cpus CPUS and input $pair"
+p1=${pair%x*}
+p2=${pair#*x}
+exec_app $APP $version $cpus -m $p1 -l $p2 $VERIFY
 
 done
 done

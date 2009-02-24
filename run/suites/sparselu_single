@@ -1,0 +1,12 @@
+[test]
+inputs=25x25
+
+[small]
+inputs=25x100
+
+[medium]
+inputs=75x100
+
+[large]
+inputs=100x100
+
