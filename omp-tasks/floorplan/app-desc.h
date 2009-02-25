@@ -10,9 +10,12 @@
 void floorplan_init(char *);
 void floorplan_end (void);
 void compute_floorplan(void);
+int floorplan_verify(void);
 
 #define KERNEL_INIT floorplan_init(nbs_arg_file)
 #define KERNEL_CALL compute_floorplan()
 #define KERNEL_FINI floorplan_end()
+
+#define KERNEL_CHECK floorplan_verify()
 
 

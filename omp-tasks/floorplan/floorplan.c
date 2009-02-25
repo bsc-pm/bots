@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "app-desc.h"
+#include "nbs.h"
 
 #define ROWS 64
 #define COLS 64
@@ -10,7 +11,7 @@
 #define max(a, b) ((a > b) ? a : b)
 #define min(a, b) ((a < b) ? a : b)
 
-int max_level = 50;
+int solution = -1;
 
 typedef int  coor[2];
 typedef char ibrd[ROWS][COLS];
@@ -150,6 +151,10 @@ static void read_inputs() {
       fscanf(inputFile, "%d", & (gcells[i].above));
       fscanf(inputFile, "%d", & (gcells[i].next));
       }
+
+  if (!feof(inputFile)) {
+      fscanf(inputFile,"%d", &solution);
+  }
 }
 
 
@@ -231,6 +236,7 @@ _end:;
 }
   }
 
+#if defined(IF_CUTOFF)
 
 static void add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS,int level) {
   int  i, j, nn, area;
@@ -245,7 +251,156 @@ static void add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS,int 
 /* for all possible locations */
       for (j = 0; j < nn; j++) {
 #pragma omp task default(none) untied private(board, footprint,area) \
-firstprivate(NWS,i,j,id,nn,level) shared(max_level) \
+firstprivate(NWS,i,j,id,nn,level) \
+shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD) \
+if(level<nbs_cutoff_value)
+{
+	  struct cell cells[N+1];
+
+	  memcpy(cells,CELLS,sizeof(struct cell)*(N+1));
+/* extent of shape */
+          cells[id].top = NWS[j][0];
+          cells[id].bot = cells[id].top + cells[id].alt[i][0] - 1;
+          cells[id].lhs = NWS[j][1];
+          cells[id].rhs = cells[id].lhs + cells[id].alt[i][1] - 1;
+
+          memcpy(board, BOARD, sizeof(ibrd));
+
+/* if the cell cannot be layed down, prune search */
+          if (! lay_down(id, board, cells)) {
+             if (verbose) printf("Chip %d, shape %d does not fit\n", id, i);
+             goto _end;
+          }
+
+/* calculate new footprint of board and area of footprint */
+          footprint[0] = max(FOOTPRINT[0], cells[id].bot);
+          footprint[1] = max(FOOTPRINT[1], cells[id].rhs);
+          area         = footprint[0] * footprint[1];
+
+/* if last cell */
+          if (cells[id].next == 0) {
+
+/* if area is minimum, update global values */
+		  if (area < MIN_AREA) {
+#pragma omp critical
+			  if (area < MIN_AREA) {
+				  MIN_AREA         = area;
+				  MIN_FOOTPRINT[0] = footprint[0];
+				  MIN_FOOTPRINT[1] = footprint[1];
+				  memcpy(BEST_BOARD, board, sizeof(ibrd));
+				  if (verbose) printf("N  %d\n", MIN_AREA);
+			  }
+		  }
+
+/* if area is less than best area */
+          } else if (area < MIN_AREA) {
+                add_cell(cells[id].next, footprint, board,cells,level+1);
+/* if area is greater than or equal to best area, prune search */
+          } else {
+
+             if (verbose) printf("T  %d, %d\n", area, MIN_AREA);
+
+	  }
+_end:;
+}
+      }
+}
+#pragma omp taskwait
+
+}
+
+#elif defined(MANUAL_CUTOFF)
+
+static void add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS,int level) {
+  int  i, j, nn, area;
+
+  ibrd board;
+  coor footprint, NWS[DMAX];
+
+/* for each possible shape */
+  for (i = 0; i < CELLS[id].n; i++) {
+/* compute all possible locations for nw corner */
+      nn = starts(id, i, NWS, CELLS);
+/* for all possible locations */
+      for (j = 0; j < nn; j++) {
+#pragma omp task untied default(none) private(board, footprint,area) \
+firstprivate(NWS,i,j,id,nn,level) shared(nbs_cutoff_value) \
+shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD)
+{
+	  struct cell cells[N+1];
+
+	  memcpy(cells,CELLS,sizeof(struct cell)*(N+1));
+/* extent of shape */
+          cells[id].top = NWS[j][0];
+          cells[id].bot = cells[id].top + cells[id].alt[i][0] - 1;
+          cells[id].lhs = NWS[j][1];
+          cells[id].rhs = cells[id].lhs + cells[id].alt[i][1] - 1;
+
+          memcpy(board, BOARD, sizeof(ibrd));
+
+/* if the cell cannot be layed down, prune search */
+          if (! lay_down(id, board, cells)) {
+             if (verbose) printf("Chip %d, shape %d does not fit\n", id, i);
+             goto _end;
+          }
+
+/* calculate new footprint of board and area of footprint */
+          footprint[0] = max(FOOTPRINT[0], cells[id].bot);
+          footprint[1] = max(FOOTPRINT[1], cells[id].rhs);
+          area         = footprint[0] * footprint[1];
+
+/* if last cell */
+          if (cells[id].next == 0) {
+
+/* if area is minimum, update global values */
+		  if (area < MIN_AREA) {
+#pragma omp critical
+			  if (area < MIN_AREA) {
+				  MIN_AREA         = area;
+				  MIN_FOOTPRINT[0] = footprint[0];
+				  MIN_FOOTPRINT[1] = footprint[1];
+				  memcpy(BEST_BOARD, board, sizeof(ibrd));
+				  if (verbose) printf("N  %d\n", MIN_AREA);
+			  }
+		  }
+
+/* if area is less than best area */
+          } else if (area < MIN_AREA) {
+	     if(level+1 < nbs_cutoff_value )
+                add_cell(cells[id].next, footprint, board,cells,level+1);
+	     else
+		add_cell_ser(cells[id].next, footprint, board,cells);
+
+/* if area is greater than or equal to best area, prune search */
+          } else {
+
+             if (verbose) printf("T  %d, %d\n", area, MIN_AREA);
+
+	  }
+_end:;
+}
+      }
+}
+#pragma omp taskwait
+
+}
+
+#else
+
+static void add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS) {
+  int  i, j, nn, area;
+
+  ibrd board;
+  coor footprint, NWS[DMAX];
+
+/* for each possible shape */
+  for (i = 0; i < CELLS[id].n; i++) {
+/* compute all possible locations for nw corner */
+      nn = starts(id, i, NWS, CELLS);
+/* for all possible locations */
+      for (j = 0; j < nn; j++) {
+#pragma omp task untied default(none) private(board, footprint,area) \
+firstprivate(NWS,i,j,id,nn) \
 shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD) 
 {
 	  struct cell cells[N+1];
@@ -287,12 +442,7 @@ shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD)
 
 /* if area is less than best area */
           } else if (area < MIN_AREA) {
-//#pragma omp task untied firsprivate(board,footprint,cells)
-	     if(level+1 < max_level )
-                add_cell(cells[id].next, footprint, board,cells,level+1);
-	     else
-		add_cell_ser(cells[id].next, footprint, board,cells);
-
+	      add_cell(cells[id].next, footprint, board,cells);
 /* if area is greater than or equal to best area, prune search */
           } else {
 
@@ -306,6 +456,8 @@ _end:;
 #pragma omp taskwait
 
 }
+
+#endif
 
 ibrd board;
 
@@ -339,12 +491,24 @@ void compute_floorplan (void)
 
 #pragma omp parallel
 #pragma omp single
-    add_cell(1, footprint, board, gcells,0);
+#if defined(MANUAL_CUTOFF) || defined(IF_CUTOFF)
+       add_cell(1, footprint, board, gcells,0);
+#else
+       add_cell(1, footprint, board, gcells);
+#endif
+
 }
 
-void floorplan_end ()
+void floorplan_end (void)
 {
     /* write results */
     write_outputs();
 }
 
+int floorplan_verify (void)
+{
+    if (solution != -1 )
+      return MIN_AREA == solution ? NBS_RESULT_SUCCESSFUL : NBS_RESULT_UNSUCCESSFUL;
+    else
+      return NBS_RESULT_NA;
+}
