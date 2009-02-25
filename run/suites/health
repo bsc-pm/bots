@@ -1,0 +1,12 @@
+[test]
+inputs=health-t.input
+
+[small]
+inputs=health-s.input
+
+[medium]
+inputs=health-m.input
+
+[large]
+inputs=health-l.input
+
