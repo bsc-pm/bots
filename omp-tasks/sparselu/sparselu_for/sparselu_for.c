@@ -263,7 +263,7 @@ double sparselu_par_call(float ***pBENCH)
    genmat(BENCH);
    if (nbs_verbose_mode) print_structure("benchmark", BENCH);
    start = nbs_usecs();
-#pragma omp parallel
+#pragma omp parallel private(kk)
    {
    for (kk=0; kk<nbs_arg_size_1; kk++) 
    {
@@ -285,7 +285,7 @@ double sparselu_par_call(float ***pBENCH)
             bdiv (BENCH[kk*nbs_arg_size_1+kk], BENCH[ii*nbs_arg_size_1+kk]);
          }
 
-#pragma omp for
+#pragma omp for private(jj)
       for (ii=kk+1; ii<nbs_arg_size_1; ii++)
          if (BENCH[ii*nbs_arg_size_1+kk] != NULL)
             for (jj=kk+1; jj<nbs_arg_size_1; jj++)
