@@ -1,4 +1,4 @@
-DIRS=fib alignment nqueens sort strassen sparselu fft knapsack concom floorplan 
+DIRS=fib alignment nqueens sort strassen sparselu fft knapsack concom floorplan health
 
 RECURSIVE=all-recursive clean-recursive dist-clean-recursive
 

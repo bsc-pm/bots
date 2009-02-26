@@ -1,3 +1,4 @@
+#include <omp.h>
 
 #define MODEL OMP-TASKS
 
