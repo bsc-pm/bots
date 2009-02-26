@@ -50,7 +50,7 @@ static int solutions[] = {
 };
 #define MAX_SOLUTIONS sizeof(solutions)/sizeof(int)
 
-int mycount;
+int mycount=0;
 #pragma omp threadprivate(mycount)
 
 int total_count;
@@ -91,7 +91,9 @@ void nqueens_ser (int n, int j, char *a, int *solutions)
 		return;
 	}
 
+#ifndef FORCE_TIED_TASKS
 	*solutions = 0;
+#endif
 
 
      	/* try each possible position for queen <j> */
@@ -129,9 +131,9 @@ void nqueens(int n, int j, char *a, int *solutions, int depth)
 		return;
 	}
 
-	*solutions = 0;
 
 #ifndef FORCE_TIED_TASKS
+	*solutions = 0;
 	csols = alloca(n*sizeof(int));
 	memset(csols,0,n*sizeof(int));
 #endif
@@ -174,9 +176,9 @@ void nqueens(int n, int j, char *a, int *solutions, int depth)
 		return;
 	}
 
-	*solutions = 0;
 
 #ifndef FORCE_TIED_TASKS
+	*solutions = 0;
 	csols = alloca(n*sizeof(int));
 	memset(csols,0,n*sizeof(int));
 #endif
@@ -227,9 +229,9 @@ void nqueens(int n, int j, char *a, int *solutions, int depth)
 		return;
 	}
 
-	*solutions = 0;
 
 #ifndef FORCE_TIED_TASKS
+	*solutions = 0;
 	csols = alloca(n*sizeof(int));
 	memset(csols,0,n*sizeof(int));
 #endif
