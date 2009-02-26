@@ -32,7 +32,7 @@ void nbs_get_date(char *str);
 void nbs_get_architecture(char *str);
 int nbs_get_max_cpus(void);
 void nbs_get_load_average(char *str);
-long nbs_usecs();
+// long nbs_usecs();
 void nbs_error(int error, char *message);
 void nbs_warning(int warning, char *message);
 

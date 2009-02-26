@@ -34,6 +34,9 @@ extern int nbs_arg_size;
 extern int nbs_arg_size_1;
 extern int nbs_arg_size_2;
 
+/* function could be used in app. code */
+long nbs_usecs();
+
 #define NBS_RESULT_NA 0
 #define NBS_RESULT_SUCCESSFUL 1
 #define NBS_RESULT_UNSUCCESSFUL 2
