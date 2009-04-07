@@ -27,7 +27,7 @@ OPT_FLAGS=-O3
 endif
 
 CC_FLAGS=-Wall 
-OMPC_FLAGS=-Wall 
+OMPC_FLAGS=-Wall
 CILKC_FLAGS=
 
 CLINK_FLAGS=
@@ -133,17 +133,17 @@ all: $(TARGETS)
 # Ugly... but there's no easy solutions because it is a pragma
 
 %-tied.o: %.c Makefile $(COMMON_DIR)/Makefile.common
-	cat $< | sed -e "s/task \+untied/task/i" > tied-$< ;\
+	cat $< | sed -e "s/task \{1,\}untied/task/g" > tied-$< ;\
 	$(OMPC) $(OMPC_ALL_FLAGS) $(TIED_FLAGS) -o $@ tied-$<;\
 	rm tied-$<
 
 %-if-tied.o: %.c Makefile $(COMMON_DIR)/Makefile.common
-	cat $< | sed -e "s/task \+untied/task/i" > tied-$< ;\
+	cat $< | sed -e "s/task \{1,\}untied/task/g" > tied-$< ;\
 	$(OMPC) $(OMPC_ALL_FLAGS) $(IF_FLAGS) $(TIED_FLAGS) -o $@ $<;\
 	rm tied-$<
 
 %-manual-tied.o: %.c Makefile $(COMMON_DIR)/Makefile.common
-	cat $< | sed -e "s/task \+untied/task/i" > tied-$< ;\
+	cat $< | sed -e "s/task \{1,\}untied/task/g" > tied-$< ;\
 	$(OMPC) $(OMPC_ALL_FLAGS) $(MANUAL_FLAGS) $(TIED_FLAGS) -o $@ $<;\
 	rm tied-$<
 
