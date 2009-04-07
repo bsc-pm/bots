@@ -11,4 +11,5 @@
 # define omp_set_num_threads(x)
 #endif
 
+void nbs_print_usage(void);
 void nbs_print_usage_option(char opt, int type, char* description, char *val, int subc, char **subv);
