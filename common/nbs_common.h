@@ -27,15 +27,10 @@
 
 #define NBS_WARNING                       0
 
-
 void nbs_get_date(char *str);
 void nbs_get_architecture(char *str);
-int nbs_get_max_cpus(void);
 void nbs_get_load_average(char *str);
 void nbs_error(int error, char *message);
 void nbs_warning(int warning, char *message);
-
 void nbs_print_results(void);
-void nbs_print_results_row(void);
-void nbs_print_header_row(void);
 #endif

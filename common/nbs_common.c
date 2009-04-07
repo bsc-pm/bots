@@ -14,7 +14,6 @@
 void
 nbs_error(int error, char *message)
 {
-   char error_message[128];
    if (message == NULL)
    {
       switch(error)
@@ -29,20 +28,38 @@ nbs_error(int error, char *message)
             fprintf(stderr, "Error (%d): %s\n",error,"Unrecognized parameter.");
             nbs_print_usage();
             break;
+         default:
+            fprintf(stderr, "Error (%d): %s\n",error,"Invalid error code.");
+            break;
       }
    }
-   else
-   {
-      fprintf(stderr, "Error (%d): %s\n",error,message);
-   }
-
+   else fprintf(stderr, "Error (%d): %s\n",error,message);
    exit(100+error);
 }
 
 void
 nbs_warning(int warning, char *message)
 {
+   if (message == NULL)
+   {
+      switch(warning)
+      {
+         case NBS_WARNING:
+            fprintf(stderr, "Warning (%d): %s\n",warning,"Unspecified warning.");
+            break;
+         default:
+            fprintf(stderr, "Warning (%d): %s\n",warning,"Invalid warning code.");
+            break;
+      }
+   }
+   else fprintf(stderr, "Warning (%d): %s\n",warning,message);
+}
 
+long nbs_usecs (void)
+{
+   struct timeval t;
+   gettimeofday(&t,NULL);
+   return t.tv_sec*1000000+t.tv_usec;
 }
 
 void
@@ -53,49 +70,28 @@ nbs_get_date(char *str)
    strftime(str, 32, "%Y/%m/%d;%H:%M", gmtime(&now));
 }
 
-int
-nbs_get_max_cpus(void)
+#if defined (__linux)
+/* ****************************************************************** */
+void nbs_get_architecture(char *str)
 {
-#if 0
-   return sysconf(_SC_NPROCESSORS_CONF);
-#endif
-   return 0;
-}
+   int ncpus = sysconf(_SC_NPROCESSORS_CONF);
+   struct utsname architecture;
 
-void
-nbs_get_architecture(char *str)
-{
-#if 0
-   struct utsname *architecture;
-   uname(architecture);
-   sprintf(str, "%s-%s;%d"
-      ,architecture->sysname
-      ,architecture->machine
-      ,nbs_get_max_cpus());
-#endif
-   sprintf(str,";");
+   uname(&architecture);
+   sprintf(str, "%s-%s;%d" ,architecture.sysname, architecture.machine, ncpus);
 }
-
-void
-nbs_get_load_average(char *str)
+void nbs_get_load_average(char *str)
 {
    double loadavg[3];
    getloadavg (loadavg, 3);
    sprintf(str, "%.2f;%.2f;%.2f",loadavg[0],loadavg[1],loadavg[2]);
 }
-
-long
-nbs_usecs (void)
-{
-   struct timeval t;
-   gettimeofday(&t,NULL);
-   return t.tv_sec*1000000+t.tv_usec;
-}
-
-void
-nbs_print_header_row()
-{
-}
+#else
+/* ****************************************************************** */
+int nbs_get_max_cpus(void) { return 0; }
+void nbs_get_architecture(char *str) { sprintf(str,";"); } 
+void nbs_get_load_average(char *str) { sprintf(str,";;"); }
+#endif
 
 void nbs_print_results()
 {
