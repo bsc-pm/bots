@@ -1,6 +1,8 @@
 #include "omp-tasks-app.h"
 
 #define NBS_APP_NAME "Sort"
+#define NBS_APP_PARAMETERS_DESC "%d"
+#define NBS_APP_PARAMETERS_LIST ,nbs_arg_size
 
 #define NBS_APP_USES_ARG_SIZE
 #define NBS_APP_DEF_ARG_SIZE (32*1024*1024)
