@@ -1,3 +1,4 @@
+#!/bin/bash
 #defaults
 
 DEF_INPUTS=prot.100.aa

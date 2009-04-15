@@ -1,3 +1,4 @@
+#!/bin/bash
 #defaults
 
 DEF_INPUTS=health-m.input

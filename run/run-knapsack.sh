@@ -1,3 +1,4 @@
+#!/bin/bash
 #defaults
 
 DEF_INPUTS=knapsack-036.input
