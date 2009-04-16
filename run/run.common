@@ -105,8 +105,16 @@ parse_suite ()
 
 compute_max_cpus ()
 {
-#TODO: this probably only works in linux
-	max_cpus=$(cat /proc/cpuinfo  | grep ^processor | wc -l)
+#TODO: Add other systems here
+	case $(uname -s) in
+		"Linux") max_cpus=$(cat /proc/cpuinfo  | grep ^processor | wc -l)
+				;;
+		"AIX") max_cpus=$(lsdev -Sa -Cc processor | wc -l)
+				;;
+		*) echo "WARNING: Don't know how to compute max cpus in this enviroment. Defaulting to 1"
+		   max_cpus=1
+		   ;;
+	esac
 }
 
 
