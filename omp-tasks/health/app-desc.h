@@ -40,19 +40,16 @@ struct Patient {
    int time_left;
    int hosps_visited;
    struct Village *home_village;
-};
-struct List {
-   struct Patient *patient;
-   struct List *back;
-   struct List *forward;
+   struct Patient *back;
+   struct Patient *forward;
 };
 struct Hosp {
    int personnel;
    int free_personnel;
-   struct List waiting;
-   struct List assess;
-   struct List inside;
-   struct List realloc;
+   struct Patient *waiting;
+   struct Patient *assess;
+   struct Patient *inside;
+   struct Patient *realloc;
    omp_lock_t  realloc_lock;
 };
 struct Village {
@@ -60,7 +57,7 @@ struct Village {
    struct Village *back;
    struct Village *next;
    struct Village *forward;
-   struct List population;
+   struct Patient *population;
    struct Hosp hosp;
    int level;
    long  seed;
@@ -74,8 +71,8 @@ void allocate_village( struct Village **capital, struct Village *back, struct Vi
 struct Patient *generate_patient(struct Village *village);
 void put_in_hosp(struct Hosp *hosp, struct Patient *patient);
 
-void addList(struct List *list, struct Patient *patient);
-void removeList(struct List *list, struct Patient *patient);
+void addList(struct Patient **list, struct Patient *patient);
+void removeList(struct Patient **list, struct Patient *patient);
 
 void check_patients_inside(struct Village *village);
 void check_patients_waiting(struct Village *village);
