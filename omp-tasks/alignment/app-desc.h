@@ -1,6 +1,8 @@
 #include "omp-tasks-app.h"
 
 #define NBS_APP_NAME "Protein alignment"
+#define NBS_APP_PARAMETERS_DESC "%s"
+#define NBS_APP_PARAMETERS_LIST ,nbs_arg_file
 
 #define NBS_APP_USES_ARG_FILE
 #define NBS_APP_DESC_ARG_FILE "Protein sequences file (mandatory)"
