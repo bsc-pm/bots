@@ -18,6 +18,8 @@
 /*  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA            */
 /**********************************************************************************************/
 
+/* Original code from the Application Kernel Matrix by Cray */
+
 char *amino_acid_order = "ABCDEFGHIKLMNPQRSTVWXYZ";
 char *amino_acid_codes = "ABCDEFGHIKLMNPQRSTUVWXYZ-";
 
