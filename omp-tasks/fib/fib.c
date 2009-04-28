@@ -1,4 +1,4 @@
-#include "nbs.h"
+#include "bots.h"
 
 int fib_seq (int n)
 {
@@ -18,10 +18,10 @@ int fib (int n,int d)
 	int x, y;
 	if (n < 2) return n;
 
-	#pragma omp task untied shared(x) firstprivate(n) if(d < nbs_cutoff_value)
+	#pragma omp task untied shared(x) firstprivate(n) if(d < bots_cutoff_value)
 	x = fib(n - 1,d+1);
 
-	#pragma omp task untied shared(y) firstprivate(n) if(d < nbs_cutoff_value)
+	#pragma omp task untied shared(y) firstprivate(n) if(d < bots_cutoff_value)
 	y = fib(n - 2,d+1);
 
 	#pragma omp taskwait
@@ -35,7 +35,7 @@ int fib (int n, int d)
 	int x, y;
 	if (n < 2) return n;
 
-	if ( d < nbs_cutoff_value ) {
+	if ( d < bots_cutoff_value ) {
 		#pragma omp task untied shared(x) firstprivate(n)
 		x = fib(n - 1,d+1);
 

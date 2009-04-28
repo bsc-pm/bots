@@ -7,26 +7,26 @@
 #include <sys/utsname.h>
 #include <sys/resource.h>
 
-#include "nbs_common.h"
-#include "nbs_main.h"
-#include "nbs.h"
+#include "bots_common.h"
+#include "bots_main.h"
+#include "bots.h"
 
 void
-nbs_error(int error, char *message)
+bots_error(int error, char *message)
 {
    if (message == NULL)
    {
       switch(error)
       {
-         case NBS_ERROR:
+         case BOTS_ERROR:
             fprintf(stderr, "Error (%d): %s\n",error,"Unspecified error.");
             break;
-         case NBS_ERROR_NOT_ENOUGH_MEMORY:
+         case BOTS_ERROR_NOT_ENOUGH_MEMORY:
             fprintf(stderr, "Error (%d): %s\n",error,"Not enough memory.");
             break;
-         case NBS_ERROR_UNRECOGNIZED_PARAMETER:
+         case BOTS_ERROR_UNRECOGNIZED_PARAMETER:
             fprintf(stderr, "Error (%d): %s\n",error,"Unrecognized parameter.");
-            nbs_print_usage();
+            bots_print_usage();
             break;
          default:
             fprintf(stderr, "Error (%d): %s\n",error,"Invalid error code.");
@@ -38,13 +38,13 @@ nbs_error(int error, char *message)
 }
 
 void
-nbs_warning(int warning, char *message)
+bots_warning(int warning, char *message)
 {
    if (message == NULL)
    {
       switch(warning)
       {
-         case NBS_WARNING:
+         case BOTS_WARNING:
             fprintf(stderr, "Warning (%d): %s\n",warning,"Unspecified warning.");
             break;
          default:
@@ -55,7 +55,7 @@ nbs_warning(int warning, char *message)
    else fprintf(stderr, "Warning (%d): %s\n",warning,message);
 }
 
-long nbs_usecs (void)
+long bots_usecs (void)
 {
    struct timeval t;
    gettimeofday(&t,NULL);
@@ -63,7 +63,7 @@ long nbs_usecs (void)
 }
 
 void
-nbs_get_date(char *str)
+bots_get_date(char *str)
 {
    time_t now;
    time(&now);
@@ -72,7 +72,7 @@ nbs_get_date(char *str)
 
 #if defined (__linux)
 /* ****************************************************************** */
-void nbs_get_architecture(char *str)
+void bots_get_architecture(char *str)
 {
    int ncpus = sysconf(_SC_NPROCESSORS_CONF);
    struct utsname architecture;
@@ -80,7 +80,7 @@ void nbs_get_architecture(char *str)
    uname(&architecture);
    sprintf(str, "%s-%s;%d" ,architecture.sysname, architecture.machine, ncpus);
 }
-void nbs_get_load_average(char *str)
+void bots_get_load_average(char *str)
 {
    double loadavg[3];
    getloadavg (loadavg, 3);
@@ -88,12 +88,12 @@ void nbs_get_load_average(char *str)
 }
 #else
 /* ****************************************************************** */
-int nbs_get_max_cpus(void) { return 0; }
-void nbs_get_architecture(char *str) { sprintf(str,";"); } 
-void nbs_get_load_average(char *str) { sprintf(str,";;"); }
+int bots_get_max_cpus(void) { return 0; }
+void bots_get_architecture(char *str) { sprintf(str,";"); } 
+void bots_get_load_average(char *str) { sprintf(str,";;"); }
 #endif
 
-void nbs_print_results()
+void bots_print_results()
 {
    char str_name[128];
    char str_parameters[128];
@@ -118,50 +118,50 @@ void nbs_print_results()
    char str_cutoff[128];
 
    /* compute output strings */
-   sprintf(str_name, "%s", nbs_name);
-   sprintf(str_parameters, "%s", nbs_parameters);
-   sprintf(str_model, "%s", nbs_model);
-   sprintf(str_cutoff, "%s", nbs_cutoff);
-   sprintf(str_resources, "%s", nbs_resources);
-   switch(nbs_result)
+   sprintf(str_name, "%s", bots_name);
+   sprintf(str_parameters, "%s", bots_parameters);
+   sprintf(str_model, "%s", bots_model);
+   sprintf(str_cutoff, "%s", bots_cutoff);
+   sprintf(str_resources, "%s", bots_resources);
+   switch(bots_result)
    {
-      case NBS_RESULT_NA: 
+      case BOTS_RESULT_NA: 
          sprintf(str_result, "n/a");
          break;
-      case NBS_RESULT_SUCCESSFUL: 
+      case BOTS_RESULT_SUCCESSFUL: 
          sprintf(str_result, "successful");
          break;
-      case NBS_RESULT_UNSUCCESSFUL: 
+      case BOTS_RESULT_UNSUCCESSFUL: 
          sprintf(str_result, "UNSUCCESSFUL");
          break;
       default: 
          sprintf(str_result, "error");
          break;
    }
-   sprintf(str_time_program, "%f", nbs_time_program);
-   if (nbs_sequential_flag) sprintf(str_time_sequential, "%f", nbs_time_sequential);
+   sprintf(str_time_program, "%f", bots_time_program);
+   if (bots_sequential_flag) sprintf(str_time_sequential, "%f", bots_time_sequential);
    else sprintf(str_time_sequential, "n/a");
-   if (nbs_sequential_flag)
-   sprintf(str_speed_up, "%3.2f", nbs_time_sequential/nbs_time_program);
+   if (bots_sequential_flag)
+   sprintf(str_speed_up, "%3.2f", bots_time_sequential/bots_time_program);
    else sprintf(str_speed_up, "n/a");
 
-   sprintf(str_number_of_tasks, "%3.2f", (float) nbs_number_of_tasks);
-   sprintf(str_number_of_tasks_per_second, "%3.2f", (float) nbs_number_of_tasks/nbs_time_program);
+   sprintf(str_number_of_tasks, "%3.2f", (float) bots_number_of_tasks);
+   sprintf(str_number_of_tasks_per_second, "%3.2f", (float) bots_number_of_tasks/bots_time_program);
 
-   sprintf(str_exec_date, "%s", nbs_exec_date);
-   sprintf(str_exec_message, "%s", nbs_exec_message);
-   nbs_get_architecture(str_architecture);
-   nbs_get_load_average(str_load_avg);
-   sprintf(str_comp_date, "%s", nbs_comp_date);
-   sprintf(str_comp_message, "%s", nbs_comp_message);
-   sprintf(str_cc, "%s", nbs_cc);
-   sprintf(str_cflags, "%s", nbs_cflags);
-   sprintf(str_ld, "%s", nbs_ld);
-   sprintf(str_ldflags, "%s", nbs_ldflags);
+   sprintf(str_exec_date, "%s", bots_exec_date);
+   sprintf(str_exec_message, "%s", bots_exec_message);
+   bots_get_architecture(str_architecture);
+   bots_get_load_average(str_load_avg);
+   sprintf(str_comp_date, "%s", bots_comp_date);
+   sprintf(str_comp_message, "%s", bots_comp_message);
+   sprintf(str_cc, "%s", bots_cc);
+   sprintf(str_cflags, "%s", bots_cflags);
+   sprintf(str_ld, "%s", bots_ld);
+   sprintf(str_ldflags, "%s", bots_ldflags);
 
-   if(nbs_print_header)
+   if(bots_print_header)
    {
-      switch(nbs_output_format)
+      switch(bots_output_format)
       {
          case 0:
             break;
@@ -179,7 +179,7 @@ Comp Date;Comp Time;Comp Message;CC;CFLAGS;LD;LDFLAGS\n");
    }
 
    /* print results */
-   switch(nbs_output_format)
+   switch(bots_output_format)
    {
       case 0:
 	 fprintf(stdout, "\n\n");
@@ -247,7 +247,7 @@ Comp Date;Comp Time;Comp Message;CC;CFLAGS;LD;LDFLAGS\n");
          fprintf(stdout,"\n");
          break;
       default:
-         nbs_error(NBS_ERROR,"No valid output format\n");
+         bots_error(BOTS_ERROR,"No valid output format\n");
          break;
    }
 }

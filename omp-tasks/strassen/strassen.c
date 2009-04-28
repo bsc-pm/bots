@@ -29,16 +29,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "app-desc.h"
-#include "nbs.h"
+#include "bots.h"
 
 /*FIXME: change to parameter ???*/
 #define SizeAtWhichNaiveAlgorithmIsMoreEfficient 16
 
-extern int nbs_arg_block;
-extern int nbs_arg_size;
-extern int nbs_arg_cutoff;
+extern int bots_arg_block;
+extern int bots_arg_size;
+extern int bots_arg_cutoff;
 #if defined(MANUAL_CUTOFF) || defined(IF_CUTOFF)
-extern int nbs_cutoff_value;
+extern int bots_cutoff_value;
 #endif
 
 /***********************************************************************
@@ -414,7 +414,7 @@ void OptimizedStrassenMultiply_seq(REAL *C, REAL *A, REAL *B, unsigned MatrixSiz
   PTR RowIncrementB = ( RowWidthB - QuadrantSize ) << 3;
   PTR RowIncrementC = ( RowWidthC - QuadrantSize ) << 3;
 
-  if (MatrixSize <= nbs_arg_cutoff) {
+  if (MatrixSize <= bots_arg_cutoff) {
     MultiplyByDivideAndConquer(C, A, B, MatrixSize, RowWidthC, RowWidthA, RowWidthB, 0);
     return;
   }
@@ -613,7 +613,7 @@ void OptimizedStrassenMultiply_par(REAL *C, REAL *A, REAL *B, unsigned MatrixSiz
   PTR RowIncrementB = ( RowWidthB - QuadrantSize ) << 3;
   PTR RowIncrementC = ( RowWidthC - QuadrantSize ) << 3;
 
-  if (MatrixSize <= nbs_arg_cutoff) {
+  if (MatrixSize <= bots_arg_cutoff) {
     MultiplyByDivideAndConquer(C, A, B, MatrixSize, RowWidthC, RowWidthA, RowWidthB, 0);
     return;
   }
@@ -697,31 +697,31 @@ void OptimizedStrassenMultiply_par(REAL *C, REAL *A, REAL *B, unsigned MatrixSiz
   } /* end column loop */
 
   /* M2 = A11 x B11 */
-  #pragma omp task untied if (Depth < nbs_cutoff_value)
+  #pragma omp task untied if (Depth < bots_cutoff_value)
   OptimizedStrassenMultiply_par(M2, A11, B11, QuadrantSize, QuadrantSize, RowWidthA, RowWidthB, Depth+1);
 
   /* M5 = S1 * S5 */
-  #pragma omp task untied if (Depth < nbs_cutoff_value)
+  #pragma omp task untied if (Depth < bots_cutoff_value)
   OptimizedStrassenMultiply_par(M5, S1, S5, QuadrantSize, QuadrantSize, QuadrantSize, QuadrantSize, Depth+1);
 
   /* Step 1 of T1 = S2 x S6 + M2 */
-  #pragma omp task untied if (Depth < nbs_cutoff_value)
+  #pragma omp task untied if (Depth < bots_cutoff_value)
   OptimizedStrassenMultiply_par(T1sMULT, S2, S6,  QuadrantSize, QuadrantSize, QuadrantSize, QuadrantSize, Depth+1);
 
   /* Step 1 of T2 = T1 + S3 x S7 */
-  #pragma omp task untied if (Depth < nbs_cutoff_value)
+  #pragma omp task untied if (Depth < bots_cutoff_value)
   OptimizedStrassenMultiply_par(C22, S3, S7, QuadrantSize, RowWidthC /*FIXME*/, QuadrantSize, QuadrantSize, Depth+1);
 
   /* Step 1 of C11 = M2 + A12 * B21 */
-  #pragma omp task untied if (Depth < nbs_cutoff_value)
+  #pragma omp task untied if (Depth < bots_cutoff_value)
   OptimizedStrassenMultiply_par(C11, A12, B21, QuadrantSize, RowWidthC, RowWidthA, RowWidthB, Depth+1);
   
   /* Step 1 of C12 = S4 x B22 + T1 + M5 */
-  #pragma omp task untied if (Depth < nbs_cutoff_value)
+  #pragma omp task untied if (Depth < bots_cutoff_value)
   OptimizedStrassenMultiply_par(C12, S4, B22, QuadrantSize, RowWidthC, QuadrantSize, RowWidthB, Depth+1);
 
   /* Step 1 of C21 = T2 - A22 * S8 */
-  #pragma omp task untied if (Depth < nbs_cutoff_value)
+  #pragma omp task untied if (Depth < bots_cutoff_value)
   OptimizedStrassenMultiply_par(C21, A22, S8, QuadrantSize, RowWidthC, RowWidthA, QuadrantSize, Depth+1);
 
   /**********************************************
@@ -823,7 +823,7 @@ void OptimizedStrassenMultiply_par(REAL *C, REAL *A, REAL *B, unsigned MatrixSiz
   PTR RowIncrementB = ( RowWidthB - QuadrantSize ) << 3;
   PTR RowIncrementC = ( RowWidthC - QuadrantSize ) << 3;
 
-  if (MatrixSize <= nbs_arg_cutoff) {
+  if (MatrixSize <= bots_arg_cutoff) {
     MultiplyByDivideAndConquer(C, A, B, MatrixSize, RowWidthC, RowWidthA, RowWidthB, 0);
     return;
   }
@@ -906,7 +906,7 @@ void OptimizedStrassenMultiply_par(REAL *C, REAL *A, REAL *B, unsigned MatrixSiz
     MatrixOffsetB += RowIncrementB;
   } /* end column loop */
 
-  if (Depth < nbs_cutoff_value)
+  if (Depth < bots_cutoff_value)
   {
     /* M2 = A11 x B11 */
     #pragma omp task untied
@@ -1054,7 +1054,7 @@ void OptimizedStrassenMultiply_par(REAL *C, REAL *A, REAL *B, unsigned MatrixSiz
   PTR RowIncrementB = ( RowWidthB - QuadrantSize ) << 3;
   PTR RowIncrementC = ( RowWidthC - QuadrantSize ) << 3;
 
-  if (MatrixSize <= nbs_arg_cutoff) {
+  if (MatrixSize <= bots_arg_cutoff) {
     MultiplyByDivideAndConquer(C, A, B, MatrixSize, RowWidthC, RowWidthA, RowWidthB, 0);
     return;
   }
@@ -1260,11 +1260,11 @@ int compare_matrix(int n, REAL *A, int an, REAL *B, int bn)
 	       c = c / ELEM(A, an, i, j);
 	       if (c > EPSILON) {
 		    printf("Wrong answer !\n");
-		    return NBS_RESULT_UNSUCCESSFUL;
+		    return BOTS_RESULT_UNSUCCESSFUL;
 	       }
 	  }
 
-     return NBS_RESULT_SUCCESSFUL;
+     return BOTS_RESULT_SUCCESSFUL;
 }
 	       
 /*

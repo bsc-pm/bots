@@ -1,11 +1,11 @@
 #include "omp-tasks-app.h"
 
-#define NBS_APP_NAME "Protein alignment"
-#define NBS_APP_PARAMETERS_DESC "%s"
-#define NBS_APP_PARAMETERS_LIST ,nbs_arg_file
+#define BOTS_APP_NAME "Protein alignment"
+#define BOTS_APP_PARAMETERS_DESC "%s"
+#define BOTS_APP_PARAMETERS_LIST ,bots_arg_file
 
-#define NBS_APP_USES_ARG_FILE
-#define NBS_APP_DESC_ARG_FILE "Protein sequences file (mandatory)"
+#define BOTS_APP_USES_ARG_FILE
+#define BOTS_APP_DESC_ARG_FILE "Protein sequences file (mandatory)"
 
 void pairalign_init(char *);
 void align_init ();
@@ -16,7 +16,7 @@ void align_seq ();
 int align_verify ();
 
 
-#define NBS_APP_INIT pairalign_init(nbs_arg_file)
+#define BOTS_APP_INIT pairalign_init(bots_arg_file)
 
 #define KERNEL_INIT align_init()
 #define KERNEL_CALL align()
@@ -27,5 +27,5 @@ int align_verify ();
 //#define KERNEL_SEQ_FINI
 
 #define KERNEL_CHECK align_verify()
-#define NBS_APP_CHECK_USES_SEQ_RESULT
+#define BOTS_APP_CHECK_USES_SEQ_RESULT
 

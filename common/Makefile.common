@@ -65,7 +65,7 @@ ifndef PROGRAM_OBJS
 	PROGRAM_OBJS = $(PROGRAM).o
 endif
 
-COMMON_OBJS = $(COMMON_DIR)/nbs_common.o
+COMMON_OBJS = $(COMMON_DIR)/bots_common.o
 
 ifeq ($(VERSION),common)
 .c.o: Makefile $(COMMON_DIR)/Makefile.common
@@ -83,7 +83,7 @@ all: $(TARGETS)
 
 INFO_FLAGS=-DCDATE="\"$(TODAY)\"" -DCC="\"$(CC)\"" -DLD="\"$(CLINK)\"" -DLDFLAGS="\"$(CLINK_ALL_FLAGS) $(LIBS)\""
 
-main.o: $(COMMON_DIR)/nbs_main.c app-desc.h Makefile $(COMMON_DIR)/Makefile.common
+main.o: $(COMMON_DIR)/bots_main.c app-desc.h Makefile $(COMMON_DIR)/Makefile.common
 	$(CC) $(CC_ALL_FLAGS) -I. -o $@ $< $(INFO_FLAGS) -DCFLAGS="\"$(CC_ALL_FLAGS) -I.\""
 
 $(BIN_DIR)/$(PROGRAM).$(VERSION): main.o $(PROGRAM_OBJS) Makefile $(COMMON_DIR)/Makefile.common $(COMMON_OBJS)
@@ -149,22 +149,22 @@ all: $(TARGETS)
 
 INFO_FLAGS_OMP=-DCDATE="\"$(TODAY)\"" -DCC="\"$(OMPC)\"" -DLD="\"$(OMPLINK)\"" -DLDFLAGS="\"$(OMPLINK_ALL_FLAGS) $(LIBS)\""
 
-main.o: $(COMMON_DIR)/nbs_main.c app-desc.h Makefile $(COMMON_DIR)/Makefile.common
+main.o: $(COMMON_DIR)/bots_main.c app-desc.h Makefile $(COMMON_DIR)/Makefile.common
 	$(OMPC) $(OMPC_ALL_FLAGS) -I. -o $@ $< $(INFO_FLAGS_OMP) -DCFLAGS="\"$(OMPC_ALL_FLAGS) -I.\""
 
-main-if.o: $(COMMON_DIR)/nbs_main.c app-desc.h Makefile $(COMMON_DIR)/Makefile.common
+main-if.o: $(COMMON_DIR)/bots_main.c app-desc.h Makefile $(COMMON_DIR)/Makefile.common
 	$(OMPC) $(OMPC_ALL_FLAGS) $(IF_FLAGS) -I. -o $@ $< $(INFO_FLAGS_OMP) -DCFLAGS="\"$(OMPC_ALL_FLAGS) $(IF_FLAGS)-I.\""
 
-main-manual.o: $(COMMON_DIR)/nbs_main.c app-desc.h Makefile $(COMMON_DIR)/Makefile.common
+main-manual.o: $(COMMON_DIR)/bots_main.c app-desc.h Makefile $(COMMON_DIR)/Makefile.common
 	$(OMPC) $(OMPC_ALL_FLAGS) $(MANUAL_FLAGS) -I. -o $@ $< $(INFO_FLAGS_OMP) -DCFLAGS="\"$(OMPC_ALL_FLAGS) $(MANUAL_FLAGS) -I.\""
 
-main-tied.o: $(COMMON_DIR)/nbs_main.c app-desc.h Makefile $(COMMON_DIR)/Makefile.common
+main-tied.o: $(COMMON_DIR)/bots_main.c app-desc.h Makefile $(COMMON_DIR)/Makefile.common
 	$(OMPC) $(OMPC_ALL_FLAGS) $(TIED_FLAGS) -I. -o $@ $< $(INFO_FLAGS_OMP) -DCFLAGS="\"$(OMPC_ALL_FLAGS) $(TIED_FLAGS) -I.\""
 
-main-if-tied.o: $(COMMON_DIR)/nbs_main.c app-desc.h Makefile $(COMMON_DIR)/Makefile.common
+main-if-tied.o: $(COMMON_DIR)/bots_main.c app-desc.h Makefile $(COMMON_DIR)/Makefile.common
 	$(OMPC) $(OMPC_ALL_FLAGS) $(TIED_FLAGS) $(IF_FLAGS) -I. -o $@ $< $(INFO_FLAGS_OMP) -DCFLAGS="\"$(OMPC_ALL_FLAGS) $(TIED_FLAGS) $(IF_FLAGS) -I.\""
 
-main-manual-tied.o: $(COMMON_DIR)/nbs_main.c app-desc.h Makefile $(COMMON_DIR)/Makefile.common
+main-manual-tied.o: $(COMMON_DIR)/bots_main.c app-desc.h Makefile $(COMMON_DIR)/Makefile.common
 	$(OMPC) $(OMPC_ALL_FLAGS) $(TIED_FLAGS) $(MANUAL_FLAGS) -I. -o $@ $< $(INFO_FLAGS_OMP) -DCFLAGS="\"$(OMPC_ALL_FLAGS) $(TIED_FLAGS) $(MANUAL_FLAGS) -I.\""
 
 

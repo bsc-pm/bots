@@ -29,7 +29,7 @@
 #include <limits.h>
 #include <string.h>
 #include "app-desc.h"
-#include "nbs.h"
+#include "bots.h"
 
 int best_so_far;
 int number_of_tasks;
@@ -108,11 +108,11 @@ void knapsack_par(struct item *e, int c, int n, int v, int *sol, int l)
      /* 
       * compute the best solution without the current item in the knapsack 
       */
-     #pragma omp task untied firstprivate(e,c,n,v,l) shared(without) if (l < nbs_cutoff_value)
+     #pragma omp task untied firstprivate(e,c,n,v,l) shared(without) if (l < bots_cutoff_value)
      knapsack_par(e + 1, c, n - 1, v, &without,l+1);
 
      /* compute the best solution with the current item in the knapsack */
-     #pragma omp task untied firstprivate(e,c,n,v,l) shared(with)  if (l < nbs_cutoff_value)
+     #pragma omp task untied firstprivate(e,c,n,v,l) shared(with)  if (l < bots_cutoff_value)
      knapsack_par(e + 1, c - e->weight, n - 1, v + e->value, &with,l+1);
 
      #pragma omp taskwait
@@ -157,7 +157,7 @@ void knapsack_par(struct item *e, int c, int n, int v, int *sol, int l)
           *sol = INT_MIN;
           return;
      }
-     if (l < nbs_cutoff_value)
+     if (l < bots_cutoff_value)
      {
         /* compute the best solution without the current item in the knapsack */
         #pragma omp task untied firstprivate(e,c,n,v,l) shared(without)
@@ -305,9 +305,9 @@ void knapsack_main_par (struct item *e, int c, int n, int v, int *sol)
         }
 
         #pragma omp critical
-        nbs_number_of_tasks += number_of_tasks;
+        bots_number_of_tasks += number_of_tasks;
      }
-     if (nbs_verbose_mode) printf("Best value for parallel execution is %d\n\n", *sol);
+     if (bots_verbose_mode) printf("Best value for parallel execution is %d\n\n", *sol);
 }
 void knapsack_main_seq (struct item *e, int c, int n, int v, int *sol)
 {
@@ -316,11 +316,11 @@ void knapsack_main_seq (struct item *e, int c, int n, int v, int *sol)
 
      knapsack_seq(e, c, n, 0, sol);
 
-     if (nbs_verbose_mode) printf("Best value for sequential execution is %d\n\n", *sol);
+     if (bots_verbose_mode) printf("Best value for sequential execution is %d\n\n", *sol);
 }
 
 int  knapsack_check (int sol_seq, int sol_par)
 {
-   if (sol_seq == sol_par) return NBS_RESULT_SUCCESSFUL;
-   else return NBS_RESULT_UNSUCCESSFUL;
+   if (sol_seq == sol_par) return BOTS_RESULT_SUCCESSFUL;
+   else return BOTS_RESULT_UNSUCCESSFUL;
 }

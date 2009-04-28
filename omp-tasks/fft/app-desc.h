@@ -1,16 +1,16 @@
 #include "omp-tasks-app.h"
 
-#define NBS_APP_NAME "FFT"
-#define NBS_APP_PARAMETERS_DESC "Size=%d"
-#define NBS_APP_PARAMETERS_LIST ,nbs_arg_size
+#define BOTS_APP_NAME "FFT"
+#define BOTS_APP_PARAMETERS_DESC "Size=%d"
+#define BOTS_APP_PARAMETERS_LIST ,bots_arg_size
 
-#define NBS_APP_CHECKING_NEEDS_SEQ
+#define BOTS_APP_CHECKING_NEEDS_SEQ
 
-#define NBS_APP_USES_ARG_SIZE
-#define NBS_APP_DEF_ARG_SIZE 32*1024*1024
-#define NBS_APP_DESC_ARG_SIZE "Matrix Size"
+#define BOTS_APP_USES_ARG_SIZE
+#define BOTS_APP_DEF_ARG_SIZE 32*1024*1024
+#define BOTS_APP_DESC_ARG_SIZE "Matrix Size"
 
-#define NBS_APP_CHECK_USES_SEQ_RESULT
+#define BOTS_APP_CHECK_USES_SEQ_RESULT
 
 /* our real numbers */
 typedef float REAL;
@@ -62,28 +62,28 @@ void fft(int n, COMPLEX * in, COMPLEX * out);
 void fft_seq(int n, COMPLEX * in, COMPLEX * out);
 int test_correctness(int n, COMPLEX *out1, COMPLEX *out2);
 
-#define NBS_APP_INIT int i;\
+#define BOTS_APP_INIT int i;\
      COMPLEX *in, *out1, *out2;\
-     in = malloc(nbs_arg_size * sizeof(COMPLEX));\
+     in = malloc(bots_arg_size * sizeof(COMPLEX));\
 
 #define KERNEL_INIT\
-     out1 = malloc(nbs_arg_size * sizeof(COMPLEX));\
-     for (i = 0; i < nbs_arg_size; ++i) {\
+     out1 = malloc(bots_arg_size * sizeof(COMPLEX));\
+     for (i = 0; i < bots_arg_size; ++i) {\
           c_re(in[i]) = 1.0;\
           c_im(in[i]) = 1.0;\
      }
-#define KERNEL_CALL fft(nbs_arg_size, in, out1);
+#define KERNEL_CALL fft(bots_arg_size, in, out1);
 #define KERNEL_FINI 
 
 #define KERNEL_SEQ_INIT\
-     out2 = malloc(nbs_arg_size * sizeof(COMPLEX));\
-     for (i = 0; i < nbs_arg_size; ++i) {\
+     out2 = malloc(bots_arg_size * sizeof(COMPLEX));\
+     for (i = 0; i < bots_arg_size; ++i) {\
           c_re(in[i]) = 1.0;\
           c_im(in[i]) = 1.0;\
      }
-#define KERNEL_SEQ_CALL fft_seq(nbs_arg_size, in, out2);
+#define KERNEL_SEQ_CALL fft_seq(bots_arg_size, in, out2);
 #define KERNEL_SEQ_FINI
 
 
-#define KERNEL_CHECK test_correctness(nbs_arg_size, out1, out2)
+#define KERNEL_CHECK test_correctness(bots_arg_size, out1, out2)
 

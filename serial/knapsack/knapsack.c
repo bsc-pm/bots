@@ -29,7 +29,7 @@
 #include <limits.h>
 #include <string.h>
 #include "app-desc.h"
-#include "nbs.h"
+#include "bots.h"
 
 int best_so_far;
 
@@ -125,5 +125,5 @@ void knapsack_main(struct item *e, int c, int n, int v, int *sol)
 {
      best_so_far = INT_MIN;
      knapsack(e, c, n, 0, sol);
-     if (nbs_verbose_mode) printf("Best value is %d\n\n", *sol);
+     if (bots_verbose_mode) printf("Best value is %d\n\n", *sol);
 }

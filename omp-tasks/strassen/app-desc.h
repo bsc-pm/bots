@@ -1,24 +1,24 @@
 #include "omp-tasks-app.h"
 
-#define NBS_APP_NAME "Strassen"
-#define NBS_APP_PARAMETERS_DESC "N=%d"
-#define NBS_APP_PARAMETERS_LIST ,nbs_arg_size
+#define BOTS_APP_NAME "Strassen"
+#define BOTS_APP_PARAMETERS_DESC "N=%d"
+#define BOTS_APP_PARAMETERS_LIST ,bots_arg_size
 
-#define NBS_APP_CHECKING_NEEDS_SEQ
+#define BOTS_APP_CHECKING_NEEDS_SEQ
 
-#define NBS_APP_USES_ARG_SIZE
-#define NBS_APP_DEF_ARG_SIZE 1024
-#define NBS_APP_DESC_ARG_SIZE "Matrix Size"
+#define BOTS_APP_USES_ARG_SIZE
+#define BOTS_APP_DEF_ARG_SIZE 1024
+#define BOTS_APP_DESC_ARG_SIZE "Matrix Size"
 
-#define NBS_APP_USES_ARG_BLOCK
-#define NBS_APP_DEF_ARG_BLOCK 32
-#define NBS_APP_DESC_ARG_BLOCK "Matrix Block Size"
+#define BOTS_APP_USES_ARG_BLOCK
+#define BOTS_APP_DEF_ARG_BLOCK 32
+#define BOTS_APP_DESC_ARG_BLOCK "Matrix Block Size"
 
-#define NBS_APP_USES_ARG_CUTOFF
-#define NBS_APP_DEF_ARG_CUTOFF 64
-#define NBS_APP_DESC_ARG_CUTOFF "Strassen Cutoff"
+#define BOTS_APP_USES_ARG_CUTOFF
+#define BOTS_APP_DEF_ARG_CUTOFF 64
+#define BOTS_APP_DESC_ARG_CUTOFF "Strassen Cutoff"
 
-#define NBS_CUTOFF_DEF_VALUE 3
+#define BOTS_CUTOFF_DEF_VALUE 3
 
 /***********************************************************************
  * The real numbers we are using --- either double or float
@@ -48,29 +48,29 @@ REAL *alloc_matrix(int n);
 void strassen_main_par(REAL *A, REAL *B, REAL *C, int n);
 void strassen_main_seq(REAL *A, REAL *B, REAL *C, int n);
 
-#define NBS_APP_INIT\
+#define BOTS_APP_INIT\
     double *A, *B, *C, *D;\
-    if ((nbs_arg_size & (nbs_arg_size - 1)) != 0 || (nbs_arg_size % 16) != 0) {\
-        printf("Error: matrix size (%d) must be a power of 2 and a multiple of %d\n", nbs_arg_size, 16);\
+    if ((bots_arg_size & (bots_arg_size - 1)) != 0 || (bots_arg_size % 16) != 0) {\
+        printf("Error: matrix size (%d) must be a power of 2 and a multiple of %d\n", bots_arg_size, 16);\
         exit (1);\
     }\
-    A = (double *) malloc (nbs_arg_size * nbs_arg_size * sizeof(double));\
-    B = (double *) malloc (nbs_arg_size * nbs_arg_size * sizeof(double));\
-    C = (double *) malloc (nbs_arg_size * nbs_arg_size * sizeof(double));\
-    D = (double *) malloc (nbs_arg_size * nbs_arg_size * sizeof(double));\
-    init_matrix(nbs_arg_size,A,nbs_arg_size);\
-    init_matrix(nbs_arg_size,B,nbs_arg_size);
+    A = (double *) malloc (bots_arg_size * bots_arg_size * sizeof(double));\
+    B = (double *) malloc (bots_arg_size * bots_arg_size * sizeof(double));\
+    C = (double *) malloc (bots_arg_size * bots_arg_size * sizeof(double));\
+    D = (double *) malloc (bots_arg_size * bots_arg_size * sizeof(double));\
+    init_matrix(bots_arg_size,A,bots_arg_size);\
+    init_matrix(bots_arg_size,B,bots_arg_size);
 
 //#define KERNEL_INIT
-#define KERNEL_CALL strassen_main_par(C,A,B,nbs_arg_size);
+#define KERNEL_CALL strassen_main_par(C,A,B,bots_arg_size);
 //#define KERNEL_FINI
 
 //#define KERNEL_SEQ_INIT
-#define KERNEL_SEQ_CALL strassen_main_seq(D,A,B,nbs_arg_size);
+#define KERNEL_SEQ_CALL strassen_main_seq(D,A,B,bots_arg_size);
 //#define KERNEL_SEQ_FINI
 
 
-#define KERNEL_CHECK compare_matrix(nbs_arg_size,C,nbs_arg_size,D,nbs_arg_size);
+#define KERNEL_CHECK compare_matrix(bots_arg_size,C,bots_arg_size,D,bots_arg_size);
 
-#define NBS_APP_CHECK_USES_SEQ_RESULT
+#define BOTS_APP_CHECK_USES_SEQ_RESULT
 

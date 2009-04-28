@@ -1,22 +1,22 @@
 #include "omp-tasks-app.h"
 
-#define NBS_APP_NAME "SparseLU"
-#define NBS_APP_PARAMETERS_DESC "S1=%dx%d, S2=%dx%d"
-#define NBS_APP_PARAMETERS_LIST ,nbs_arg_size_1,nbs_arg_size_1,nbs_arg_size_2,nbs_arg_size_2
+#define BOTS_APP_NAME "SparseLU"
+#define BOTS_APP_PARAMETERS_DESC "S1=%dx%d, S2=%dx%d"
+#define BOTS_APP_PARAMETERS_LIST ,bots_arg_size_1,bots_arg_size_1,bots_arg_size_2,bots_arg_size_2
 
-#define NBS_APP_CHECKING_NEEDS_SEQ
-#define NBS_APP_CHECK_USES_SEQ_RESULT
-#define NBS_APP_SELF_TIMING
+#define BOTS_APP_CHECKING_NEEDS_SEQ
+#define BOTS_APP_CHECK_USES_SEQ_RESULT
+#define BOTS_APP_SELF_TIMING
 
-#define NBS_APP_USES_ARG_SIZE_1
-#define NBS_APP_DEF_ARG_SIZE_1 50
-#define NBS_APP_DESC_ARG_SIZE_1 "Matrix Size"
+#define BOTS_APP_USES_ARG_SIZE_1
+#define BOTS_APP_DEF_ARG_SIZE_1 50
+#define BOTS_APP_DESC_ARG_SIZE_1 "Matrix Size"
 
-#define NBS_APP_USES_ARG_SIZE_2
-#define NBS_APP_DEF_ARG_SIZE_2 100
-#define NBS_APP_DESC_ARG_SIZE_2 "Submatrix Size"
+#define BOTS_APP_USES_ARG_SIZE_2
+#define BOTS_APP_DEF_ARG_SIZE_2 100
+#define BOTS_APP_DESC_ARG_SIZE_2 "Submatrix Size"
 
-#define NBS_APP_INIT float **SEQ,**BENCH;
+#define BOTS_APP_INIT float **SEQ,**BENCH;
 
 int checkmat (float *M, float *N);
 void genmat (float *M[]);

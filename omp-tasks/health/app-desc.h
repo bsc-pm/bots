@@ -1,16 +1,16 @@
 #include "omp-tasks-app.h"
 
-#define NBS_APP_NAME "Health"
-#define NBS_APP_PARAMETERS_DESC "%s"
-#define NBS_APP_PARAMETERS_LIST ,nbs_arg_file
+#define BOTS_APP_NAME "Health"
+#define BOTS_APP_PARAMETERS_DESC "%s"
+#define BOTS_APP_PARAMETERS_LIST ,bots_arg_file
 
-//#define NBS_APP_SELF_TIMING
+//#define BOTS_APP_SELF_TIMING
 
-#define NBS_APP_USES_ARG_FILE
-#define NBS_APP_DEF_ARG_FILE "Input filename"
-#define NBS_APP_DESC_ARG_FILE
+#define BOTS_APP_USES_ARG_FILE
+#define BOTS_APP_DEF_ARG_FILE "Input filename"
+#define BOTS_APP_DESC_ARG_FILE
 
-#define NBS_CUTOFF_DEF_VALUE 2
+#define BOTS_CUTOFF_DEF_VALUE 2
 
 /* random defines */
 #define IA 16807
@@ -95,9 +95,9 @@ void sim_village_main_seq(struct Village *top);
 
 int check_village(struct Village *top);
 
-#define NBS_APP_INIT \
+#define BOTS_APP_INIT \
    struct Village *top;\
-   read_input_data(nbs_arg_file);
+   read_input_data(bots_arg_file);
 
 #define KERNEL_INIT \
    allocate_village(&top, NULL, NULL, sim_level, 0);

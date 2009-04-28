@@ -7,7 +7,7 @@
 #include <math.h>
 #include <assert.h>
 #include "app-desc.h"
-#include "nbs.h"
+#include "bots.h"
 
 /* global variables */
 int sim_level;
@@ -430,7 +430,7 @@ void sim_village_par(struct Village *village)
    vlist = village->forward;
    while(vlist)
    {
-#pragma omp task untied if((sim_level - village->level) < nbs_cutoff_value)
+#pragma omp task untied if((sim_level - village->level) < bots_cutoff_value)
       sim_village_par(vlist);
       vlist = vlist->next;
    }
@@ -464,7 +464,7 @@ void sim_village_par(struct Village *village)
 
    /* Traverse village hierarchy (lower level first)*/
    vlist = village->forward;
-   if ((sim_level-village->level) < nbs_cutoff_value)
+   if ((sim_level-village->level) < bots_cutoff_value)
    {
       while(vlist)
       {
@@ -491,7 +491,7 @@ void sim_village_par(struct Village *village)
    /* Uses lists v->hosp->waiting, and v->hosp->assess */
    check_patients_waiting(village);
 
-   if ((sim_level-village->level) < nbs_cutoff_value)
+   if ((sim_level-village->level) < bots_cutoff_value)
    {
 #pragma omp taskwait
    }
@@ -632,7 +632,7 @@ void read_input_data(char *filename)
    );
    fclose(fin);
 
-   if (nbs_verbose_mode)
+   if (bots_verbose_mode)
    {
       // Printing input data
       fprintf(stdout,"\n");
@@ -651,19 +651,19 @@ void read_input_data(char *filename)
 int check_village(struct Village *top)
 {
    struct Results result = get_results(top);
-   int answer = NBS_RESULT_SUCCESSFUL;
+   int answer = BOTS_RESULT_SUCCESSFUL;
 
-   if (res_population != result.total_patients) answer = NBS_RESULT_UNSUCCESSFUL;
-   if (res_hospitals != result.hosps_number) answer = NBS_RESULT_UNSUCCESSFUL;
-   if (res_personnel != result.hosps_personnel) answer = NBS_RESULT_UNSUCCESSFUL;
-   if (res_checkin != result.total_hosps_v) answer = NBS_RESULT_UNSUCCESSFUL;
-   if (res_village != result.total_in_village) answer = NBS_RESULT_UNSUCCESSFUL;
-   if (res_waiting != result.total_waiting) answer = NBS_RESULT_UNSUCCESSFUL;
-   if (res_assess != result.total_assess) answer = NBS_RESULT_UNSUCCESSFUL;
-   if (res_inside != result.total_inside) answer = NBS_RESULT_UNSUCCESSFUL;
-   if (res_avg_stay > (float) (result.total_time/result.total_patients)+0.005) answer = NBS_RESULT_UNSUCCESSFUL;
-   if (res_avg_stay < (float) (result.total_time/result.total_patients)-0.005) answer = NBS_RESULT_UNSUCCESSFUL;
-   if (nbs_verbose_mode)
+   if (res_population != result.total_patients) answer = BOTS_RESULT_UNSUCCESSFUL;
+   if (res_hospitals != result.hosps_number) answer = BOTS_RESULT_UNSUCCESSFUL;
+   if (res_personnel != result.hosps_personnel) answer = BOTS_RESULT_UNSUCCESSFUL;
+   if (res_checkin != result.total_hosps_v) answer = BOTS_RESULT_UNSUCCESSFUL;
+   if (res_village != result.total_in_village) answer = BOTS_RESULT_UNSUCCESSFUL;
+   if (res_waiting != result.total_waiting) answer = BOTS_RESULT_UNSUCCESSFUL;
+   if (res_assess != result.total_assess) answer = BOTS_RESULT_UNSUCCESSFUL;
+   if (res_inside != result.total_inside) answer = BOTS_RESULT_UNSUCCESSFUL;
+   if (res_avg_stay > (float) (result.total_time/result.total_patients)+0.005) answer = BOTS_RESULT_UNSUCCESSFUL;
+   if (res_avg_stay < (float) (result.total_time/result.total_patients)-0.005) answer = BOTS_RESULT_UNSUCCESSFUL;
+   if (bots_verbose_mode)
    {
       fprintf(stdout,"\n");
       fprintf(stdout,"Sim. Variables      = expect / result\n", (int)   res_population, (int) result.total_patients);

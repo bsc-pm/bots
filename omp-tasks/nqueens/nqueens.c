@@ -28,7 +28,7 @@
 #include <stdio.h>
 #include <memory.h>
 #include <alloca.h>
-#include "nbs.h"
+#include "bots.h"
 
 
 /* Checking information */
@@ -141,7 +141,7 @@ void nqueens(int n, int j, char *a, int *solutions, int depth)
 
      	/* try each possible position for queen <j> */
 	for (i = 0; i < n; i++) {
- 		#pragma omp task untied if(depth < nbs_cutoff_value)
+ 		#pragma omp task untied if(depth < bots_cutoff_value)
 		{
 	  		/* allocate a temporary array and copy <a> into it */
 	  		char * b = alloca((j + 1) * sizeof(char));
@@ -186,7 +186,7 @@ void nqueens(int n, int j, char *a, int *solutions, int depth)
 
      	/* try each possible position for queen <j> */
 	for (i = 0; i < n; i++) {
-		if ( depth < nbs_cutoff_value ) {
+		if ( depth < bots_cutoff_value ) {
  			#pragma omp task untied
 			{
 	  			/* allocate a temporary array and copy <a> into it */
@@ -290,10 +290,10 @@ void find_queens (int size)
 
 int verify_queens (int size)
 {
-	if ( size > MAX_SOLUTIONS ) return NBS_RESULT_NA;
+	if ( size > MAX_SOLUTIONS ) return BOTS_RESULT_NA;
 
 
-	if ( total_count == solutions[size-1]) return NBS_RESULT_SUCCESSFUL;
+	if ( total_count == solutions[size-1]) return BOTS_RESULT_SUCCESSFUL;
 
-	return NBS_RESULT_UNSUCCESSFUL;
+	return BOTS_RESULT_UNSUCCESSFUL;
 }

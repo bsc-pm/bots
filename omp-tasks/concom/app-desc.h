@@ -1,23 +1,23 @@
 #include "omp-tasks-app.h"
 
-#define NBS_APP_NAME "Connected Components"
-#define NBS_APP_PARAMETERS_DESC "N=%d,L=%d,M=%d"
-#define NBS_APP_PARAMETERS_LIST ,nbs_arg_size,nbs_arg_size_2,nbs_arg_size_1
+#define BOTS_APP_NAME "Connected Components"
+#define BOTS_APP_PARAMETERS_DESC "N=%d,L=%d,M=%d"
+#define BOTS_APP_PARAMETERS_LIST ,bots_arg_size,bots_arg_size_2,bots_arg_size_1
 
-#define NBS_APP_CHECK_USES_SEQ_RESULT
-//#define NBS_APP_SELF_TIMING
+#define BOTS_APP_CHECK_USES_SEQ_RESULT
+//#define BOTS_APP_SELF_TIMING
 
-#define NBS_APP_USES_ARG_SIZE
-#define NBS_APP_DEF_ARG_SIZE 100000
-#define NBS_APP_DESC_ARG_SIZE "Number of nodes"
+#define BOTS_APP_USES_ARG_SIZE
+#define BOTS_APP_DEF_ARG_SIZE 100000
+#define BOTS_APP_DESC_ARG_SIZE "Number of nodes"
 
-#define NBS_APP_USES_ARG_SIZE_1
-#define NBS_APP_DEF_ARG_SIZE_1 20
-#define NBS_APP_DESC_ARG_SIZE_1 "Maximum number of neighbors per node"
+#define BOTS_APP_USES_ARG_SIZE_1
+#define BOTS_APP_DEF_ARG_SIZE_1 20
+#define BOTS_APP_DESC_ARG_SIZE_1 "Maximum number of neighbors per node"
 
-#define NBS_APP_USES_ARG_SIZE_2
-#define NBS_APP_DEF_ARG_SIZE_2 100000
-#define NBS_APP_DESC_ARG_SIZE_2 "Number of links in the entire graph"
+#define BOTS_APP_USES_ARG_SIZE_2
+#define BOTS_APP_DEF_ARG_SIZE_2 100000
+#define BOTS_APP_DESC_ARG_SIZE_2 "Number of links in the entire graph"
 
 typedef struct node {
     int   n;
@@ -35,7 +35,7 @@ void cc_par(int *cc);
 void cc_seq(int *cc);
 int cc_check(int ccs, int ccb);
 
-#define NBS_APP_INIT int ccs, ccp;\
+#define BOTS_APP_INIT int ccs, ccp;\
    initialize();
 
 #define KERNEL_INIT cc_init();

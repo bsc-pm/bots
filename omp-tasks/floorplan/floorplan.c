@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "app-desc.h"
-#include "nbs.h"
+#include "bots.h"
 
 #define ROWS 64
 #define COLS 64
@@ -10,6 +10,9 @@
 #define verbose 0
 #define max(a, b) ((a > b) ? a : b)
 #define min(a, b) ((a < b) ? a : b)
+
+int number_of_tasks;
+#pragma omp threadprivate(number_of_tasks)
 
 int solution = -1;
 
@@ -172,16 +175,18 @@ static void write_outputs() {
 } }
 
 
-static void add_cell_ser (int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS) {
-  int  i, j, nn, area;
+static int add_cell_ser (int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS) {
+  int  i, j, nn, nn2, area;
 
   ibrd board;
   coor footprint, NWS[DMAX];
 
+  nn2 = 0;
 /* for each possible shape */
   for (i = 0; i < CELLS[id].n; i++) {
 /* compute all possible locations for nw corner */
       nn = starts(id, i, NWS, CELLS);
+      nn2 += nn;
 /* for all possible locations */
       for (j = 0; j < nn; j++) {
 	  struct cell cells[N+1];
@@ -223,7 +228,7 @@ static void add_cell_ser (int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS
 
 /* if area is less than best area */
           } else if (area < MIN_AREA) {
-             add_cell_ser(cells[id].next, footprint, board,cells);
+             nn2 += add_cell_ser(cells[id].next, footprint, board,cells);
 
 /* if area is greater than or equal to best area, prune search */
           } else {
@@ -234,29 +239,32 @@ static void add_cell_ser (int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS
 _end:;  
 }
 }
+  return nn2;
   }
 
 #if defined(IF_CUTOFF)
 
-static void add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS,int level) {
-  int  i, j, nn, area;
+static int add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS,int level) {
+  int  i, j, nn, area, nn2;
 
   ibrd board;
   coor footprint, NWS[DMAX];
 
+  nn2 = 0;
 /* for each possible shape */
   for (i = 0; i < CELLS[id].n; i++) {
 /* compute all possible locations for nw corner */
       nn = starts(id, i, NWS, CELLS);
+      nn2 += nn;
 /* for all possible locations */
       for (j = 0; j < nn; j++) {
 #pragma omp task default(none) untied private(board, footprint,area) \
 firstprivate(NWS,i,j,id,nn,level) \
-shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD) \
-if(level<nbs_cutoff_value)
+shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD,nn2) \
+if(level<bots_cutoff_value)
 {
 	  struct cell cells[N+1];
-
+	  number_of_tasks++;
 	  memcpy(cells,CELLS,sizeof(struct cell)*(N+1));
 /* extent of shape */
           cells[id].top = NWS[j][0];
@@ -294,7 +302,7 @@ if(level<nbs_cutoff_value)
 
 /* if area is less than best area */
           } else if (area < MIN_AREA) {
-                add_cell(cells[id].next, footprint, board,cells,level+1);
+                nn2 += add_cell(cells[id].next, footprint, board,cells,level+1);
 /* if area is greater than or equal to best area, prune search */
           } else {
 
@@ -306,28 +314,31 @@ _end:;
       }
 }
 #pragma omp taskwait
-
+return nn2;
 }
 
 #elif defined(MANUAL_CUTOFF)
 
-static void add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS,int level) {
-  int  i, j, nn, area;
+static int add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS,int level) {
+  int  i, j, nn, area, nn2;
 
   ibrd board;
   coor footprint, NWS[DMAX];
 
+  nn2 = 0;
 /* for each possible shape */
   for (i = 0; i < CELLS[id].n; i++) {
 /* compute all possible locations for nw corner */
       nn = starts(id, i, NWS, CELLS);
+      nn2 += nn;
 /* for all possible locations */
       for (j = 0; j < nn; j++) {
 #pragma omp task untied default(none) private(board, footprint,area) \
-firstprivate(NWS,i,j,id,nn,level) shared(nbs_cutoff_value) \
+firstprivate(NWS,i,j,id,nn,level) shared(bots_cutoff_value,nn2) \
 shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD)
 {
 	  struct cell cells[N+1];
+          
 
 	  memcpy(cells,CELLS,sizeof(struct cell)*(N+1));
 /* extent of shape */
@@ -366,10 +377,10 @@ shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD)
 
 /* if area is less than best area */
           } else if (area < MIN_AREA) {
-	     if(level+1 < nbs_cutoff_value )
-                add_cell(cells[id].next, footprint, board,cells,level+1);
+	     if(level+1 < bots_cutoff_value )
+                nn2 += add_cell(cells[id].next, footprint, board,cells,level+1);
 	     else
-		add_cell_ser(cells[id].next, footprint, board,cells);
+		nn2 += add_cell_ser(cells[id].next, footprint, board,cells);
 
 /* if area is greater than or equal to best area, prune search */
           } else {
@@ -382,29 +393,32 @@ _end:;
       }
 }
 #pragma omp taskwait
-
+  
+return nn2;
 }
 
 #else
 
-static void add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS) {
-  int  i, j, nn, area;
+static int add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS) {
+  int  i, j, nn, area, nn2;
 
   ibrd board;
   coor footprint, NWS[DMAX];
 
+  nn2 = 0;
 /* for each possible shape */
   for (i = 0; i < CELLS[id].n; i++) {
 /* compute all possible locations for nw corner */
       nn = starts(id, i, NWS, CELLS);
+      nn2 += nn;
 /* for all possible locations */
       for (j = 0; j < nn; j++) {
 #pragma omp task untied default(none) private(board, footprint,area) \
 firstprivate(NWS,i,j,id,nn) \
-shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD) 
+shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD,nn2) 
 {
 	  struct cell cells[N+1];
-
+	  number_of_tasks++;
 	  memcpy(cells,CELLS,sizeof(struct cell)*(N+1));
 /* extent of shape */
           cells[id].top = NWS[j][0];
@@ -442,7 +456,7 @@ shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD)
 
 /* if area is less than best area */
           } else if (area < MIN_AREA) {
-	      add_cell(cells[id].next, footprint, board,cells);
+	      nn2 += add_cell(cells[id].next, footprint, board,cells);
 /* if area is greater than or equal to best area, prune search */
           } else {
 
@@ -454,7 +468,7 @@ _end:;
       }
 }
 #pragma omp taskwait
-
+return nn2;
 }
 
 #endif
@@ -490,12 +504,15 @@ void compute_floorplan (void)
     footprint[1] = 0;
 
 #pragma omp parallel
+{
+      number_of_tasks = 0;
 #pragma omp single
 #if defined(MANUAL_CUTOFF) || defined(IF_CUTOFF)
-       add_cell(1, footprint, board, gcells,0);
+       bots_number_of_tasks = add_cell(1, footprint, board, gcells,0);
 #else
-       add_cell(1, footprint, board, gcells);
+       bots_number_of_tasks = add_cell(1, footprint, board, gcells);
 #endif
+}
 
 }
 
@@ -508,7 +525,7 @@ void floorplan_end (void)
 int floorplan_verify (void)
 {
     if (solution != -1 )
-      return MIN_AREA == solution ? NBS_RESULT_SUCCESSFUL : NBS_RESULT_UNSUCCESSFUL;
+      return MIN_AREA == solution ? BOTS_RESULT_SUCCESSFUL : BOTS_RESULT_UNSUCCESSFUL;
     else
-      return NBS_RESULT_NA;
+      return BOTS_RESULT_NA;
 }

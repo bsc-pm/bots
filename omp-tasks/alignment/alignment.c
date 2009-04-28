@@ -6,7 +6,7 @@
 #include <libgen.h>
 #include "param.h"
 #include "alignment.h"
-#include "nbs.h"
+#include "bots.h"
 
 int readseqs(int first_seq, char *filename);
 
@@ -546,11 +546,11 @@ void pairalign_init (char *filename)
 
 	init_matrix();
 
-	if (nbs_verbose_mode) fprintf(stdout,"Multiple Pair Alignment\n");
+	if (bots_verbose_mode) fprintf(stdout,"Multiple Pair Alignment\n");
 
 	nseqs = readseqs(1,filename);
 
-	if (nbs_verbose_mode)
+	if (bots_verbose_mode)
 	{
 		for (i = 1; i <= nseqs; i++)
 			fprintf(stdout, "Sequence %d: %s %6.d aa\n", i, names[i], seqlen_array[i]);
@@ -625,10 +625,10 @@ int align_verify ()
 		for(j = 0; j<nseqs; j++)
 		{
 			if (bench_output[i*nseqs+j] != seq_output[i*nseqs+j])
-				return NBS_RESULT_UNSUCCESSFUL;
+				return BOTS_RESULT_UNSUCCESSFUL;
 		}
 	}
-	return NBS_RESULT_SUCCESSFUL;
+	return BOTS_RESULT_SUCCESSFUL;
 }
 		
 

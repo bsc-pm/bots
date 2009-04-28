@@ -3,7 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "alignment.h"
-#include "nbs.h"
+#include "bots.h"
 
 extern int *seqlen_array;
 extern int nseqs, gap_pos2;
@@ -143,7 +143,7 @@ int readseqs(int first_seq, char *filename)
 	fscanf(fin,"Number of sequences is %d", &no_seqs);
 	
 	fill_chartab(chartab);
-	if (nbs_verbose_mode) fprintf(stdout, "Sequence format is Pearson\n");
+	if (bots_verbose_mode) fprintf(stdout, "Sequence format is Pearson\n");
 
 	alloc_aln(no_seqs);
 

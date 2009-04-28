@@ -57,7 +57,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "nbs.h"
+#include "bots.h"
 
 typedef long ELM;
 
@@ -451,6 +451,6 @@ int sort_verify (int size)
 	  if (array[i] != i)
 	       success = 0;
 
-     return success ? NBS_RESULT_SUCCESSFUL : NBS_RESULT_UNSUCCESSFUL;
+     return success ? BOTS_RESULT_SUCCESSFUL : BOTS_RESULT_UNSUCCESSFUL;
 }
 

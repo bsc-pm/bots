@@ -3,11 +3,11 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include "app-desc.h"
-#include "nbs.h"
+#include "bots.h"
 
-// nbs_arg_size == Number of nodes
-// nbs_arg_size_1 == Maximum number of neighbors per node
-// nbs_arg_size_2 == Number of links in the entire graph
+// bots_arg_size == Number of nodes
+// bots_arg_size_1 == Maximum number of neighbors per node
+// bots_arg_size_2 == Number of links in the entire graph
 
 node *nodes;
 int *visited, *components;
@@ -17,8 +17,8 @@ int linkable(int N1, int N2) {
     int i;
 
     if (N1 == N2) return (0);
-    if (nodes[N1].n >= nbs_arg_size_1) return (0);
-    if (nodes[N2].n >= nbs_arg_size_1) return (0);
+    if (nodes[N1].n >= bots_arg_size_1) return (0);
+    if (nodes[N2].n >= bots_arg_size_1) return (0);
     
     for (i = 0; i < nodes[N1].n; i++)
         if (nodes[N1].neighbor[i] == N2) return (0);
@@ -31,21 +31,21 @@ void initialize() {
    int i, l1, l2, N1, N2;
    double RN;
    
-   nodes = (node *) malloc(nbs_arg_size * sizeof(node)); 
-   visited = (int *) malloc(nbs_arg_size * sizeof(int)); 
-   components = (int *) malloc(nbs_arg_size * sizeof(int)); 
+   nodes = (node *) malloc(bots_arg_size * sizeof(node)); 
+   visited = (int *) malloc(bots_arg_size * sizeof(int)); 
+   components = (int *) malloc(bots_arg_size * sizeof(int)); 
    /* initialize nodes */
-   for (i = 0; i < nbs_arg_size; i++) {
+   for (i = 0; i < bots_arg_size; i++) {
       nodes[i].n = 0;
-      nodes[i].neighbor = (int *) malloc(nbs_arg_size_1 * sizeof(int));
+      nodes[i].neighbor = (int *) malloc(bots_arg_size_1 * sizeof(int));
    }
    /* for each link, generate end nodes and link */
-   for (i = 0; i < nbs_arg_size_2; i++)
+   for (i = 0; i < bots_arg_size_2; i++)
    {
       RN = rand() / (double) RAND_MAX;
-      N1 = (int) ((nbs_arg_size-1) * RN);
+      N1 = (int) ((bots_arg_size-1) * RN);
       RN = rand() / (double) RAND_MAX;
-      N2 = (int) ((nbs_arg_size-1) * RN);
+      N2 = (int) ((bots_arg_size-1) * RN);
       if (linkable(N1, N2)) {
          l1 = nodes[N1].n;
          l2 = nodes[N2].n;
@@ -62,7 +62,7 @@ void write_outputs(int n, int cc) {
 
   printf("Graph %d, Number of components %d\n", n, cc);
 
-  if (nbs_verbose_mode)
+  if (bots_verbose_mode)
      for (i = 0; i < cc; i++)
          printf("Component %d       Size: %d\n", i, components[i]);
 }
@@ -73,7 +73,7 @@ void CC_par (int i, int cc)
    /* if node has not been visited */
    if (visited[i] == 0) {
       /* add node to current component */
-      if (nbs_verbose_mode) printf("Adding node %d to component %d\n", i, cc);
+      if (bots_verbose_mode) printf("Adding node %d to component %d\n", i, cc);
       #pragma omp critical
       {
          visited[i] = 1;
@@ -95,7 +95,7 @@ void CC_seq (int i, int cc)
    /* if node has not been visited */
    if (visited[i] == 0) {
       /* add node to current component */
-      if (nbs_verbose_mode) printf("Adding node %d to component %d\n", i, cc);
+      if (bots_verbose_mode) printf("Adding node %d to component %d\n", i, cc);
       {
          visited[i] = 1;
          components[cc]++;
@@ -112,7 +112,7 @@ void cc_init()
 {
     int i;
    /* initialize global data structures */      
-   for (i = 0; i < nbs_arg_size; i++)
+   for (i = 0; i < bots_arg_size; i++)
    {
       visited[i] = 0;
       components[i] = 0;
@@ -126,7 +126,7 @@ void cc_par(int *cc)
    #pragma omp parallel
    #pragma omp single
    #pragma omp task untied
-   for (i = 0; i < nbs_arg_size; i++)
+   for (i = 0; i < bots_arg_size; i++)
    {
       if (visited[i] == 0)
       {
@@ -142,7 +142,7 @@ void cc_seq(int *cc)
    int i;
    (*cc) = 0;
    /* for all nodes ... unvisited nodes start a new component */
-   for (i = 0; i < nbs_arg_size; i++)
+   for (i = 0; i < bots_arg_size; i++)
    {
       if (visited[i] == 0)
       {
@@ -153,7 +153,7 @@ void cc_seq(int *cc)
 }
 int cc_check(int ccs, int ccp)
 {
-  if (nbs_verbose_mode) fprintf(stdout, "Sequential = %d CC, Parallel =%d CC\n", ccs, ccp);
-  if (ccs == ccp) return NBS_RESULT_SUCCESSFUL;
-  else return NBS_RESULT_UNSUCCESSFUL;
+  if (bots_verbose_mode) fprintf(stdout, "Sequential = %d CC, Parallel =%d CC\n", ccs, ccp);
+  if (ccs == ccp) return BOTS_RESULT_SUCCESSFUL;
+  else return BOTS_RESULT_UNSUCCESSFUL;
 }

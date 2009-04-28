@@ -1,5 +1,5 @@
 
 #define MODEL SERIAL
-#define NBS_MODEL_DESC "Serial"
+#define BOTS_MODEL_DESC "Serial"
 
 
