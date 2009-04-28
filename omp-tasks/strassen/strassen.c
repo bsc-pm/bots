@@ -18,6 +18,12 @@
 /*  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA            */
 /**********************************************************************************************/
 
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include "app-desc.h"
+#include "bots.h"
+
 /*FIXME: change to parameter ???*/
 #define SizeAtWhichNaiveAlgorithmIsMoreEfficient 16
 

@@ -19,6 +19,23 @@
 /**********************************************************************************************/
 
 /***********************************************************************
+ * main function & common behaviour of the benchmark.
+ **********************************************************************/
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+#include <stddef.h>
+#include <memory.h>
+#include <sys/time.h>
+#include <libgen.h>
+#include "bots_common.h"
+#include "bots_main.h"
+#include "bots.h"
+#include "app-desc.h"
+
+
+/***********************************************************************
  * BENCHMARK HEADERS 
  *********************************************************************/
 void bots_initialize();
