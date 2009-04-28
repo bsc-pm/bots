@@ -18,6 +18,31 @@
 /*  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA            */
 /**********************************************************************************************/
 
+/* common flags */
+extern int bots_sequential_flag;
+extern int bots_check_flag;
+extern int bots_result;
+extern int bots_output_format;
+extern int bots_print_header;
+/* common variables */
+extern char bots_name[];
+extern char bots_parameters[];
+extern char bots_model[];
+extern char bots_resources[];
+/* compile and execution information */
+extern char bots_exec_date[];
+extern char bots_exec_message[];
+extern char bots_comp_date[];
+extern char bots_comp_message[];
+extern char bots_cc[];
+extern char bots_cflags[];
+extern char bots_ld[];
+extern char bots_ldflags[];
+/* time variables */
+extern double bots_time_program;
+extern double bots_time_sequential;
+extern int    bots_number_of_tasks;
+
 extern char bots_cutoff[];
 extern int  bots_cutoff_value;
 extern int  bots_verbose_mode;
