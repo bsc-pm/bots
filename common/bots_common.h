@@ -49,7 +49,5 @@
 void bots_get_date(char *str);
 void bots_get_architecture(char *str);
 void bots_get_load_average(char *str);
-void bots_error(int error, char *message);
-void bots_warning(int warning, char *message);
 void bots_print_results(void);
 #endif

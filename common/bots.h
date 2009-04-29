@@ -51,9 +51,10 @@ extern int bots_arg_size;
 extern int bots_arg_size_1;
 extern int bots_arg_size_2;
 
-/* function could be used in app. code */
+/* function could be used in app. code but are implemented in bots_common.c */
 long bots_usecs();
 void bots_error(int error, char *message);
+void bots_warning(int warning, char *message);
 
 #define BOTS_RESULT_NA 0
 #define BOTS_RESULT_SUCCESSFUL 1
