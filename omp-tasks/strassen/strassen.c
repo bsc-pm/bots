@@ -3,20 +3,37 @@
 /*  Copyright (C) 2009 Barcelona Supercomputing Center - Centro Nacional de Supercomputacion  */
 /*  Copyright (C) 2009 Universitat Politecnica de Catalunya                                   */
 /*                                                                                            */
-/*  This program is free software; you can redistribute it and/or modify                      */
-/*  it under the terms of the GNU General Public License as published by                      */
-/*  the Free Software Foundation; either version 2 of the License, or                         */
-/*  (at your option) any later version.                                                       */
-/*                                                                                            */
-/*  This program is distributed in the hope that it will be useful,                           */
-/*  but WITHOUT ANY WARRANTY; without even the implied warranty of                            */
-/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                             */
-/*  GNU General Public License for more details.                                              */
-/*                                                                                            */
-/*  You should have received a copy of the GNU General Public License                         */
-/*  along with this program; if not, write to the Free Software                               */
-/*  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA            */
 /**********************************************************************************************/
+
+/*
+ * Copyright (c) 1996 Massachusetts Institute of Technology
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to use, copy, modify, and distribute the Software without
+ * restriction, provided the Software, including any modified copies made
+ * under this license, is not distributed for a fee, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE MASSACHUSETTS INSTITUTE OF TECHNOLOGY BE LIABLE
+ * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * Except as contained in this notice, the name of the Massachusetts
+ * Institute of Technology shall not be used in advertising or otherwise
+ * to promote the sale, use or other dealings in this Software without
+ * prior written authorization from the Massachusetts Institute of
+ * Technology.
+ *
+ */
+
 
 #include <math.h>
 #include <stdio.h>
