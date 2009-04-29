@@ -6,13 +6,12 @@ print_help()
 	echo "$0 [options]"
 	echo "Where options are:"
 	echo "-c cpus_list		List of number of cpus to use for executions"
-	echo "-C class_list		List of execution classes to use (TODO)"
-	echo "-f suite			Suite file to define benchmarks execution"
+	echo "-C class_list		List of execution classes to use"
 	echo "-h			Prints this help"
 	echo "-i inputs_list		List of inputs to use for executions"
 	echo "-v versions_list		List of versions of the benchmark to use for execution"
-	echo "-verify			Enable verification (TODO)"
-	echo "-verbose			Show extra messages (TODO)"
+	echo "-verify			Enable verification"
+	echo "-verbose			Show extra messages"
 }
 
 parse_args ()
@@ -22,8 +21,6 @@ parse_args ()
 			"-c")   shift; ARG_CPUS=$1
 				;;
 			"-C")   shift; ARG_CLASSES=$1
-				;;
-			"-f")	shift; ARG_SUITE=$1
 				;;
 			"-h") 	print_help $0; exit 
 				;;
@@ -46,7 +43,7 @@ parse_args ()
 
 parse_class_file ()
 {
-	local file=$SUITE_DIR/$1
+	local file=$CLASS_DIR/$1
 	shift
 
 	while read line; do
@@ -76,32 +73,6 @@ parse_class_file ()
 	done < $file
 }
 
-parse_suite ()
-{
-	local file=$1
-	local scope=
-	local key value
-	local found=no
-
-	while read line; do
-		if [ "${line:0:1}" = "[" ]; then
-			local n=${#line}
-			scope=${line:1:n-2}
-			[ "$scope" = "$APP" ] && found=yes;	
-		elif [ -z "$scope" -o "$scope" = "$APP" ]; then
-			key=${line%=*}
-			value=${line#*=}
-	
-			case $key in
-				versions) SUITE_VERSIONS=$value;;
-				cpus) SUITE_CPUS=$value;;
-				sizes) SUITE_INPUTS=$value;;
-				inputs) SUITE_INPUTS=$value;;
-			esac
-		fi
-	done < $file
-	[ "$found" = "no" ] && echo "Application $APP not in suite" && exit
-}
 
 compute_max_cpus ()
 {
@@ -172,9 +143,6 @@ expand_inputs ()
 
 set_values ()
 {
-#	if [ "$ARG_SUITE" ]; then
-#		parse_suite $ARG_SUITE
-#	fi
 
 	if [ "$ARG_CLASSES" ]; then
 		parse_class_file $APP $(echo $ARG_CLASSES | tr , ' ')
@@ -182,8 +150,6 @@ set_values ()
 
 	if [ "$ARG_CPUS" ]; then
 		CPUS=$ARG_CPUS
-	elif [ "$SUITE_CPUS" ]; then
-		CPUS=$SUITE_CPUS
 	else
 		CPUS=$DEF_CPUS
 	fi 
@@ -191,8 +157,6 @@ set_values ()
 
 	if [ "$ARG_VERSIONS" ]; then
 		VERSIONS=$ARG_VERSIONS
-	elif [ "$SUITE_VERSIONS" ]; then
-		VERSIONS=$SUITE_VERSIONS
 	else
 		VERSIONS=$DEF_VERSIONS
 	fi 
@@ -202,12 +166,20 @@ set_values ()
 		INPUTS=$ARG_INPUTS
 	elif [ "$CLASS_INPUTS" ]; then
 		INPUTS=$CLASS_INPUTS
-	elif [ "$SUITE_INPUTS" ]; then
-		INPUTS=$SUITE_INPUTS
 	else
 		INPUTS=$DEF_INPUTS
 	fi 
 	expand_inputs
+}
+
+exec_serial ()
+{
+	command=$BIN/$2
+	cpus=$1
+	shift 2
+
+	[ "$cpus" -eq 1 ] && $command $*
+	return 0
 }
 
 exec_omp ()
@@ -248,6 +220,7 @@ exec_app ()
 	shift 3
 
 	[ "$EXEC_MANAGER" ] && exec_external $cpus $app $version $* && return
+	(echo $version | grep serial) > /dev/null && exec_serial $cpus $app.$version $* && return
 	(echo $version | grep omp) > /dev/null && exec_omp $cpus $app.$version $* && return
 
 	echo "FATAL ERROR: Don't know how to execute $version"
@@ -341,8 +314,7 @@ fi
 
 BIN=$BASE_DIR/bin
 RUN=$BASE_DIR/run
-CLASS_DIR=$RUN/class
-SUITE_DIR=$RUN/suites
+CLASS_DIR=$RUN/classes
 INPUTS_DIR=$BASE_DIR/inputs
 
 
