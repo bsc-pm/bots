@@ -53,6 +53,7 @@ extern int bots_arg_size_2;
 
 /* function could be used in app. code */
 long bots_usecs();
+void bots_error(int error, char *message);
 
 #define BOTS_RESULT_NA 0
 #define BOTS_RESULT_SUCCESSFUL 1
