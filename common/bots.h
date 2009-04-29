@@ -58,6 +58,10 @@ long bots_usecs();
 #define BOTS_RESULT_SUCCESSFUL 1
 #define BOTS_RESULT_UNSUCCESSFUL 2
 
+#define BOTS_VERBOSE_NONE 0
+#define BOTS_VERBOSE_DEFAULT 1
+#define BOTS_VERBOSE_DEBUG 2
+
 #define FALSE 0
 #define TRUE 1
 
