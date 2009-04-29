@@ -562,17 +562,16 @@ void pairalign_init (char *filename)
 	int i;
 
 	if (!filename || !filename[0]) {
-		fprintf(stdout,"Please specify an input file with the -f option\n");
-		exit(-1);
+		bots_error(0, "Please specify an input file with the -f option\n");
 	}
 
 	init_matrix();
 
-	if (bots_verbose_mode) fprintf(stdout,"Multiple Pair Alignment\n");
+	if (bots_verbose_mode >= BOTS_VERBOSE_DEFAULT) fprintf(stdout,"Multiple Pair Alignment\n");
 
 	nseqs = readseqs(1,filename);
 
-	if (bots_verbose_mode)
+	if (bots_verbose_mode >= BOTS_VERBOSE_DEFAULT)
 	{
 		for (i = 1; i <= nseqs; i++)
 			fprintf(stdout, "Sequence %d: %s %6.d aa\n", i, names[i], seqlen_array[i]);
@@ -624,16 +623,19 @@ void align_seq()
 void align_end ()
 {
 	int i,j;
-	for(i = 0; i<nseqs; i++)
+	if (bots_verbose_mode >= BOTS_VERBOSE_DEFAULT)
 	{
-		for(j = 0; j<nseqs; j++)
+		for(i = 0; i<nseqs; i++)
 		{
-			if (bench_output[i*nseqs+j] != 0)
+			for(j = 0; j<nseqs; j++)
 			{
-				fprintf(stdout, "Benchmark sequences (%d:%d) Aligned. Score: %d\n",
-					i+1 , j+1 , (int) bench_output[i*nseqs+j]);
-			}
+				if (bench_output[i*nseqs+j] != 0)
+				{
+					fprintf(stdout, "Benchmark sequences (%d:%d) Aligned. Score: %d\n",
+						i+1 , j+1 , (int) bench_output[i*nseqs+j]);
+				}
 
+			}
 		}
 	}
 }
