@@ -84,7 +84,7 @@ int    bots_number_of_tasks = 0;
 int  bots_cutoff_value=BOTS_CUTOFF_DEF_VALUE;
 #endif
 #ifdef BOTS_APP_USES_ARG_CUTOFF
-int  bots_app_cutoff_value=BOTS_APP_CUTOFF_DEF_VALUE;
+int  bots_app_cutoff_value=BOTS_APP_DEF_ARG_CUTOFF;
 #endif
 
 /*
@@ -231,7 +231,7 @@ void bots_print_usage()
    fprintf(stderr, "  -x <value> : cut-off value (default=%d)\n",BOTS_CUTOFF_DEF_VALUE);
 #endif
 #ifdef BOTS_APP_USES_ARG_CUTOFF
-   fprintf(stderr, "  -y <value> : application cut-off value (default=%d)\n",BOTS_APP_CUTOFF_DEF_VALUE);
+   fprintf(stderr, "  -y <value> : application cut-off value (default=%d)\n", BOTS_APP_DEF_ARG_CUTOFF);
 #endif
 
    fprintf(stderr, "\n");

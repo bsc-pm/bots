@@ -46,6 +46,7 @@ extern int    bots_number_of_tasks;
 
 extern char bots_cutoff[];
 extern int  bots_cutoff_value;
+extern int  bots_app_cutoff_value;
 extern int  bots_verbose_mode;
 
 extern int bots_arg_size;
