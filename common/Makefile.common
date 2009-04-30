@@ -18,42 +18,7 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA            #
 ##############################################################################################
 
-#configure compilers and linkers
-
-ifndef CILKC
-CILKC := cilkc
-endif
-
-ifndef OMPC
-OMPC=mcc
-endif
-
-ifndef CC
-CC=gcc
-endif
-
-ifndef OMPLINK
-OMPLINK=mcc
-endif
-
-ifndef CLINK
-CLINK=gcc
-endif
-
-#configue compiler and linker flags
-
-ifndef OPT_FLAGS
-OPT_FLAGS=-O3 
-endif
-
-CC_FLAGS=-Wall 
-OMPC_FLAGS=-Wall
-CILKC_FLAGS=
-
-CLINK_FLAGS=
-OMPLINK_FLAGS=
-CILKLINK_FLAGS=
-
+include $(BASE_DIR)/config/make.config
 
 # Don't change below this line
 ##############################
