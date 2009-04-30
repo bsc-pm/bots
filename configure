@@ -1,8 +1,9 @@
 #!/bin/sh
 
-GCC=`gcc -v &> /dev/null && echo "yes"`
+GCC=`gcc -x c -c -fopenmp /dev/null &>/dev/null  && echo "yes"`
 MCC=`mcc -v &> /dev/null && echo "yes"`
 ICC=`icc -v &> /dev/null && echo "yes"`
+XLC=`xlc -qversion &> /dev/null && echo "yes"`
 
 nc=0
 
@@ -19,6 +20,11 @@ fi
 if [ "$ICC" = "yes" ]; then
 	let nc=nc+1
 	COMPILERS[nc]="icc"
+fi
+
+if [ "$XLC" = "yes" ]; then
+	let nc=nc+1
+	COMPILERS[nc]="xlc"
 fi
 
 if [ "$nc" -gt "0" ]; then
@@ -65,16 +71,29 @@ fi
 
 
 if [ "$COMPILER" = "mcc" ]; then
-	CC=gcc
-	CLINK=gcc
-	OMPC=mcc
-	OMPLINK=mcc
+	CC=mcc
+	CLINK=$CC
+	OMPC=$CC
+	OMPLINK=$CC
 
 	OPT_FLAGS=-O3
 	CC_FLAGS=
 	OMPC_FLAGS=
 	CLINK_FLAGS=
 	OMPLINK_FLAGS=
+fi
+
+if [ "$COMPILER" = "xlc" ]; then
+	CC=xlc
+	CLINK=$CC
+	OMPC="$CC -qsmp=omp"
+	OMPLINK=$OMPC
+
+	OPT_FLAGS=-O3
+	CC_FLAGS=
+	OMPC_FLAGS=-qthreaded
+	CLINK_FLAGS=
+	OMPLINK_FLAGS=-qthreaded
 fi
 
 cat > config/make.config << EOF
