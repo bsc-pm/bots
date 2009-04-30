@@ -29,7 +29,6 @@
 #define ROWS 64
 #define COLS 64
 #define DMAX 64
-#define verbose 0
 #define max(a, b) ((a > b) ? a : b)
 #define min(a, b) ((a < b) ? a : b)
 
@@ -186,15 +185,19 @@ static void read_inputs() {
 static void write_outputs() {
   int i, j;
 
-  printf("Minimum area = %d\n\n", MIN_AREA);
+  if (bots_verbose_mode >= BOTS_VERBOSE_DEFAULT)
+  {
+    printf("Minimum area = %d\n\n", MIN_AREA);
 
-  for (i = 0; i < MIN_FOOTPRINT[0]; i++) {
-  for (j = 0; j < MIN_FOOTPRINT[1]; j++) {
-      if (BEST_BOARD[i][j] == 0) printf(" ");
-      else                       printf("%c", 'A' + BEST_BOARD[i][j] - 1);
-  } 
-  printf("\n");
-} }
+    for (i = 0; i < MIN_FOOTPRINT[0]; i++) {
+      for (j = 0; j < MIN_FOOTPRINT[1]; j++) {
+          if (BEST_BOARD[i][j] == 0) printf(" ");
+          else                       printf("%c", 'A' + BEST_BOARD[i][j] - 1);
+      } 
+      printf("\n");
+    }  
+  }
+}
 
 
 static int add_cell_ser (int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS) {
@@ -224,7 +227,7 @@ static int add_cell_ser (int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS)
 
 /* if the cell cannot be layed down, prune search */
           if (! lay_down(id, board, cells)) {
-             if (verbose) printf("Chip %d, shape %d does not fit\n", id, i);
+             if (bots_verbose_mode >= BOTS_VERBOSE_DEBUG) printf("Chip %d, shape %d does not fit\n", id, i);
              goto _end;
           }
 
@@ -244,7 +247,7 @@ static int add_cell_ser (int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS)
 				  MIN_FOOTPRINT[0] = footprint[0];
 				  MIN_FOOTPRINT[1] = footprint[1];
 				  memcpy(BEST_BOARD, board, sizeof(ibrd));
-				  if (verbose) printf("N  %d\n", MIN_AREA);
+				  if (bots_verbose_mode >= BOTS_VERBOSE_DEBUG) printf("N  %d\n", MIN_AREA);
 			  }
 		  }
 
@@ -255,7 +258,7 @@ static int add_cell_ser (int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS)
 /* if area is greater than or equal to best area, prune search */
           } else {
 
-             if (verbose) printf("T  %d, %d\n", area, MIN_AREA);
+             if (bots_verbose_mode >= BOTS_VERBOSE_DEBUG) printf("T  %d, %d\n", area, MIN_AREA);
  
 	  }
 _end:;  
@@ -282,7 +285,7 @@ static int add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS,int l
       for (j = 0; j < nn; j++) {
 #pragma omp task default(none) untied private(board, footprint,area) \
 firstprivate(NWS,i,j,id,nn,level) \
-shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD,nn2) \
+shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD,nn2,number_of_tasks,bots_verbose_mode) \
 if(level<bots_cutoff_value)
 {
 	  struct cell cells[N+1];
@@ -298,7 +301,7 @@ if(level<bots_cutoff_value)
 
 /* if the cell cannot be layed down, prune search */
           if (! lay_down(id, board, cells)) {
-             if (verbose) printf("Chip %d, shape %d does not fit\n", id, i);
+             if (bots_verbose_mode >= BOTS_VERBOSE_DEBUG) printf("Chip %d, shape %d does not fit\n", id, i);
              goto _end;
           }
 
@@ -318,7 +321,7 @@ if(level<bots_cutoff_value)
 				  MIN_FOOTPRINT[0] = footprint[0];
 				  MIN_FOOTPRINT[1] = footprint[1];
 				  memcpy(BEST_BOARD, board, sizeof(ibrd));
-				  if (verbose) printf("N  %d\n", MIN_AREA);
+				  if (bots_verbose_mode >= BOTS_VERBOSE_DEBUG) printf("N  %d\n", MIN_AREA);
 			  }
 		  }
 
@@ -328,7 +331,7 @@ if(level<bots_cutoff_value)
 /* if area is greater than or equal to best area, prune search */
           } else {
 
-             if (verbose) printf("T  %d, %d\n", area, MIN_AREA);
+             if (bots_verbose_mode >= BOTS_VERBOSE_DEBUG) printf("T  %d, %d\n", area, MIN_AREA);
 
 	  }
 _end:;
@@ -357,7 +360,7 @@ static int add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS,int l
       for (j = 0; j < nn; j++) {
 #pragma omp task untied default(none) private(board, footprint,area) \
 firstprivate(NWS,i,j,id,nn,level) shared(bots_cutoff_value,nn2) \
-shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD)
+shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD,number_of_tasks,bots_verbose_mode)
 {
 	  struct cell cells[N+1];
           
@@ -373,7 +376,7 @@ shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD)
 
 /* if the cell cannot be layed down, prune search */
           if (! lay_down(id, board, cells)) {
-             if (verbose) printf("Chip %d, shape %d does not fit\n", id, i);
+             if (bots_verbose_mode >= BOTS_VERBOSE_DEBUG) printf("Chip %d, shape %d does not fit\n", id, i);
              goto _end;
           }
 
@@ -393,7 +396,7 @@ shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD)
 				  MIN_FOOTPRINT[0] = footprint[0];
 				  MIN_FOOTPRINT[1] = footprint[1];
 				  memcpy(BEST_BOARD, board, sizeof(ibrd));
-				  if (verbose) printf("N  %d\n", MIN_AREA);
+				  if (bots_verbose_mode >= BOTS_VERBOSE_DEBUG) printf("N  %d\n", MIN_AREA);
 			  }
 		  }
 
@@ -407,7 +410,7 @@ shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD)
 /* if area is greater than or equal to best area, prune search */
           } else {
 
-             if (verbose) printf("T  %d, %d\n", area, MIN_AREA);
+             if (bots_verbose_mode >= BOTS_VERBOSE_DEBUG) printf("T  %d, %d\n", area, MIN_AREA);
 
 	  }
 _end:;
@@ -437,7 +440,7 @@ static int add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS) {
       for (j = 0; j < nn; j++) {
 #pragma omp task untied default(none) private(board, footprint,area) \
 firstprivate(NWS,i,j,id,nn) \
-shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD,nn2) 
+shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD,nn2,number_of_tasks,bots_verbose_mode) 
 {
 	  struct cell cells[N+1];
 	  number_of_tasks++;
@@ -452,7 +455,7 @@ shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD,nn2)
 
 /* if the cell cannot be layed down, prune search */
           if (! lay_down(id, board, cells)) {
-             if (verbose) printf("Chip %d, shape %d does not fit\n", id, i);
+             if (bots_verbose_mode >= BOTS_VERBOSE_DEBUG) printf("Chip %d, shape %d does not fit\n", id, i);
              goto _end;
           }
 
@@ -472,7 +475,7 @@ shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD,nn2)
 				  MIN_FOOTPRINT[0] = footprint[0];
 				  MIN_FOOTPRINT[1] = footprint[1];
 				  memcpy(BEST_BOARD, board, sizeof(ibrd));
-				  if (verbose) printf("N  %d\n", MIN_AREA);
+				  if (bots_verbose_mode >= BOTS_VERBOSE_DEBUG) printf("N  %d\n", MIN_AREA);
 			  }
 		  }
 
@@ -482,7 +485,7 @@ shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD,nn2)
 /* if area is greater than or equal to best area, prune search */
           } else {
 
-             if (verbose) printf("T  %d, %d\n", area, MIN_AREA);
+             if (bots_verbose_mode >= BOTS_VERBOSE_DEBUG) printf("T  %d, %d\n", area, MIN_AREA);
  
 	  }
 _end:;  

@@ -4835,7 +4835,7 @@ int test_correctness(int n, COMPLEX *out1, COMPLEX *out2)
        if (d < -1.0e-10 || d > 1.0e-10) a /= d;
        if (a > error) error = a;
   }
-  if (bots_verbose_mode) printf("relative error=%e\n", error);
+  if (bots_verbose_mode >= BOTS_VERBOSE_DEFAULT) printf("relative error=%e\n", error);
   if (error > 1e-3) return BOTS_RESULT_UNSUCCESSFUL;
   else return BOTS_RESULT_SUCCESSFUL;
 }
