@@ -186,12 +186,21 @@ void bots_print_results()
          case 0:
             break;
          case 1:
+            break;
+         case 2:
 fprintf(stdout,
 "Benchmark;Parameters;Model;Cutoff;Resources;Result;\
 Time;Sequential;Speed-up;\
+Tasks;Tasks/Sec;\
 Exec Date;Exec Time;Exec Message;\
 Architecture;Processors;Load Avg-1;Load Avg-5;Load Avg-15;\
 Comp Date;Comp Time;Comp Message;CC;CFLAGS;LD;LDFLAGS\n");
+            break;
+         case 3:
+fprintf(stdout,
+"Benchmark;Parameters;Model;Cutoff;Resources;Result;\
+Time;Sequential;Speed-up;\
+Tasks;Tasks/Sec;\n");
             break;
          default:
             break;
@@ -202,7 +211,9 @@ Comp Date;Comp Time;Comp Message;CC;CFLAGS;LD;LDFLAGS\n");
    switch(bots_output_format)
    {
       case 0:
-	 fprintf(stdout, "\n\n");
+         break;
+      case 1:
+	 fprintf(stdout, "\n");
          fprintf(stdout, "Program             = %s\n", str_name); /*fix*/
          fprintf(stdout, "Parameters          = %s\n", str_parameters); /*fix*/
          fprintf(stdout, "Model               = %s\n", str_model); 
@@ -232,7 +243,7 @@ Comp Date;Comp Time;Comp Message;CC;CFLAGS;LD;LDFLAGS\n");
          fprintf(stdout, "Linker Flags        = %s\n", str_ldflags);
 	 fflush(stdout);
          break;
-      case 1:
+      case 2:
          fprintf(stdout,"%s;%s;%s;%s;%s;%s;", 
               str_name, 
               str_parameters, 
@@ -245,6 +256,10 @@ Comp Date;Comp Time;Comp Message;CC;CFLAGS;LD;LDFLAGS\n");
               str_time_program, 
               str_time_sequential, 
               str_speed_up 
+         );
+         fprintf(stdout,"%s;%s;", 
+              str_number_of_tasks, 
+              str_number_of_tasks_per_second
          );
          fprintf(stdout,"%s;%s;", 
               str_exec_date,
@@ -263,6 +278,26 @@ Comp Date;Comp Time;Comp Message;CC;CFLAGS;LD;LDFLAGS\n");
               str_cflags,
               str_ld,
               str_ldflags
+         );
+         fprintf(stdout,"\n");
+         break;
+      case 3:
+         fprintf(stdout,"%s;%s;%s;%s;%s;%s;", 
+              str_name, 
+              str_parameters, 
+              str_model, 
+              str_cutoff, 
+              str_resources, 
+              str_result
+         );
+         fprintf(stdout,"%s;%s;%s;", 
+              str_time_program, 
+              str_time_sequential, 
+              str_speed_up 
+         );
+         fprintf(stdout,"%s;%s;", 
+              str_number_of_tasks, 
+              str_number_of_tasks_per_second
          );
          fprintf(stdout,"\n");
          break;

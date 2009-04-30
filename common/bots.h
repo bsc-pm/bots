@@ -20,6 +20,7 @@
 
 /* common flags */
 extern int bots_sequential_flag;
+extern int bots_benchmark_flag;
 extern int bots_check_flag;
 extern int bots_result;
 extern int bots_output_format;

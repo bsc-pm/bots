@@ -22,7 +22,7 @@
  * main function & common behaviour of the benchmark.
  **********************************************************************/
 #include <stdio.h>
-#include <stdlib.h>
+#include <stdlib.h> 
 #include <string.h>
 #include <math.h>
 #include <stddef.h>
@@ -33,7 +33,6 @@
 #include "bots_main.h"
 #include "bots.h"
 #include "app-desc.h"
-
 
 /***********************************************************************
  * BENCHMARK HEADERS 
@@ -53,10 +52,11 @@ void bots_set_info();
  *********************************************************************/
 /* common flags */
 int bots_sequential_flag = FALSE;
+int bots_benchmark_flag = TRUE;
 int bots_check_flag = FALSE;
-int bots_verbose_mode = 0;
+int bots_verbose_mode = BOTS_VERBOSE_DEFAULT;
 int bots_result = BOTS_RESULT_NA;
-int bots_output_format = 0;
+int bots_output_format = 1;
 int bots_print_header = FALSE;
 /* common variables */
 char bots_name[128];
@@ -82,6 +82,9 @@ int    bots_number_of_tasks = 0;
 
 #if defined(MANUAL_CUTOFF) || defined(IF_CUTOFF)
 int  bots_cutoff_value=BOTS_CUTOFF_DEF_VALUE;
+#endif
+#ifdef BOTS_APP_USES_ARG_CUTOFF
+int  bots_app_cutoff_value=BOTS_APP_CUTOFF_DEF_VALUE;
 #endif
 
 /*
@@ -132,7 +135,6 @@ int  bots_cutoff_value=BOTS_CUTOFF_DEF_VALUE;
 #define BOTS_MODEL_DESC "Unknown"
 #endif
 
-/* FIXME: remove arg size to arg_size_0, use only arg_size_1 and arg_size_2 */
 #ifdef BOTS_APP_USES_ARG_SIZE
 #ifndef BOTS_APP_DEF_ARG_SIZE
 #error "Default vaule for argument size must be specified (#define BOTS_APP_DEF_ARG_SIZE)"
@@ -210,36 +212,52 @@ void bots_print_usage()
    fprintf(stderr, "Usage: %s -[options]\n", bots_execname);
    fprintf(stderr, "\n");
    fprintf(stderr, "Where options are:\n");
+#ifdef BOTS_APP_USES_REPETITIONS
+   fprintf(stderr, "  -r <value> : Set the number of repetitions (default = 1).\n");
+#endif
 #ifdef BOTS_APP_USES_ARG_SIZE
-   fprintf(stderr, "  -n <size>: "BOTS_APP_DESC_ARG_SIZE"\n");
+   fprintf(stderr, "  -n <size>  : "BOTS_APP_DESC_ARG_SIZE"\n");
 #endif
 #ifdef BOTS_APP_USES_ARG_SIZE_1
-   fprintf(stderr, "  -m <size>: "BOTS_APP_DESC_ARG_SIZE_1"\n");
+   fprintf(stderr, "  -m <size>  : "BOTS_APP_DESC_ARG_SIZE_1"\n");
 #endif
 #ifdef BOTS_APP_USES_ARG_SIZE_2
-   fprintf(stderr, "  -l <size>: "BOTS_APP_DESC_ARG_SIZE_2"\n");
+   fprintf(stderr, "  -l <size>  : "BOTS_APP_DESC_ARG_SIZE_2"\n");
 #endif
 #ifdef BOTS_APP_USES_ARG_FILE
-   fprintf(stderr, "  -f <file>: "BOTS_APP_DESC_ARG_FILE"\n");
+   fprintf(stderr, "  -f <file>  : "BOTS_APP_DESC_ARG_FILE"\n");
 #endif
 #if defined(MANUAL_CUTOFF) || defined(IF_CUTOFF)
-   fprintf(stderr, "  -x <value>: cut-off value (default=%d)\n",BOTS_CUTOFF_DEF_VALUE);
+   fprintf(stderr, "  -x <value> : cut-off value (default=%d)\n",BOTS_CUTOFF_DEF_VALUE);
 #endif
+#ifdef BOTS_APP_USES_ARG_CUTOFF
+   fprintf(stderr, "  -y <value> : application cut-off value (default=%d)\n",BOTS_APP_CUTOFF_DEF_VALUE);
+#endif
+
    fprintf(stderr, "\n");
-   fprintf(stderr, "  -e <str>: Include 'str' execution message.\n");
-   fprintf(stderr, "  -o <nnn>: Set output format mode (default = 0).\n");
+   fprintf(stderr, "  -e <str>   : Include 'str' execution message.\n");
+   fprintf(stderr, "  -v <level> : Set verbose level (default = 1).\n");
+   fprintf(stderr, "               0 - none.\n");
+   fprintf(stderr, "               1 - default.\n");
+   fprintf(stderr, "               2 - debug.\n");
+   fprintf(stderr, "  -o <value> : Set output format mode (default = 1).\n");
+   fprintf(stderr, "               0 - no benchmark output.\n");
+   fprintf(stderr, "               1 - detailed list format.\n");
+   fprintf(stderr, "               2 - detailed row format.\n");
+   fprintf(stderr, "               3 - abridged row format.\n");
+   fprintf(stderr, "  -z         : Print row header (if output format is a row variant).\n");
    fprintf(stderr, "\n");
 #ifdef KERNEL_SEQ_CALL
-   fprintf(stderr, "  -s [1|0]: Set/Unset run sequential version (default = UNSET).\n");
+   fprintf(stderr, "  -s         : Run sequential version.\n");
 #endif
-   fprintf(stderr, "  -c [1|0]: Set/Unset check mode (default = UNSET).\n");
+   fprintf(stderr, "  -d         : Do not run parallel version.\n");
 #ifdef BOTS_APP_CHECK_USES_SEQ_RESULT
-   fprintf(stderr, "            Implies running sequential version.\n");
+   fprintf(stderr, "  -c         : Check mode ON (implies running sequential version).\n");
+#else
+   fprintf(stderr, "  -c         : Check mode ON.\n");
 #endif
-   fprintf(stderr, "  -v <level>: Set verbose level (default = 0).\n");
-   fprintf(stderr, "  -r [1|0]: Set/Unset print header (default = UNSET).\n");
    fprintf(stderr, "\n");
-   fprintf(stderr, "  -h : Print program's usage (this help).\n");
+   fprintf(stderr, "  -h         : Print program's usage (this help).\n");
    fprintf(stderr, "\n");
 }
 /***********************************************************************
@@ -258,26 +276,35 @@ bots_get_params_common(int argc, char **argv)
       {
          switch (argv[i][1])
          {
+            case 'c': /* set/unset check mode */
+               argv[i][1] = '*';
+               //i++;
+               //if (argc == i) { bots_print_usage(); exit(100); }
+               //bots_check_flag = atoi(argv[i]);
+               bots_check_flag = TRUE;
+               break;
+            case 'd': /* do not run benchmark  */
+               argv[i][1] = '*';
+               bots_benchmark_flag = FALSE;
+               break;
             case 'e': /* include execution message */
                argv[i][1] = '*';
                i++;
                if (argc == i) { bots_print_usage(); exit(100); }
                strcpy(bots_exec_message, argv[i]);
                break;
-            case 'c': /* set/unset check mode */
-               argv[i][1] = '*';
-               i++;
-               if (argc == i) { bots_print_usage(); exit(100); }
-               bots_check_flag = atoi(argv[i]);
-               break;
 #ifdef BOTS_APP_USES_ARG_FILE
-            case 'f': /* read argument size */
+            case 'f': /* read argument file name */
                argv[i][1] = '*';
                i++;
                if (argc == i) { bots_print_usage(); exit(100); }
                strcpy(bots_arg_file,argv[i]);
                break;
 #endif
+            case 'h': /* print usage */
+               argv[i][1] = '*';
+               bots_print_usage();
+               exit (100);
 #ifdef BOTS_APP_USES_ARG_SIZE
             case 'n': /* read argument size 0 */
                argv[i][1] = '*';
@@ -302,10 +329,10 @@ bots_get_params_common(int argc, char **argv)
                bots_arg_size_2 = atoi(argv[i]);
                break;
 #endif
-/*TODO*/
 #ifdef BOTS_APP_USES_ARG_BLOCK
+/*TODO*/
 #endif
-            case 'o': /* set/unset row output mode */
+            case 'o': /* set output mode */
                argv[i][1] = '*';
                i++;
                if (argc == i) { bots_print_usage(); exit(100); }
@@ -320,11 +347,12 @@ bots_get_params_common(int argc, char **argv)
                break;
 #endif
 #ifdef KERNEL_SEQ_CALL
-            case 's': /* set/unset sequential execution */
+            case 's': /* set sequential execution */
                argv[i][1] = '*';
-               i++;
-               if (argc == i) { bots_print_usage(); exit(100); }
-               bots_sequential_flag = atoi(argv[i]);
+               //i++;
+               //if (argc == i) { bots_print_usage(); exit(100); }
+               //bots_sequential_flag = atoi(argv[i]);
+               bots_sequential_flag = TRUE;
                break;
 #endif
             case 'v': /* set/unset verbose mode */
@@ -341,27 +369,40 @@ bots_get_params_common(int argc, char **argv)
                bots_cutoff_value = atoi(argv[i]);
                break;
 #endif
-/*TODO*/
 #ifdef BOTS_APP_USES_ARG_CUTOFF
+	    case 'y':
+	       argv[i][1] = '*';
+               i++;
+               if (argc == i) { bots_print_usage(); exit(100); }
+               bots_app_cutoff_value = atoi(argv[i]);
+               break;
 #endif
-            case 'h': /* print usage */
-               argv[i][1] = '*';
+	    case 'z':
+	       argv[i][1] = '*';
+               bots_print_header = TRUE;
+               break;
+            default:
+               // As at the moment there are only common paramenters
+               // we launch an error. Otherwise we have to ignore the
+               // parameter and to check, after specific parameters are
+               // completely read, if there are unrecognized parameters.
+               fprintf(stderr, "Error: Unrecognized parameter.\n");
                bots_print_usage();
                exit (100);
-            default:
-               i++;
-               break;
          }
       }
       else
       {
+         // As at the moment there are only common paramenters
+         // we launch an error. Otherwise we have to ignore the
+         // parameter and to check, after specific parameters are
+         // completely read, if there are unrecognized parameters.
          fprintf(stderr, "Error: Unrecognized parameter.\n");
          bots_print_usage();
          exit (100);
       }
    }
 }
-
 /***********************************************************************
  * bots_get_params_common: 
  **********************************************************************/
@@ -438,16 +479,19 @@ main(int argc, char* argv[])
    }
 #endif
 
-   KERNEL_INIT;
+   if (bots_benchmark_flag || bots_check_flag)
+   {
+      KERNEL_INIT;
 #ifdef BOTS_APP_SELF_TIMING
-   bots_time_program = KERNEL_CALL;
+      bots_time_program = KERNEL_CALL;
 #else
-   bots_t_start = bots_usecs();
-   KERNEL_CALL;
-   bots_t_end = bots_usecs();
-   bots_time_program = ((double)(bots_t_end-bots_t_start))/1000000;
+      bots_t_start = bots_usecs();
+      KERNEL_CALL;
+      bots_t_end = bots_usecs();
+      bots_time_program = ((double)(bots_t_end-bots_t_start))/1000000;
 #endif
-   KERNEL_FINI;
+      KERNEL_FINI;
+   }
 
 #ifdef KERNEL_CHECK
    if (bots_check_flag)
