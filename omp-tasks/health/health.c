@@ -662,7 +662,7 @@ void read_input_data(char *filename)
    );
    fclose(fin);
 
-   if (bots_verbose_mode)
+   if (bots_verbose_mode >= BOTS_VERBOSE_DEFAULT)
    {
       // Printing input data
       fprintf(stdout,"\n");
@@ -693,7 +693,7 @@ int check_village(struct Village *top)
    if (res_inside != result.total_inside) answer = BOTS_RESULT_UNSUCCESSFUL;
    if (res_avg_stay > (float) (result.total_time/result.total_patients)+0.005) answer = BOTS_RESULT_UNSUCCESSFUL;
    if (res_avg_stay < (float) (result.total_time/result.total_patients)-0.005) answer = BOTS_RESULT_UNSUCCESSFUL;
-   if (bots_verbose_mode)
+   if (bots_verbose_mode >= BOTS_VERBOSE_DEFAULT)
    {
       fprintf(stdout,"\n");
       fprintf(stdout,"Sim. Variables      = expect / result\n", (int)   res_population, (int) result.total_patients);
@@ -707,6 +707,9 @@ int check_village(struct Village *top)
       fprintf(stdout,"Inside Hospital     = %6d / %6d people\n", (int)   res_inside, (int) result.total_inside);
       fprintf(stdout,"Average Stay        = %6f / %6f u/time\n", (float) res_avg_stay,(float) result.total_time/result.total_patients);
    }
+
+   if (bots_verbose_mode >= BOTS_VERBOSE_DEBUG) my_print(top);
+
    return answer;
 }
 /**********************************************************************/
