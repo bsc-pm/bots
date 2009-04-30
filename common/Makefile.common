@@ -36,7 +36,7 @@ ifndef OMPLINK
 OMPLINK=mcc
 endif
 
-ifndef CLIK
+ifndef CLINK
 CLINK=gcc
 endif
 
