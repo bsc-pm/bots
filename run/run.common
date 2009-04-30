@@ -29,7 +29,7 @@ parse_args ()
 			"-v")   shift; ARG_VERSIONS=$1
 				;;
 			"-verify")
-			        VERIFY="-c 1"
+			        VERIFY="-c"
 				;;
 			"-verbose") VERBOSE=yes
 				;;
