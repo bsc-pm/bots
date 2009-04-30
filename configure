@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 GCC=`gcc -x c -c -fopenmp /dev/null &>/dev/null  && echo "yes"`
 MCC=`mcc -v &> /dev/null && echo "yes"`
@@ -84,7 +84,7 @@ if [ "$COMPILER" = "mcc" ]; then
 fi
 
 if [ "$COMPILER" = "xlc" ]; then
-	CC=xlc
+	CC=xlc_r
 	CLINK=$CC
 	OMPC="$CC -qsmp=omp"
 	OMPLINK=$OMPC
@@ -118,6 +118,14 @@ OMPLINK_FLAGS=$OMPLINK_FLAGS
 EOF
 
 echo "make.config generated"
-echo "Run make to compile the benchmarks"
+
+if make -v | grep GNU &> /dev/null; then
+	echo "Run make to compile the benchmarks"
+elif gmake -v | grep GNU &> /dev/null; then 
+	echo "Run gmake to compile the benchmarks"
+else
+	echo "I didn't find a GNU-compatible make. You'll need it to compile the benchmarks"
+fi
+
 echo "Use the scripts in the run directory to execute them"
 
