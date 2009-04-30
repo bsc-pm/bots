@@ -7,11 +7,13 @@ print_help()
 	echo "Where options are:"
 	echo "-c cpus_list		List of number of cpus to use for executions"
 	echo "-C class_list		List of execution classes to use"
+	echo "-check			Enable verification"
+	echo "-debug			Show extra messages"
 	echo "-h			Prints this help"
 	echo "-i inputs_list		List of inputs to use for executions"
 	echo "-v versions_list		List of versions of the benchmark to use for execution"
-	echo "-verify			Enable verification"
-	echo "-verbose			Show extra messages"
+	echo "-verbose 0|1|2		Set application verbosity (TODO)"
+	echo "-of			Output format (TODO)"
 }
 
 parse_args ()
@@ -22,16 +24,16 @@ parse_args ()
 				;;
 			"-C")   shift; ARG_CLASSES=$1
 				;;
+			"-check")
+			        VERIFY="-c"
+				;;
+			"-debug") VERBOSE=yes
+				;;
 			"-h") 	print_help $0; exit 
 				;;
 			"-i")   shift; ARG_INPUTS=$1
 				;;
 			"-v")   shift; ARG_VERSIONS=$1
-				;;
-			"-verify")
-			        VERIFY="-c"
-				;;
-			"-verbose") VERBOSE=yes
 				;;
 			*)
 				echo "Unkown option $1"; print_help $0; exit
