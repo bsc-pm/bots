@@ -1,5 +1,15 @@
 #!/bin/bash
 
+while [ "$#" -gt 0  ]; do
+	case $1 in
+		--debug) debug=yes
+				;;
+		*) echo "Unknown option $1 (skipping)"
+			;;
+	esac
+	shift
+done
+
 GCC=`gcc -x c -c -fopenmp /dev/null &>/dev/null  && echo "yes"`
 MCC=`mcc -v &> /dev/null && echo "yes"`
 ICC=`icc -v &> /dev/null && echo "yes"`
@@ -48,12 +58,13 @@ if [ "$COMPILER" = "gcc" ]; then
 	CLINK=$CC
 	OMPC="$CC -fopenmp"
 	OMPLINK="$CC -fopenmp"
+	[ "$debug" = "yes" ] && DEBUG=-g
 
 	OPT_FLAGS=-O3
-	CC_FLAGS=
-	OMPC_FLAGS=
-	CLINK_FLAGS=
-	OMPLINK_FLAGS=
+	CC_FLAGS=$DEBUG
+	OMPC_FLAGS=$DEBUG
+	CLINK_FLAGS=$DEBUG
+	OMPLINK_FLAGS=$DEBUG
 fi
 
 if [ "$COMPILER" = "icc" ]; then
@@ -61,12 +72,13 @@ if [ "$COMPILER" = "icc" ]; then
 	CLINK=$CC
 	OMPC="$CC -openmp"
 	OMPLINK="$CC -openmp"
+	[ "$debug" = "yes" ] && DEBUG=-g
 
 	OPT_FLAGS=-O2
-	CC_FLAGS=
-	OMPC_FLAGS=
-	CLINK_FLAGS=
-	OMPLINK_FLAGS=
+	CC_FLAGS=$DEBUG
+	OMPC_FLAGS=$DEBUG
+	CLINK_FLAGS=$DEBUG
+	OMPLINK_FLAGS=$DEBUG
 fi
 
 
@@ -75,12 +87,13 @@ if [ "$COMPILER" = "mcc" ]; then
 	CLINK=$CC
 	OMPC=$CC
 	OMPLINK=$CC
+	[ "$debug" = "yes" ] && DEBUG=-g
 
 	OPT_FLAGS=-O3
-	CC_FLAGS=
-	OMPC_FLAGS=
-	CLINK_FLAGS=
-	OMPLINK_FLAGS=
+	CC_FLAGS=$DEBUG
+	OMPC_FLAGS=$DEBUG
+	CLINK_FLAGS=$DEBUG
+	OMPLINK_FLAGS=$DEBUG
 fi
 
 if [ "$COMPILER" = "xlc" ]; then
@@ -88,12 +101,13 @@ if [ "$COMPILER" = "xlc" ]; then
 	CLINK=$CC
 	OMPC="$CC -qsmp=omp"
 	OMPLINK=$OMPC
+	[ "$debug" = "yes" ] && DEBUG=-g
 
 	OPT_FLAGS=-O3
-	CC_FLAGS=
-	OMPC_FLAGS=-qthreaded
-	CLINK_FLAGS=
-	OMPLINK_FLAGS=-qthreaded
+	CC_FLAGS=$DEBUG
+	OMPC_FLAGS=-qthreaded $DEBUG
+	CLINK_FLAGS=$DEBUG
+	OMPLINK_FLAGS=-qthreaded $DEBUG
 fi
 
 cat > config/make.config << EOF
