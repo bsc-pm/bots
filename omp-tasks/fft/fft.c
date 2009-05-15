@@ -4643,22 +4643,22 @@ void fft_aux(int n, COMPLEX * in, COMPLEX * out, int *factors, COMPLEX * W, int 
 	   * split the DFT of length n into r DFTs of length n/r,  and
 	   * recurse 
 	   */
-	  if (r == 32)
+	  if (r == 32) {
                #pragma omp task untied
 	       fft_unshuffle_32(0, m, in, out, m);
-	  else if (r == 16)
+	  } else if (r == 16) {
                #pragma omp task untied
 	       fft_unshuffle_16(0, m, in, out, m);
-	  else if (r == 8)
+	  } else if (r == 8) {
                #pragma omp task untied
 	       fft_unshuffle_8(0, m, in, out, m);
-	  else if (r == 4)
+	  } else if (r == 4) {
                #pragma omp task untied
 	       fft_unshuffle_4(0, m, in, out, m);
-	  else if (r == 2)
+	  } else if (r == 2) {
                #pragma omp task untied
 	       fft_unshuffle_2(0, m, in, out, m);
-	  else
+	  } else
 	       unshuffle(0, m, in, out, r, m);
 
           #pragma omp taskwait
@@ -4673,24 +4673,25 @@ void fft_aux(int n, COMPLEX * in, COMPLEX * out, int *factors, COMPLEX * W, int 
       * now multiply by the twiddle factors, and perform m FFTs
       * of length r
       */
-     if (r == 2)
+     if (r == 2) {
           #pragma omp task untied
 	  fft_twiddle_2(0, m, in, out, W, nW, nW / n, m);
-     else if (r == 4)
+     } else if (r == 4) {
           #pragma omp task untied
 	  fft_twiddle_4(0, m, in, out, W, nW, nW / n, m);
-     else if (r == 8)
+     } else if (r == 8) {
           #pragma omp task untied
 	  fft_twiddle_8(0, m, in, out, W, nW, nW / n, m);
-     else if (r == 16)
+     } else if (r == 16) {
           #pragma omp task untied
 	  fft_twiddle_16(0, m, in, out, W, nW, nW / n, m);
-     else if (r == 32)
+     } else if (r == 32) {
           #pragma omp task untied
 	  fft_twiddle_32(0, m, in, out, W, nW, nW / n, m);
-     else
+     } else {
           #pragma omp task untied
 	  fft_twiddle_gen(0, m, in, out, W, nW, nW / n, r, m);
+     }
 
      #pragma omp taskwait
 
