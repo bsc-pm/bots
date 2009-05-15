@@ -133,6 +133,8 @@ EOF
 
 echo "make.config generated"
 
+[ -d bin ] || mkdir -p bin
+
 if make -v | grep GNU &> /dev/null; then
 	echo "Run make to compile the benchmarks"
 elif gmake -v | grep GNU &> /dev/null; then 
