@@ -15,6 +15,7 @@ MCC=`mcc -v &> /dev/null && echo "yes"`
 ICC=`icc -v &> /dev/null && echo "yes"`
 XLC=`xlc -qversion &> /dev/null && echo "yes"`
 PGI=`pgcc &> /dev/null && echo "yes"`
+SUN=`cc -xopenmp &> /dev/null && echo "yes"`
 
 nc=0
 
@@ -42,6 +43,11 @@ if [ "$PGI" = "yes" ]; then
         let nc=nc+1
         COMPILERS[nc]="pgi"
 fi
+
+if [ "$SUN" = "yes" ]; then
+        let nc=nc+1        
+        COMPILERS[nc]="sunstudio"
+fi     
 
 if [ "$nc" -gt "0" ]; then
 	echo "The following compilers are recognized: "
@@ -121,6 +127,20 @@ if [ "$COMPILER" = "pgi" ]; then
         CLINK=$CC
         OMPC="$CC -mp -Minfo=mp"
         OMPLINK=$OMPC
+        [ "$debug" = "yes" ] && DEBUG=-g
+
+        OPT_FLAGS=-fast
+        CC_FLAGS=$DEBUG
+        OMPC_FLAGS=$DEBUG
+        CLINK_FLAGS=$DEBUG
+        OMPLINK_FLAGS=$DEBUG
+fi
+
+if [ "$COMPILER" = "sunstudio" ]; then
+        CC=cc                         
+        CLINK=$CC                     
+        OMPC="$CC -xopenmp"           
+        OMPLINK=$OMPC                 
         [ "$debug" = "yes" ] && DEBUG=-g
 
         OPT_FLAGS=-fast
