@@ -691,8 +691,7 @@ int check_village(struct Village *top)
    if (res_waiting != result.total_waiting) answer = BOTS_RESULT_UNSUCCESSFUL;
    if (res_assess != result.total_assess) answer = BOTS_RESULT_UNSUCCESSFUL;
    if (res_inside != result.total_inside) answer = BOTS_RESULT_UNSUCCESSFUL;
-   if (res_avg_stay > (float) (result.total_time/result.total_patients)+0.005) answer = BOTS_RESULT_UNSUCCESSFUL;
-   if (res_avg_stay < (float) (result.total_time/result.total_patients)-0.005) answer = BOTS_RESULT_UNSUCCESSFUL;
+
    if (bots_verbose_mode >= BOTS_VERBOSE_DEFAULT)
    {
       fprintf(stdout,"\n");
