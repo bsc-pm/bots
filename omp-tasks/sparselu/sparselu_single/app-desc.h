@@ -22,19 +22,19 @@
 
 #define BOTS_APP_NAME "SparseLU"
 #define BOTS_APP_PARAMETERS_DESC "S1=%dx%d, S2=%dx%d"
-#define BOTS_APP_PARAMETERS_LIST ,bots_arg_size_1,bots_arg_size_1,bots_arg_size_2,bots_arg_size_2
+#define BOTS_APP_PARAMETERS_LIST ,bots_arg_size,bots_arg_size,bots_arg_size_1,bots_arg_size_1
 
 #define BOTS_APP_CHECKING_NEEDS_SEQ
 #define BOTS_APP_CHECK_USES_SEQ_RESULT
 #define BOTS_APP_SELF_TIMING
 
-#define BOTS_APP_USES_ARG_SIZE_1
-#define BOTS_APP_DEF_ARG_SIZE_1 50
-#define BOTS_APP_DESC_ARG_SIZE_1 "Matrix Size"
+#define BOTS_APP_USES_ARG_SIZE
+#define BOTS_APP_DEF_ARG_SIZE 50
+#define BOTS_APP_DESC_ARG_SIZE "Matrix Size"
 
-#define BOTS_APP_USES_ARG_SIZE_2
-#define BOTS_APP_DEF_ARG_SIZE_2 100
-#define BOTS_APP_DESC_ARG_SIZE_2 "Submatrix Size"
+#define BOTS_APP_USES_ARG_SIZE_1
+#define BOTS_APP_DEF_ARG_SIZE_1 100
+#define BOTS_APP_DESC_ARG_SIZE_1 "Submatrix Size"
 
 #define BOTS_APP_INIT float **SEQ,**BENCH;
 

@@ -38,7 +38,7 @@ int checkmat (float *M, float *N)
       {
          if(M[i*bots_arg_size_1+j] != N[i*bots_arg_size_1+j])
          {
-            if (bots_verbose_mode) fprintf(stderr, "Checking failure: A[%d][%d] = %f instead of B[%d][%d] = %f\n",i,j, M[i*bots_arg_size_1+j], i,j, N[i*bots_arg_size_1+j]);
+            if (bots_verbose_mode >= BOTS_VERBOSE_DEBUG) fprintf(stderr, "Checking failure: A[%d][%d] = %f instead of B[%d][%d] = %f\n",i,j, M[i*bots_arg_size_1+j], i,j, N[i*bots_arg_size_1+j]);
             return FALSE;
          }
       }
@@ -187,52 +187,7 @@ void fwd(float *diag, float *col)
          for (i=k+1; i<bots_arg_size_1; i++)
             col[i*bots_arg_size_1+j] = col[i*bots_arg_size_1+j] - diag[i*bots_arg_size_1+k]*col[k*bots_arg_size_1+j];
 }
-double sparselu_seq_call_old(float ***pSEQ)
-{
-   int ii, jj, kk;
-   long start, end;
-   double time;
-   float **SEQ  = (float **) malloc(bots_arg_size*bots_arg_size*sizeof(float *));
-   *pSEQ = SEQ;
-
-   genmat(SEQ);
-   if (bots_verbose_mode) print_structure("sequential", SEQ);
-
-   start = bots_usecs();
-   for (kk=0; kk<bots_arg_size; kk++) 
-   {
-      lu0(SEQ[kk*bots_arg_size+kk]);
-      for (jj=kk+1; jj<bots_arg_size; jj++)
-      {
-         if (SEQ[kk*bots_arg_size+jj] != NULL)
-         {
-            fwd(SEQ[kk*bots_arg_size+kk], SEQ[kk*bots_arg_size+jj]);
-         }
-      }
-      for (ii=kk+1; ii<bots_arg_size; ii++) 
-      {
-         if (SEQ[ii*bots_arg_size+kk] != NULL)
-         {
-            bdiv (SEQ[kk*bots_arg_size+kk], SEQ[ii*bots_arg_size+kk]);
-         }
-      }
-      for (ii=kk+1; ii<bots_arg_size; ii++)
-      {
-         if (SEQ[ii*bots_arg_size+kk] != NULL)
-            for (jj=kk+1; jj<bots_arg_size; jj++)
-               if (SEQ[kk*bots_arg_size+jj] != NULL)
-               {
-                  if (SEQ[ii*bots_arg_size+jj]==NULL) SEQ[ii*bots_arg_size+jj] = allocate_clean_block();
-                  bmod(SEQ[ii*bots_arg_size+kk], SEQ[kk*bots_arg_size+jj], SEQ[ii*bots_arg_size+jj]);
-               }
-      }
-   }  
-   end = bots_usecs();
-   time = ((double)(end-start))/1000000;
-   if (bots_verbose_mode) print_structure("sequential", SEQ);
-   return time;
-}
-double sparselu_seq_call(float ***pBENCH)
+double sparselu(float ***pBENCH)
 {
    int ii, jj, kk;
    long start, end;
@@ -241,7 +196,7 @@ double sparselu_seq_call(float ***pBENCH)
    *pBENCH = BENCH;
 
    genmat(BENCH);
-   if (bots_verbose_mode) print_structure("sequential", BENCH);
+   if (bots_verbose_mode >= BOTS_VERBOSE_DEFAULT) print_structure("sequential", BENCH);
    start = bots_usecs();
    for (kk=0; kk<bots_arg_size; kk++) 
    {
@@ -269,76 +224,7 @@ double sparselu_seq_call(float ***pBENCH)
 
    end = bots_usecs();
    time = ((double)(end-start))/1000000;
-   if (bots_verbose_mode) print_structure("sequential", BENCH);
+   if (bots_verbose_mode >= BOTS_VERBOSE_DEFAULT) print_structure("sequential", BENCH);
    return time;
-}
-double sparselu_par_call(float ***pBENCH)
-{
-   int ii, jj, kk;
-   long start, end;
-   double time;
-   float **BENCH = (float **) malloc(bots_arg_size*bots_arg_size*sizeof(float *));
-   *pBENCH = BENCH;
-
-   genmat(BENCH);
-   if (bots_verbose_mode) print_structure("benchmark", BENCH);
-   start = bots_usecs();
-#pragma omp parallel private(kk)
-   {
-   for (kk=0; kk<bots_arg_size; kk++) 
-   {
-#pragma omp single
-      lu0(BENCH[kk*bots_arg_size+kk]);
-
-#pragma omp for nowait
-      for (jj=kk+1; jj<bots_arg_size; jj++)
-         if (BENCH[kk*bots_arg_size+jj] != NULL)
-            #pragma omp task untied firstprivate(kk, jj) shared(BENCH)
-         {
-            fwd(BENCH[kk*bots_arg_size+kk], BENCH[kk*bots_arg_size+jj]);
-         }
-#pragma omp for
-      for (ii=kk+1; ii<bots_arg_size; ii++) 
-         if (BENCH[ii*bots_arg_size+kk] != NULL)
-            #pragma omp task untied firstprivate(kk, ii) shared(BENCH)
-         {
-            bdiv (BENCH[kk*bots_arg_size+kk], BENCH[ii*bots_arg_size+kk]);
-         }
-
-#pragma omp for private(jj)
-      for (ii=kk+1; ii<bots_arg_size; ii++)
-         if (BENCH[ii*bots_arg_size+kk] != NULL)
-            for (jj=kk+1; jj<bots_arg_size; jj++)
-               if (BENCH[kk*bots_arg_size+jj] != NULL)
-               #pragma omp task untied firstprivate(kk, jj, ii) shared(BENCH)
-               {
-                     if (BENCH[ii*bots_arg_size+jj]==NULL) BENCH[ii*bots_arg_size+jj] = allocate_clean_block();
-                     bmod(BENCH[ii*bots_arg_size+kk], BENCH[kk*bots_arg_size+jj], BENCH[ii*bots_arg_size+jj]);
-               }
-
-   }
-   }
-
-   end = bots_usecs();
-   time = ((double)(end-start))/1000000;
-   if (bots_verbose_mode) print_structure("benchmark", BENCH);
-   return time;
-}
-int sparselu_check(float **SEQ, float **BENCH)
-{
-   int ii,jj,ok=1;
-
-   for (ii=0; ((ii<bots_arg_size) && ok); ii++)
-   {
-      for (jj=0; ((jj<bots_arg_size) && ok); jj++)
-      {
-         if ((SEQ[ii*bots_arg_size+jj] == NULL) && (BENCH[ii*bots_arg_size+jj] != NULL)) ok = FALSE;
-         if ((SEQ[ii*bots_arg_size+jj] != NULL) && (BENCH[ii*bots_arg_size+jj] == NULL)) ok = FALSE;
-         if ((SEQ[ii*bots_arg_size+jj] != NULL) && (BENCH[ii*bots_arg_size+jj] != NULL))
-            ok = checkmat(SEQ[ii*bots_arg_size+jj], BENCH[ii*bots_arg_size+jj]);
-      }
-   }
-   if (ok) return BOTS_RESULT_SUCCESSFUL;
-   else return BOTS_RESULT_UNSUCCESSFUL;
 }
 
