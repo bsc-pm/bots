@@ -80,13 +80,6 @@ double bots_time_program = 0.0;
 double bots_time_sequential = 0.0;
 int    bots_number_of_tasks = 0;
 
-#if defined(MANUAL_CUTOFF) || defined(IF_CUTOFF)
-int  bots_cutoff_value=BOTS_CUTOFF_DEF_VALUE;
-#endif
-#ifdef BOTS_APP_USES_ARG_CUTOFF
-int  bots_app_cutoff_value=BOTS_APP_DEF_ARG_CUTOFF;
-#endif
-
 /*
  * Application dependent info
  */
@@ -189,7 +182,6 @@ char bots_arg_file[255]="";
 #ifndef BOTS_APP_DESC_ARG_BLOCK
 #error "Help description for argument block must be specified (#define BOTS_APP_DESC_ARG_BLOCK)"
 #endif
-
 int bots_arg_block = BOTS_APP_DEF_ARG_BLOCK;
 #endif
 
@@ -200,7 +192,11 @@ int bots_arg_block = BOTS_APP_DEF_ARG_BLOCK;
 #ifndef BOTS_APP_DESC_ARG_CUTOFF
 #error "Help description for argument cutoff must be specified (#define BOTS_APP_DESC_ARG_CUTOFF)"
 #endif
-int bots_arg_cutoff = BOTS_APP_DEF_ARG_CUTOFF;
+int bots_app_cutoff_value = BOTS_APP_DEF_ARG_CUTOFF;
+#endif
+
+#if defined(MANUAL_CUTOFF) || defined(IF_CUTOFF)
+int  bots_cutoff_value = BOTS_CUTOFF_DEF_VALUE;
 #endif
 
 /***********************************************************************
@@ -228,7 +224,7 @@ void bots_print_usage()
    fprintf(stderr, "  -f <file>  : "BOTS_APP_DESC_ARG_FILE"\n");
 #endif
 #if defined(MANUAL_CUTOFF) || defined(IF_CUTOFF)
-   fprintf(stderr, "  -x <value> : cut-off value (default=%d)\n",BOTS_CUTOFF_DEF_VALUE);
+   fprintf(stderr, "  -x <value> : OpenMP tasks cut-off value (default=%d)\n",BOTS_CUTOFF_DEF_VALUE);
 #endif
 #ifdef BOTS_APP_USES_ARG_CUTOFF
    fprintf(stderr, "  -y <value> : application cut-off value (default=%d)\n", BOTS_APP_DEF_ARG_CUTOFF);

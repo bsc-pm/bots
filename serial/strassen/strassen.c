@@ -46,7 +46,6 @@
 
 extern int bots_arg_block;
 extern int bots_arg_size;
-extern int bots_arg_cutoff;
 
 /***********************************************************************
  * maximum tolerable relative error (for the checking routine)

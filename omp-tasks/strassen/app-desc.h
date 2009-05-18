@@ -22,7 +22,7 @@
 
 #define BOTS_APP_NAME "Strassen"
 #define BOTS_APP_PARAMETERS_DESC "N=%d:Y=%d"
-#define BOTS_APP_PARAMETERS_LIST ,bots_arg_size,bots_arg_cutoff
+#define BOTS_APP_PARAMETERS_LIST ,bots_arg_size,bots_app_cutoff_value
 
 #define BOTS_APP_CHECKING_NEEDS_SEQ
 
