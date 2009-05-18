@@ -18,22 +18,103 @@
 /*  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA            */
 /**********************************************************************************************/
 
-#include "omp-tasks-app.h"
+/*
+ * Original code from the Cilk project (by Keith Randall)
+ * 
+ * Copyright (c) 2000 Massachusetts Institute of Technology
+ * Copyright (c) 2000 Matteo Frigo
+ */
 
-#define BOTS_APP_NAME "N Queens"
-#define BOTS_APP_PARAMETERS_DESC "N=%d"
-#define BOTS_APP_PARAMETERS_LIST ,bots_arg_size
+#include <stdlib.h>
+#include <stdio.h>
+#include <memory.h>
+#include <alloca.h>
+#include "bots.h"
 
-#define BOTS_APP_USES_ARG_SIZE
-#define BOTS_APP_DEF_ARG_SIZE 14
-#define BOTS_APP_DESC_ARG_SIZE "Board size"
 
-int verify_queens(int);
-void find_queens (int);
-void find_queens_ser (int);
+/* Checking information */
 
-#define KERNEL_CALL find_queens(bots_arg_size)
-#define KERNEL_SEQ_CALL find_queens_ser(bots_arg_size)
-#define KERNEL_CHECK verify_queens(bots_arg_size)
+static int solutions[] = {
+        1,
+        0,
+        0,
+        2,
+        10, /* 5 */
+        4,
+        40,
+        92,
+        352,
+        724, /* 10 */
+        2680,
+        14200,
+        73712,
+        365596,
+};
+#define MAX_SOLUTIONS sizeof(solutions)/sizeof(int)
 
-#define BOTS_CUTOFF_DEF_VALUE 3
+int total_count;
+
+/*
+ * <a> contains array of <n> queen positions.  Returns 1
+ * if none of the queens conflict, and returns 0 otherwise.
+ */
+int ok(int n, char *a)
+{
+     int i, j;
+     char p, q;
+
+     for (i = 0; i < n; i++) {
+	  p = a[i];
+
+	  for (j = i + 1; j < n; j++) {
+	       q = a[j];
+	       if (q == p || q == p - (j - i) || q == p + (j - i))
+		    return 0;
+	  }
+     }
+     return 1;
+}
+
+void nqueens (int n, int j, char *a, int *solutions)
+{
+	int i,res;
+
+	if (n == j) {
+		/* good solution, count it */
+		*solutions = 1;
+		return;
+	}
+
+	*solutions = 0;
+
+     	/* try each possible position for queen <j> */
+	for (i = 0; i < n; i++) {
+		{
+	  		/* allocate a temporary array and copy <a> into it */
+	  		char * b = alloca((j + 1) * sizeof(char));
+	  		memcpy(b, a, j * sizeof(char));
+	  		b[j] = i;
+	  		if (ok(j + 1, b)) {
+	       			nqueens(n, j + 1, b,&res);
+				*solutions += res;
+			}
+		}
+	}
+}
+
+void find_queens (int size)
+{
+	char *a;
+
+	total_count=0;
+	a = alloca(size * sizeof(char));
+	nqueens(size, 0, a, &total_count);
+}
+
+int verify_queens (int size)
+{
+	if ( size > MAX_SOLUTIONS ) return BOTS_RESULT_NA;
+	if ( total_count == solutions[size-1]) return BOTS_RESULT_SUCCESSFUL;
+	return BOTS_RESULT_UNSUCCESSFUL;
+}
+
