@@ -18,7 +18,7 @@
 /*  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA            */
 /**********************************************************************************************/
 
-#include "omp-tasks-app.h"
+#include "serial-app.h"
 
 #define BOTS_APP_NAME "Health"
 #define BOTS_APP_PARAMETERS_DESC "%s"
@@ -29,8 +29,6 @@
 #define BOTS_APP_USES_ARG_FILE
 #define BOTS_APP_DEF_ARG_FILE "Input filename"
 #define BOTS_APP_DESC_ARG_FILE "Health input file (mandatory)"
-
-#define BOTS_CUTOFF_DEF_VALUE 2
 
 /* random defines */
 #define IA 16807
@@ -98,8 +96,7 @@ void check_patients_inside(struct Village *village);
 void check_patients_waiting(struct Village *village);
 void check_patients_realloc(struct Village *village);
 
-void check_patients_assess_par(struct Village *village);
-void check_patients_assess_seq(struct Village *village);
+void check_patients_assess(struct Village *village);
 
 float get_num_people(struct Village *village);
 float get_total_time(struct Village *village);
@@ -107,11 +104,9 @@ float get_total_hosps(struct Village *village);
 
 struct Results get_results(struct Village *village);
 
-void sim_village_par(struct Village *village);
-void sim_village_seq(struct Village *village);
+void sim_village(struct Village *village);
 
-void sim_village_main_par(struct Village *top);
-void sim_village_main_seq(struct Village *top);
+void sim_village_main(struct Village *top);
 
 int check_village(struct Village *top);
 
@@ -122,16 +117,13 @@ int check_village(struct Village *top);
 #define KERNEL_INIT \
    allocate_village(&top, NULL, NULL, sim_level, 0);
 
-#define KERNEL_CALL sim_village_main_par(top);
+#define KERNEL_CALL sim_village_main(top);
  
 #define KERNEL_FINI
 
-#define KERNEL_SEQ_INIT \
-   allocate_village(&top, NULL, NULL, sim_level, 0);
-
-#define KERNEL_SEQ_CALL sim_village_main_seq(top); 
-
-#define KERNEL_SEQ_FINI
+//#define KERNEL_SEQ_INIT 
+//#define KERNEL_SEQ_CALL
+//#define KERNEL_SEQ_FINI
 
 #define KERNEL_CHECK check_village(top);
 

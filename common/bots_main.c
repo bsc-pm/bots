@@ -246,7 +246,7 @@ void bots_print_usage()
 #ifdef KERNEL_SEQ_CALL
    fprintf(stderr, "  -s         : Run sequential version.\n");
 #endif
-   fprintf(stderr, "  -d         : Do not run parallel version.\n");
+   fprintf(stderr, "  -d         : Do not run 'kernel' version.\n");
 #ifdef BOTS_APP_CHECK_USES_SEQ_RESULT
    fprintf(stderr, "  -c         : Check mode ON (implies running sequential version).\n");
 #else
