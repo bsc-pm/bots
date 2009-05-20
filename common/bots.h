@@ -18,6 +18,9 @@
 /*  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA            */
 /**********************************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
+
 /* common flags */
 extern int bots_sequential_flag;
 extern int bots_benchmark_flag;
@@ -68,4 +71,5 @@ void bots_warning(int warning, char *message);
 
 #define FALSE 0
 #define TRUE 1
+
 
