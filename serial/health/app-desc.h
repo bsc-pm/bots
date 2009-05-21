@@ -68,7 +68,6 @@ struct Hosp {
    struct Patient *assess;
    struct Patient *inside;
    struct Patient *realloc;
-   omp_lock_t  realloc_lock;
 };
 struct Village {
    int id;
