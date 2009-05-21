@@ -154,6 +154,9 @@ void bots_print_results()
       case BOTS_RESULT_UNSUCCESSFUL: 
          sprintf(str_result, "UNSUCCESSFUL");
          break;
+      case BOTS_RESULT_NOT_REQUESTED:
+         sprintf(str_result, "Not requested");
+         break;
       default: 
          sprintf(str_result, "error");
          break;
@@ -222,11 +225,15 @@ Tasks;Tasks/Sec;\n");
          fprintf(stdout, "Verification        = %s\n", str_result);
 
          fprintf(stdout, "Time Program        = %s seconds\n", str_time_program);
-         fprintf(stdout, "Time Sequential     = %s seconds\n", str_time_sequential);
-         fprintf(stdout, "Speed-up            = %s\n", str_speed_up);
+	 if (bots_sequential_flag) {
+           fprintf(stdout, "Time Sequential     = %s seconds\n", str_time_sequential);
+           fprintf(stdout, "Speed-up            = %s\n", str_speed_up);
+	 }
 
-         fprintf(stdout, "Tasks               = %s\n", str_number_of_tasks);
-         fprintf(stdout, "Tasks/Sec           = %s\n", str_number_of_tasks_per_second);
+         if ( bots_number_of_tasks > 0 ) {
+           fprintf(stdout, "Tasks               = %s\n", str_number_of_tasks);
+           fprintf(stdout, "Tasks/Sec           = %s\n", str_number_of_tasks_per_second);
+	 }
 
          fprintf(stdout, "Execution Date      = %s\n", str_exec_date);
          fprintf(stdout, "Execution Message   = %s\n", str_exec_message);

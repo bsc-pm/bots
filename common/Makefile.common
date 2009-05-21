@@ -66,7 +66,8 @@ all: $(TARGETS)
 .c.o: Makefile $(COMMON_DIR)/Makefile.common 
 	$(CC) $(CC_ALL_FLAGS) -o $@ $<
 
-INFO_FLAGS=-DCDATE="\"$(TODAY)\"" -DCC="\"$(CC)\"" -DLD="\"$(CLINK)\"" -DLDFLAGS="\"$(CLINK_ALL_FLAGS) $(LIBS)\""
+INFO_FLAGS=-DCDATE="\"$(TODAY)\"" -DCC="\"$(CC)\"" -DLD="\"$(CLINK)\"" -DCMESSAGE="\"$(CMESSAGE)\"" \
+	  -DLDFLAGS="\"$(CLINK_ALL_FLAGS) $(LIBS)\""
 
 main.o: $(COMMON_DIR)/bots_main.c app-desc.h Makefile $(COMMON_DIR)/Makefile.common
 	$(CC) $(CC_ALL_FLAGS) -I. -o $@ $< $(INFO_FLAGS) -DCFLAGS="\"$(CC_ALL_FLAGS) -I.\""
@@ -132,7 +133,8 @@ all: $(TARGETS)
 	$(OMPC) $(OMPC_ALL_FLAGS) $(MANUAL_FLAGS) $(TIED_FLAGS) -o $@ $<;\
 	rm tied-$<
 
-INFO_FLAGS_OMP=-DCDATE="\"$(TODAY)\"" -DCC="\"$(OMPC)\"" -DLD="\"$(OMPLINK)\"" -DLDFLAGS="\"$(OMPLINK_ALL_FLAGS) $(LIBS)\""
+INFO_FLAGS_OMP=-DCDATE="\"$(TODAY)\"" -DCC="\"$(OMPC)\"" -DLD="\"$(OMPLINK)\"" -DCMESSAGE="\"$(CMESSAGE)\"" \
+               -DLDFLAGS="\"$(OMPLINK_ALL_FLAGS) $(LIBS)\""
 
 main.o: $(COMMON_DIR)/bots_main.c app-desc.h Makefile $(COMMON_DIR)/Makefile.common
 	$(OMPC) $(OMPC_ALL_FLAGS) -I. -o $@ $< $(INFO_FLAGS_OMP) -DCFLAGS="\"$(OMPC_ALL_FLAGS) -I.\""

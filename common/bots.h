@@ -64,6 +64,7 @@ void bots_warning(int warning, char *message);
 #define BOTS_RESULT_NA 0
 #define BOTS_RESULT_SUCCESSFUL 1
 #define BOTS_RESULT_UNSUCCESSFUL 2
+#define BOTS_RESULT_NOT_REQUESTED 3
 
 #define BOTS_VERBOSE_NONE 0
 #define BOTS_VERBOSE_DEFAULT 1

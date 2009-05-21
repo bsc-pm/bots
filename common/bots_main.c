@@ -52,7 +52,6 @@ void bots_set_info();
  *********************************************************************/
 /* common flags */
 int bots_sequential_flag = FALSE;
-int bots_benchmark_flag = TRUE;
 int bots_check_flag = FALSE;
 int bots_verbose_mode = BOTS_VERBOSE_DEFAULT;
 int bots_result = BOTS_RESULT_NA;
@@ -227,7 +226,7 @@ void bots_print_usage()
    fprintf(stderr, "  -x <value> : OpenMP tasks cut-off value (default=%d)\n",BOTS_CUTOFF_DEF_VALUE);
 #endif
 #ifdef BOTS_APP_USES_ARG_CUTOFF
-   fprintf(stderr, "  -y <value> : application cut-off value (default=%d)\n", BOTS_APP_DEF_ARG_CUTOFF);
+   fprintf(stderr, "  -y <value> : Application cut-off value (default=%d)\n", BOTS_APP_DEF_ARG_CUTOFF);
 #endif
 
    fprintf(stderr, "\n");
@@ -246,7 +245,6 @@ void bots_print_usage()
 #ifdef KERNEL_SEQ_CALL
    fprintf(stderr, "  -s         : Run sequential version.\n");
 #endif
-   fprintf(stderr, "  -d         : Do not run 'kernel' version.\n");
 #ifdef BOTS_APP_CHECK_USES_SEQ_RESULT
    fprintf(stderr, "  -c         : Check mode ON (implies running sequential version).\n");
 #else
@@ -278,10 +276,6 @@ bots_get_params_common(int argc, char **argv)
                //if (argc == i) { bots_print_usage(); exit(100); }
                //bots_check_flag = atoi(argv[i]);
                bots_check_flag = TRUE;
-               break;
-            case 'd': /* do not run benchmark  */
-               argv[i][1] = '*';
-               bots_benchmark_flag = FALSE;
                break;
             case 'e': /* include execution message */
                argv[i][1] = '*';
@@ -475,25 +469,24 @@ main(int argc, char* argv[])
    }
 #endif
 
-   if (bots_benchmark_flag || bots_check_flag)
-   {
-      KERNEL_INIT;
+   KERNEL_INIT;
 #ifdef BOTS_APP_SELF_TIMING
-      bots_time_program = KERNEL_CALL;
+   bots_time_program = KERNEL_CALL;
 #else
-      bots_t_start = bots_usecs();
-      KERNEL_CALL;
-      bots_t_end = bots_usecs();
-      bots_time_program = ((double)(bots_t_end-bots_t_start))/1000000;
+   bots_t_start = bots_usecs();
+   KERNEL_CALL;
+   bots_t_end = bots_usecs();
+   bots_time_program = ((double)(bots_t_end-bots_t_start))/1000000;
 #endif
-      KERNEL_FINI;
-   }
+   KERNEL_FINI;
 
 #ifdef KERNEL_CHECK
    if (bots_check_flag)
-   {
-      bots_result = KERNEL_CHECK;
-   }
+     bots_result = KERNEL_CHECK;
+   else
+     bots_result = BOTS_RESULT_NOT_REQUESTED;
+#else
+   bots_result = BOTS_RESULT_NOT_REQUESTED;
 #endif
 
    BOTS_APP_FINI;
