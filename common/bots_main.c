@@ -54,7 +54,7 @@ void bots_set_info();
 int bots_sequential_flag = FALSE;
 int bots_check_flag = FALSE;
 int bots_verbose_mode = BOTS_VERBOSE_DEFAULT;
-int bots_result = BOTS_RESULT_NA;
+int bots_result = BOTS_RESULT_NOT_REQUESTED;
 int bots_output_format = 1;
 int bots_print_header = FALSE;
 /* common variables */
@@ -481,12 +481,9 @@ main(int argc, char* argv[])
    KERNEL_FINI;
 
 #ifdef KERNEL_CHECK
-   if (bots_check_flag)
+   if (bots_check_flag) {
      bots_result = KERNEL_CHECK;
-   else
-     bots_result = BOTS_RESULT_NOT_REQUESTED;
-#else
-   bots_result = BOTS_RESULT_NOT_REQUESTED;
+   }
 #endif
 
    BOTS_APP_FINI;

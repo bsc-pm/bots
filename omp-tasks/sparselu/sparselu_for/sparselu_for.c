@@ -25,6 +25,7 @@
 #include <math.h>
 #include <libgen.h>
 #include "bots.h"
+#include "sparselu.h"
 
 /***********************************************************************
  * checkmat: 
@@ -187,63 +188,20 @@ void fwd(float *diag, float *col)
          for (i=k+1; i<bots_arg_size_1; i++)
             col[i*bots_arg_size_1+j] = col[i*bots_arg_size_1+j] - diag[i*bots_arg_size_1+k]*col[k*bots_arg_size_1+j];
 }
-double sparselu_seq_call_old(float ***pSEQ)
+
+void sparselu_init (float ***pBENCH, char *pass)
 {
-   int ii, jj, kk;
-   long start, end;
-   double time;
-   float **SEQ  = (float **) malloc(bots_arg_size*bots_arg_size*sizeof(float *));
-   *pSEQ = SEQ;
-
-   genmat(SEQ);
-   if (bots_verbose_mode) print_structure("sequential", SEQ);
-
-   start = bots_usecs();
-   for (kk=0; kk<bots_arg_size; kk++) 
-   {
-      lu0(SEQ[kk*bots_arg_size+kk]);
-      for (jj=kk+1; jj<bots_arg_size; jj++)
-      {
-         if (SEQ[kk*bots_arg_size+jj] != NULL)
-         {
-            fwd(SEQ[kk*bots_arg_size+kk], SEQ[kk*bots_arg_size+jj]);
-         }
-      }
-      for (ii=kk+1; ii<bots_arg_size; ii++) 
-      {
-         if (SEQ[ii*bots_arg_size+kk] != NULL)
-         {
-            bdiv (SEQ[kk*bots_arg_size+kk], SEQ[ii*bots_arg_size+kk]);
-         }
-      }
-      for (ii=kk+1; ii<bots_arg_size; ii++)
-      {
-         if (SEQ[ii*bots_arg_size+kk] != NULL)
-            for (jj=kk+1; jj<bots_arg_size; jj++)
-               if (SEQ[kk*bots_arg_size+jj] != NULL)
-               {
-                  if (SEQ[ii*bots_arg_size+jj]==NULL) SEQ[ii*bots_arg_size+jj] = allocate_clean_block();
-                  bmod(SEQ[ii*bots_arg_size+kk], SEQ[kk*bots_arg_size+jj], SEQ[ii*bots_arg_size+jj]);
-               }
-      }
-   }  
-   end = bots_usecs();
-   time = ((double)(end-start))/1000000;
-   if (bots_verbose_mode) print_structure("sequential", SEQ);
-   return time;
+   *pBENCH = (float **) malloc(bots_arg_size*bots_arg_size*sizeof(float *));
+   genmat(*pBENCH);
+   if (bots_verbose_mode) print_structure(pass, *pBENCH);
 }
-double sparselu_seq_call(float ***pBENCH)
+
+
+void sparselu_seq_call(float **BENCH)
 {
    int ii, jj, kk;
-   long start, end;
-   double time;
-   float **BENCH = (float **) malloc(bots_arg_size*bots_arg_size*sizeof(float *));
-   *pBENCH = BENCH;
 
-   genmat(BENCH);
-   if (bots_verbose_mode) print_structure("sequential", BENCH);
-   start = bots_usecs();
-   for (kk=0; kk<bots_arg_size; kk++) 
+   for (kk=0; kk<bots_arg_size; kk++)
    {
       lu0(BENCH[kk*bots_arg_size+kk]);
       for (jj=kk+1; jj<bots_arg_size; jj++)
@@ -266,23 +224,12 @@ double sparselu_seq_call(float ***pBENCH)
                }
 
    }
-
-   end = bots_usecs();
-   time = ((double)(end-start))/1000000;
-   if (bots_verbose_mode) print_structure("sequential", BENCH);
-   return time;
 }
-double sparselu_par_call(float ***pBENCH)
+
+void sparselu_par_call(float **BENCH)
 {
    int ii, jj, kk;
-   long start, end;
-   double time;
-   float **BENCH = (float **) malloc(bots_arg_size*bots_arg_size*sizeof(float *));
-   *pBENCH = BENCH;
-
-   genmat(BENCH);
-   if (bots_verbose_mode) print_structure("benchmark", BENCH);
-   start = bots_usecs();
+   
 #pragma omp parallel private(kk)
    {
    for (kk=0; kk<bots_arg_size; kk++) 
@@ -318,12 +265,13 @@ double sparselu_par_call(float ***pBENCH)
 
    }
    }
-
-   end = bots_usecs();
-   time = ((double)(end-start))/1000000;
-   if (bots_verbose_mode) print_structure("benchmark", BENCH);
-   return time;
 }
+
+void sparselu_fini (float **BENCH, char *pass)
+{
+   if (bots_verbose_mode) print_structure(pass, BENCH);
+}
+
 int sparselu_check(float **SEQ, float **BENCH)
 {
    int ii,jj,ok=1;
