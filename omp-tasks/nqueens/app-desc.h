@@ -30,10 +30,8 @@
 
 int verify_queens(int);
 void find_queens (int);
-void find_queens_ser (int);
 
 #define KERNEL_CALL find_queens(bots_arg_size)
-#define KERNEL_SEQ_CALL find_queens_ser(bots_arg_size)
 #define KERNEL_CHECK verify_queens(bots_arg_size)
 
 #define BOTS_CUTOFF_DEF_VALUE 3

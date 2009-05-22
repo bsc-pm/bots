@@ -24,7 +24,6 @@
 #define BOTS_APP_PARAMETERS_DESC "S1=%dx%d, S2=%dx%d"
 #define BOTS_APP_PARAMETERS_LIST ,bots_arg_size,bots_arg_size,bots_arg_size_1,bots_arg_size_1
 
-#define BOTS_APP_CHECKING_NEEDS_SEQ
 #define BOTS_APP_CHECK_USES_SEQ_RESULT
 #define BOTS_APP_SELF_TIMING
 

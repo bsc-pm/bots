@@ -24,7 +24,6 @@
 #define BOTS_APP_PARAMETERS_DESC "N=%d:Y=%d"
 #define BOTS_APP_PARAMETERS_LIST ,bots_arg_size,bots_app_cutoff_value
 
-#define BOTS_APP_CHECKING_NEEDS_SEQ
 
 #define BOTS_APP_USES_ARG_SIZE
 #define BOTS_APP_DEF_ARG_SIZE 1024
@@ -89,8 +88,7 @@ void strassen_main_seq(REAL *A, REAL *B, REAL *C, int n);
 #define KERNEL_SEQ_CALL strassen_main_seq(D,A,B,bots_arg_size);
 //#define KERNEL_SEQ_FINI
 
-
+#define BOTS_APP_CHECK_USES_SEQ_RESULT
 #define KERNEL_CHECK compare_matrix(bots_arg_size,C,bots_arg_size,D,bots_arg_size);
 
-#define BOTS_APP_CHECK_USES_SEQ_RESULT
 

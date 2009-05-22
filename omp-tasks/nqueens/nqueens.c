@@ -259,15 +259,6 @@ void nqueens(int n, int j, char *a, int *solutions, int depth)
 
 #endif
 
-void find_queens_ser (int size)
-{
-	char *a;
-
-	total_count=0;
-	a = alloca(size * sizeof(char));
-	nqueens_ser(size, 0, a, &total_count);
-}
-
 void find_queens (int size)
 {
 	total_count=0;
