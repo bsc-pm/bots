@@ -303,7 +303,7 @@ for pair in $INPUTS; do
 [ "$VERBOSE" ] && echo "Executing $APP($version) with $cpus CPUS and input $pair"
 p1=${pair%x*}
 p2=${pair#*x}
-exec_app $APP $version $cpus -m $p1 -l $p2 $VERIFY
+exec_app $APP $version $cpus -n $p1 -m $p2 $VERIFY
 
 done
 done
