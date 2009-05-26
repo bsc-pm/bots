@@ -91,7 +91,7 @@ void nqueens (int n, int j, char *a, int *solutions)
 	for (i = 0; i < n; i++) {
 		{
 	  		a[j] = i;
-	  		if (ok(j + 1, b)) {
+	  		if (ok(j + 1, a)) {
 	       			nqueens(n, j + 1, a,&res);
 				*solutions += res;
 			}

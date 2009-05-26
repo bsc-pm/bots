@@ -24,8 +24,6 @@
 #define BOTS_APP_PARAMETERS_DESC "S1=%dx%d, S2=%dx%d"
 #define BOTS_APP_PARAMETERS_LIST ,bots_arg_size,bots_arg_size,bots_arg_size_1,bots_arg_size_1
 
-#define BOTS_APP_SELF_TIMING
-
 #define BOTS_APP_USES_ARG_SIZE
 #define BOTS_APP_DEF_ARG_SIZE 50
 #define BOTS_APP_DESC_ARG_SIZE "Matrix Size"
@@ -36,23 +34,13 @@
 
 #define BOTS_APP_INIT float **SEQ;
 
-int checkmat (float *M, float *N);
-void genmat (float *M[]);
-void print_structure(char *name, float *M[]);
-float * allocate_clean_block();
-void lu0(float *diag);
-void bdiv(float *diag, float *row);
-void bmod(float *row, float *col, float *inner);
-void fwd(float *diag, float *col);
-double sparselu(float ***SEQ);
+void sparselu_init(float ***pM, char *pass);
+void sparselu_fini(float **M, char *pass);
+void sparselu(float **SEQ);
 
-#define KERNEL_INIT
-#define KERNEL_CALL sparselu(&SEQ);
-#define KERNEL_FINI
-
-#define KERNEL_SEQ_INIT
-#define KERNEL_SEQ_CALL 0
-#define KERNEL_SEQ_FINI
+#define KERNEL_INIT sparselu_init(&SEQ,"serial");
+#define KERNEL_CALL sparselu(SEQ);
+#define KERNEL_FINI sparselu_fini(SEQ,"serial");
 
 #define KERNEL_CHECK BOTS_RESULT_NA;
 

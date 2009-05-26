@@ -25,6 +25,7 @@
 #include <math.h>
 #include <libgen.h>
 #include "bots.h"
+#include "sparselu.h"
 
 /***********************************************************************
  * checkmat: 
@@ -187,18 +188,19 @@ void fwd(float *diag, float *col)
          for (i=k+1; i<bots_arg_size_1; i++)
             col[i*bots_arg_size_1+j] = col[i*bots_arg_size_1+j] - diag[i*bots_arg_size_1+k]*col[k*bots_arg_size_1+j];
 }
-double sparselu(float ***pBENCH)
+
+void sparselu_init (float ***pBENCH, char *pass)
+{
+  *pBENCH = (float **) malloc(bots_arg_size*bots_arg_size*sizeof(float *));
+  genmat(*pBENCH);
+  if (bots_verbose_mode) print_structure(pass, *pBENCH);
+} 
+
+void sparselu(float **BENCH)
 {
    int ii, jj, kk;
-   long start, end;
-   double time;
-   float **BENCH = (float **) malloc(bots_arg_size*bots_arg_size*sizeof(float *));
-   *pBENCH = BENCH;
 
-   genmat(BENCH);
-   if (bots_verbose_mode >= BOTS_VERBOSE_DEFAULT) print_structure("sequential", BENCH);
-   start = bots_usecs();
-   for (kk=0; kk<bots_arg_size; kk++) 
+   for (kk=0; kk<bots_arg_size; kk++)
    {
       lu0(BENCH[kk*bots_arg_size+kk]);
       for (jj=kk+1; jj<bots_arg_size; jj++)
@@ -221,10 +223,9 @@ double sparselu(float ***pBENCH)
                }
 
    }
-
-   end = bots_usecs();
-   time = ((double)(end-start))/1000000;
-   if (bots_verbose_mode >= BOTS_VERBOSE_DEFAULT) print_structure("sequential", BENCH);
-   return time;
 }
 
+void sparselu_fini (float **BENCH, char *pass)
+{
+  if (bots_verbose_mode) print_structure(pass, BENCH);
+} 
