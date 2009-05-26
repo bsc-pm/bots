@@ -90,12 +90,9 @@ void nqueens (int n, int j, char *a, int *solutions)
      	/* try each possible position for queen <j> */
 	for (i = 0; i < n; i++) {
 		{
-	  		/* allocate a temporary array and copy <a> into it */
-	  		char * b = alloca((j + 1) * sizeof(char));
-	  		memcpy(b, a, j * sizeof(char));
-	  		b[j] = i;
+	  		a[j] = i;
 	  		if (ok(j + 1, b)) {
-	       			nqueens(n, j + 1, b,&res);
+	       			nqueens(n, j + 1, a,&res);
 				*solutions += res;
 			}
 		}
