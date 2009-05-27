@@ -180,7 +180,7 @@ exec_serial ()
 	cpus=$1
 	shift 2
 
-	[ "$cpus" -eq 1 ] && $command $*
+	$command $*
 	return 0
 }
 
@@ -220,6 +220,12 @@ exec_app ()
 	version=$2
 	cpus=$3
 	shift 3
+
+	if (echo $version | grep serial) > /dev/null && [ "$serial_run" = "yes" ]; then
+	    return 0
+	else
+	    serial_run="yes"
+	fi
 
 	[ "$EXEC_MANAGER" ] && exec_external $cpus $app $version $* && return
 	(echo $version | grep serial) > /dev/null && exec_serial $cpus $app.$version $* && return
@@ -319,4 +325,4 @@ RUN=$BASE_DIR/run
 CLASS_DIR=$BASE_DIR/config/classes
 INPUTS_DIR=$BASE_DIR/inputs
 
-
+serial_run=no
