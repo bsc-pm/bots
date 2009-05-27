@@ -299,63 +299,7 @@ ELM *binsplit(ELM val, ELM *low, ELM *high)
 	  return low;
 }
 
-void cilkmerge_seq(ELM *low1, ELM *high1, ELM *low2, ELM *high2, ELM *lowdest)
-{
-     /*
-      * Cilkmerge: Merges range [low1, high1] with range [low2, high2] 
-      * into the range [lowdest, ...]  
-      */
 
-     ELM *split1, *split2;	/*
-				 * where each of the ranges are broken for 
-				 * recursive merge 
-				 */
-     long int lowsize;		/*
-				 * total size of lower halves of two
-				 * ranges - 2 
-				 */
-
-     /*
-      * We want to take the middle element (indexed by split1) from the
-      * larger of the two arrays.  The following code assumes that split1
-      * is taken from range [low1, high1].  So if [low1, high1] is
-      * actually the smaller range, we should swap it with [low2, high2] 
-      */
-
-     if (high2 - low2 > high1 - low1) {
-	  swap_indices(low1, low2);
-	  swap_indices(high1, high2);
-     }
-     if (high1 < low1) {
-	  /* smaller range is empty */
-	  memcpy(lowdest, low2, sizeof(ELM) * (high2 - low2));
-	  return;
-     }
-     if (high2 - low2 < MERGESIZE) {
-	  seqmerge(low1, high1, low2, high2, lowdest);
-	  return;
-     }
-     /*
-      * Basic approach: Find the middle element of one range (indexed by
-      * split1). Find where this element would fit in the other range
-      * (indexed by split 2). Then merge the two lower halves and the two
-      * upper halves. 
-      */
-
-     split1 = ((high1 - low1 + 1) / 2) + low1;
-     split2 = binsplit(*split1, low2, high2);
-     lowsize = split1 - low1 + split2 - low2;
-
-     /* 
-      * directly put the splitting element into
-      * the appropriate location
-      */
-     *(lowdest + lowsize + 1) = *split1;
-     cilkmerge_seq(low1, split1 - 1, low2, split2, lowdest);
-     cilkmerge_seq(split1 + 1, high1, split2 + 1, high2, lowdest + lowsize + 2);
-
-     return;
-}
 void cilkmerge_par(ELM *low1, ELM *high1, ELM *low2, ELM *high2, ELM *lowdest)
 {
      /*
@@ -416,43 +360,6 @@ void cilkmerge_par(ELM *low1, ELM *high1, ELM *low2, ELM *high2, ELM *lowdest)
 #pragma omp taskwait
 
      return;
-}
-
-void cilksort_seq(ELM *low, ELM *tmp, long size)
-{
-     /*
-      * divide the input in four parts of the same size (A, B, C, D)
-      * Then:
-      *   1) recursively sort A, B, C, and D (in parallel)
-      *   2) merge A and B into tmp1, and C and D into tmp2 (in parallel)
-      *   3) merbe tmp1 and tmp2 into the original array
-      */
-     long quarter = size / 4;
-     ELM *A, *B, *C, *D, *tmpA, *tmpB, *tmpC, *tmpD;
-
-     if (size < QUICKSIZE) {
-	  /* quicksort when less than 1024 elements */
-	  seqquick(low, low + size - 1);
-	  return;
-     }
-     A = low;
-     tmpA = tmp;
-     B = A + quarter;
-     tmpB = tmpA + quarter;
-     C = B + quarter;
-     tmpC = tmpB + quarter;
-     D = C + quarter;
-     tmpD = tmpC + quarter;
-
-     cilksort_seq(A, tmpA, quarter);
-     cilksort_seq(B, tmpB, quarter);
-     cilksort_seq(C, tmpC, quarter);
-     cilksort_seq(D, tmpD, size - 3 * quarter);
-
-     cilkmerge_seq(A, A + quarter - 1, B, B + quarter - 1, tmpA);
-     cilkmerge_seq(C, C + quarter - 1, D, low + size - 1, tmpC);
-
-     cilkmerge_seq(tmpA, tmpC - 1, tmpC, tmpA + size - 1, A);
 }
 
 void cilksort_par(ELM *low, ELM *tmp, long size)
@@ -537,11 +444,6 @@ void sort_par (int size)
 #pragma omp single nowait
 #pragma omp task untied
      cilksort_par(array, tmp, size);
-}
-
-void sort_seq (int size)
-{
-     cilksort_seq(array, tmp, size);
 }
 
 int sort_verify (int size)

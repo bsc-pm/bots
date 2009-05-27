@@ -28,7 +28,6 @@
 #define BOTS_APP_DEF_ARG_SIZE (32*1024*1024)
 #define BOTS_APP_DESC_ARG_SIZE "Array size"
 
-void sort_seq (int);
 void sort_par (int);
 void sort_init (int);
 int sort_verify(int);
@@ -39,7 +38,4 @@ int sort_verify(int);
 #define KERNEL_CALL sort_par(bots_arg_size)
 #define KERNEL_CHECK sort_verify(bots_arg_size)
 
-#define KERNEL_SEQ_INIT scramble_array(bots_arg_size)
-#define KERNEL_SEQ_CALL sort_seq(bots_arg_size)
-#define KERNEL_SEQ_CHECK sort_verify(bots_arg_size)
 
