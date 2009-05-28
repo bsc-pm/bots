@@ -524,7 +524,7 @@ int check_village(struct Village *top)
    if (bots_verbose_mode >= BOTS_VERBOSE_DEFAULT)
    {
       fprintf(stdout,"\n");
-      fprintf(stdout,"Sim. Variables      = expect / result\n", (int)   res_population, (int) result.total_patients);
+      fprintf(stdout,"Sim. Variables      = expect / result\n");
       fprintf(stdout,"Total population    = %6d / %6d people\n", (int)   res_population, (int) result.total_patients);
       fprintf(stdout,"Hospitals           = %6d / %6d people\n", (int)   res_hospitals, (int) result.hosps_number);
       fprintf(stdout,"Personnel           = %6d / %6d people\n", (int)   res_personnel, (int) result.hosps_personnel);
