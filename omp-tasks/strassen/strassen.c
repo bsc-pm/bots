@@ -24,7 +24,7 @@
  * IN NO EVENT SHALL THE MASSACHUSETTS INSTITUTE OF TECHNOLOGY BE LIABLE
  * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
  * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * /WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  * Except as contained in this notice, the name of the Massachusetts
  * Institute of Technology shall not be used in advertising or otherwise
@@ -34,34 +34,13 @@
  *
  */
 
-
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "app-desc.h"
 #include "bots.h"
+#include "strassen.h"
 
-/*FIXME: change to parameter ???*/
-#define SizeAtWhichNaiveAlgorithmIsMoreEfficient 16
-
-extern int bots_arg_block;
-extern int bots_arg_size;
-
-#if defined(MANUAL_CUTOFF) || defined(IF_CUTOFF)
-extern int bots_cutoff_value;
-#endif
-
-/***********************************************************************
- * maximum tolerable relative error (for the checking routine)
- **********************************************************************/
-#define EPSILON (1.0E-6)
-/***********************************************************************
- * Matrices are stored in row-major order; A is a pointer to
- * the first element of the matrix, and an is the number of elements
- * between two rows. This macro produces the element A[i,j]
- * given A, an, i and j
- **********************************************************************/
-#define ELEM(A, an, i, j) (A[(i)*(an)+(j)])
 /***********************************************************************
  * Naive sequential algorithm, for comparison purposes
  **********************************************************************/
