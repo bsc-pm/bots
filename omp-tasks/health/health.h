@@ -17,7 +17,8 @@
 /*  along with this program; if not, write to the Free Software                               */
 /*  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA            */
 /**********************************************************************************************/
-
+#ifndef _HEALTH_H
+#define _HEALTH_H
 /* random defines */
 #define IA 16807
 #define IM 2147483647
@@ -59,4 +60,4 @@ float get_total_hosps(struct Village *village);
 struct Results get_results(struct Village *village);
 
 void sim_village_par(struct Village *village);
-
+#endif
