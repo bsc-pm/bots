@@ -18,71 +18,45 @@
 /*  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA            */
 /**********************************************************************************************/
 
-#include "omp-tasks-app.h"
+/* random defines */
+#define IA 16807
+#define IM 2147483647
+#define AM (1.0 / IM)
+#define IQ 127773
+#define IR 2836
+#define MASK 123459876
 
-#define BOTS_APP_NAME "Health"
-#define BOTS_APP_PARAMETERS_DESC "%s"
-#define BOTS_APP_PARAMETERS_LIST ,bots_arg_file
-
-//#define BOTS_APP_SELF_TIMING
-
-#define BOTS_APP_USES_ARG_FILE
-#define BOTS_APP_DEF_ARG_FILE "Input filename"
-#define BOTS_APP_DESC_ARG_FILE "Health input file (mandatory)"
-
-#define BOTS_CUTOFF_DEF_VALUE 2
-
-extern int sim_level;
-
-struct Patient {
-   int id;
-   long seed;
-   int time;
-   int time_left;
-   int hosps_visited;
-   struct Village *home_village;
-   struct Patient *back;
-   struct Patient *forward;
-};
-struct Hosp {
-   int personnel;
-   int free_personnel;
-   struct Patient *waiting;
-   struct Patient *assess;
-   struct Patient *inside;
-   struct Patient *realloc;
-   omp_lock_t  realloc_lock;
-};
-struct Village {
-   int id;
-   struct Village *back;
-   struct Village *next;
-   struct Village *forward;
-   struct Patient *population;
-   struct Hosp hosp;
-   int level;
-   long  seed;
+struct Results {
+   float hosps_number;
+   float hosps_personnel;
+   float total_patients;
+   float total_in_village;
+   float total_waiting;
+   float total_assess;
+   float total_inside;
+   float total_time;
+   float total_hosps_v;
 };
 
-void read_input_data(char *filename);
-void allocate_village( struct Village **capital, struct Village *back, struct Village *next, int level, int vid);
-void sim_village_main_par(struct Village *top);
-int check_village(struct Village *top);
+float my_rand(long *seed);
 
-#define BOTS_APP_INIT \
-   struct Village *top;\
-   read_input_data(bots_arg_file);
+struct Patient *generate_patient(struct Village *village);
+void put_in_hosp(struct Hosp *hosp, struct Patient *patient);
 
-#define KERNEL_INIT \
-   allocate_village(&top, NULL, NULL, sim_level, 0);
+void addList(struct Patient **list, struct Patient *patient);
+void removeList(struct Patient **list, struct Patient *patient);
 
-#define KERNEL_CALL sim_village_main_par(top);
- 
-#define KERNEL_FINI
+void check_patients_inside(struct Village *village);
+void check_patients_waiting(struct Village *village);
+void check_patients_realloc(struct Village *village);
 
-//#define KERNEL_SEQ_INIT
-//#define KERNEL_SEQ_CALL
-//#define KERNEL_SEQ_FINI
+void check_patients_assess_par(struct Village *village);
 
-#define KERNEL_CHECK check_village(top);
+float get_num_people(struct Village *village);
+float get_total_time(struct Village *village);
+float get_total_hosps(struct Village *village);
+
+struct Results get_results(struct Village *village);
+
+void sim_village_par(struct Village *village);
 

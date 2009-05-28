@@ -38,6 +38,7 @@
 #include <assert.h>
 #include "app-desc.h"
 #include "bots.h"
+#include "health.h"
 
 /* global variables */
 int sim_level;
@@ -323,50 +324,6 @@ void check_patients_assess_par(struct Village *village)
    } 
 }
 /**********************************************************************/
-void check_patients_assess_seq(struct Village *village) 
-{
-   struct Patient *list = village->hosp.assess;
-   float rand;
-   struct Patient *p;
-
-   while (list != NULL) 
-   {
-      p = list;
-      list = list->forward; 
-      p->time_left--;
-
-      if (p->time_left == 0) 
-      { 
-         rand = my_rand(&(p->seed));
-         /* sim_covalescense_p % */
-         if (rand < sim_convalescence_p)
-         {
-            rand = my_rand(&(p->seed));
-            /* !sim_realloc_p % or root hospital */
-            if (rand > sim_realloc_p || village->level == sim_level) 
-            {
-               removeList(&(village->hosp.assess), p);
-               addList(&(village->hosp.inside), p);
-               p->time_left = sim_convalescence_time;
-               p->time += p->time_left;
-            }
-            else /* move to upper level hospital !!! */
-            {
-               village->hosp.free_personnel++;
-               removeList(&(village->hosp.assess), p);
-               addList(&(village->back->hosp.realloc), p); 
-            } 
-         }
-         else /* move to village */
-         {
-            village->hosp.free_personnel++;
-            removeList(&(village->hosp.assess), p);
-            addList(&(village->population), p); 
-         }
-      }
-   } 
-}
-/**********************************************************************/
 void check_patients_waiting(struct Village *village) 
 {
    struct Patient *list = village->hosp.waiting;
@@ -570,39 +527,6 @@ void sim_village_par(struct Village *village)
 }
 #endif
 /**********************************************************************/
-void sim_village_seq(struct Village *village)
-{
-   struct Village *vlist;
-
-   // lowest level returns nothing
-   // only for sim_village first call with village = NULL
-   // recursive call cannot occurs
-   if (village == NULL) return;
-
-   /* Traverse village hierarchy (lower level first)*/
-   vlist = village->forward;
-   while(vlist)
-   {
-      sim_village_seq(vlist);
-      vlist = vlist->next;
-   }
-
-   /* Uses lists v->hosp->inside, and v->return */
-   check_patients_inside(village);
-
-   /* Uses lists v->hosp->assess, v->hosp->inside, v->population and (v->back->hosp->up) !!! */
-   check_patients_assess_seq(village);
-
-   /* Uses lists v->hosp->waiting, and v->hosp->assess */
-   check_patients_waiting(village);
-
-   /* Uses lists v->hosp->realloc, v->hosp->asses and v->hosp->waiting */
-   check_patients_realloc(village);
-
-   /* Uses list v->population, v->hosp->asses and v->h->waiting */
-   check_patients_population(village);
-}
-/**********************************************************************/
 void my_print(struct Village *village)
 {
    struct Village *vlist;
@@ -695,7 +619,7 @@ int check_village(struct Village *top)
    if (bots_verbose_mode >= BOTS_VERBOSE_DEFAULT)
    {
       fprintf(stdout,"\n");
-      fprintf(stdout,"Sim. Variables      = expect / result\n", (int)   res_population, (int) result.total_patients);
+      fprintf(stdout,"Sim. Variables      = expect / result\n");
       fprintf(stdout,"Total population    = %6d / %6d people\n", (int)   res_population, (int) result.total_patients);
       fprintf(stdout,"Hospitals           = %6d / %6d people\n", (int)   res_hospitals, (int) result.hosps_number);
       fprintf(stdout,"Personnel           = %6d / %6d people\n", (int)   res_personnel, (int) result.hosps_personnel);
@@ -720,9 +644,4 @@ void sim_village_main_par(struct Village *top)
 #pragma omp task untied
    for (i = 0; i < sim_time; i++) sim_village_par(top);   
 }
-/**********************************************************************/
-void sim_village_main_seq(struct Village *top)
-{
-   long i;
-   for (i = 0; i < sim_time; i++) sim_village_seq(top);   
-}
+
