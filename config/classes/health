@@ -1,12 +1,12 @@
 [test]
-inputs=health-t.input
+inputs=test.input
 
 [small]
-inputs=health-s.input
+inputs=small.input
 
 [medium]
-inputs=health-m.input
+inputs=medium.input
 
 [large]
-inputs=health-l.input
+inputs=large.input
 

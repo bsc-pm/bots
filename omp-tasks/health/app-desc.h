@@ -19,6 +19,7 @@
 /**********************************************************************************************/
 
 #include "omp-tasks-app.h"
+#include "health.h"
 
 #define BOTS_APP_NAME "Health"
 #define BOTS_APP_PARAMETERS_DESC "%s"
@@ -31,43 +32,6 @@
 #define BOTS_APP_DESC_ARG_FILE "Health input file (mandatory)"
 
 #define BOTS_CUTOFF_DEF_VALUE 2
-
-extern int sim_level;
-
-struct Patient {
-   int id;
-   long seed;
-   int time;
-   int time_left;
-   int hosps_visited;
-   struct Village *home_village;
-   struct Patient *back;
-   struct Patient *forward;
-};
-struct Hosp {
-   int personnel;
-   int free_personnel;
-   struct Patient *waiting;
-   struct Patient *assess;
-   struct Patient *inside;
-   struct Patient *realloc;
-   omp_lock_t  realloc_lock;
-};
-struct Village {
-   int id;
-   struct Village *back;
-   struct Village *next;
-   struct Village *forward;
-   struct Patient *population;
-   struct Hosp hosp;
-   int level;
-   long  seed;
-};
-
-void read_input_data(char *filename);
-void allocate_village( struct Village **capital, struct Village *back, struct Village *next, int level, int vid);
-void sim_village_main_par(struct Village *top);
-int check_village(struct Village *top);
 
 #define BOTS_APP_INIT \
    struct Village *top;\

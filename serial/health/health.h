@@ -39,8 +39,6 @@ struct Results {
    float total_hosps_v;
 };
 
-extern int sim_level;
-
 struct Patient {
    int id;
    long seed;
@@ -58,8 +56,8 @@ struct Hosp {
    struct Patient *assess;
    struct Patient *inside;
    struct Patient *realloc;
-   omp_lock_t  realloc_lock;
 };
+
 struct Village {
    int id;
    struct Village *back;
@@ -91,12 +89,14 @@ float get_total_hosps(struct Village *village);
 
 struct Results get_results(struct Village *village);
 
+void sim_village_par(struct Village *village);
+
+extern int sim_level;
+
 void read_input_data(char *filename);
 void allocate_village( struct Village **capital, struct Village *back, struct Village *next, int level, int vid);
-void sim_village_main_par(struct Village *top);
+void sim_village_main(struct Village *top);
 
-void sim_village_par(struct Village *village);
 int check_village(struct Village *top);
-
 
 #endif

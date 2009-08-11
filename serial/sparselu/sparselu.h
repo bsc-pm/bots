@@ -11,3 +11,4 @@ void bmod(float *row, float *col, float *inner);
 void fwd(float *diag, float *col);
 
 #endif
+

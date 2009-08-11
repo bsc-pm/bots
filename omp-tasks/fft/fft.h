@@ -52,3 +52,4 @@ void fft_seq(int n, COMPLEX * in, COMPLEX * out);
 int test_correctness(int n, COMPLEX *out1, COMPLEX *out2);
 
 #endif
+

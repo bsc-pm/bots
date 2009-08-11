@@ -12,7 +12,7 @@ print_help()
 	echo "-h			Prints this help"
 	echo "-i inputs_list		List of inputs to use for executions"
 	echo "-v versions_list		List of versions of the benchmark to use for execution"
-	echo "-verbose 0|1|2		Set application verbosity (TODO)"
+	echo "-verbose 0|1|2		Set application verbosity"
 	echo "-of			Output format (TODO)"
 }
 
@@ -34,6 +34,9 @@ parse_args ()
 			"-i")   shift; ARG_INPUTS=$1
 				;;
 			"-v")   shift; ARG_VERSIONS=$1
+				;;
+			"-verbose")
+				shift; EXTRA="$EXTRA -v $1"
 				;;
 			*)
 				echo "Unkown option $1"; print_help $0; exit
@@ -221,10 +224,12 @@ exec_app ()
 	cpus=$3
 	shift 3
 
-	if (echo $version | grep serial) > /dev/null && [ "$serial_run" = "yes" ]; then
-	    return 0
-	else
-	    serial_run="yes"
+	if (echo $version | grep serial) > /dev/null; then
+	   if [ "$serial_run" = "yes" ]; then
+	      return 0
+	   else
+	      serial_run="yes"
+	   fi
 	fi
 
 	[ "$EXEC_MANAGER" ] && exec_external $cpus $app $version $* && return
@@ -265,7 +270,7 @@ for version in $VERSIONS; do
 for size in $INPUTS; do
 
 [ "$VERBOSE" ] && echo "Executing $APP($version) with $cpus CPUS and size $size"
-exec_app $APP $version $cpus -n $size $VERIFY
+exec_app $APP $version $cpus -n $size $VERIFY $EXTRA
 
 done
 done
@@ -293,7 +298,7 @@ if [ ! -e $file ]; then
 fi 
 
 [ "$VERBOSE" ] && echo "Executing $APP($version) with $cpus CPUS and input file $file"
-exec_app $APP $version $cpus -f $file $VERIFY
+exec_app $APP $version $cpus -f $file $VERIFY $EXTRA
 
 done
 done
@@ -309,7 +314,7 @@ for pair in $INPUTS; do
 [ "$VERBOSE" ] && echo "Executing $APP($version) with $cpus CPUS and input $pair"
 p1=${pair%x*}
 p2=${pair#*x}
-exec_app $APP $version $cpus -n $p1 -m $p2 $VERIFY
+exec_app $APP $version $cpus -n $p1 -m $p2 $VERIFY $EXTRA
 
 done
 done

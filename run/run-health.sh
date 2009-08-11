@@ -1,7 +1,7 @@
 #!/bin/bash
 #defaults
 
-DEF_INPUTS=health-m.input
+DEF_INPUTS=medium.input
 
 #don't modify from here
 
