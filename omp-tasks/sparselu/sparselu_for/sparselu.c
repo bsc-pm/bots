@@ -53,6 +53,7 @@ void genmat (float *M[])
 {
    int null_entry, init_val, i, j, ii, jj;
    float *p;
+   int a=0,b=0;
 
    init_val = 1325;
 
@@ -72,6 +73,7 @@ void genmat (float *M[])
          if (ii-1 == jj) null_entry = FALSE; 
          /* allocating matrix */
          if (null_entry == FALSE){
+            a++;
             M[ii*bots_arg_size+jj] = (float *) malloc(bots_arg_size_1*bots_arg_size_1*sizeof(float));
 	    if ((M[ii*bots_arg_size+jj] == NULL))
             {
@@ -92,10 +94,12 @@ void genmat (float *M[])
          }
          else
          {
+            b++;
             M[ii*bots_arg_size+jj] = NULL;
          }
       }
    }
+   fprintf(stderr,"allo = %d, no = %d, total = %d, factor = %f\n",a,b,a+b,(float)((float)a/(float)(a+b)));
 }
 /***********************************************************************
  * print_structure: 

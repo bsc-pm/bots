@@ -230,8 +230,8 @@ static int add_cell (int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS)
           }
 
 /* calculate new footprint of board and area of footprint */
-          footprint[0] = max(FOOTPRINT[0], cells[id].bot);
-          footprint[1] = max(FOOTPRINT[1], cells[id].rhs);
+          footprint[0] = max(FOOTPRINT[0], cells[id].bot+1);
+          footprint[1] = max(FOOTPRINT[1], cells[id].rhs+1);
           area         = footprint[0] * footprint[1];
 
 /* if last cell */

@@ -232,8 +232,8 @@ static int add_cell_ser (int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS)
           }
 
 /* calculate new footprint of board and area of footprint */
-          footprint[0] = max(FOOTPRINT[0], cells[id].bot);
-          footprint[1] = max(FOOTPRINT[1], cells[id].rhs);
+          footprint[0] = max(FOOTPRINT[0], cells[id].bot+1);
+          footprint[1] = max(FOOTPRINT[1], cells[id].rhs+1);
           area         = footprint[0] * footprint[1];
 
 /* if last cell */
@@ -306,8 +306,8 @@ if(level<bots_cutoff_value)
           }
 
 /* calculate new footprint of board and area of footprint */
-          footprint[0] = max(FOOTPRINT[0], cells[id].bot);
-          footprint[1] = max(FOOTPRINT[1], cells[id].rhs);
+          footprint[0] = max(FOOTPRINT[0], cells[id].bot+1);
+          footprint[1] = max(FOOTPRINT[1], cells[id].rhs+1);
           area         = footprint[0] * footprint[1];
 
 /* if last cell */
@@ -460,8 +460,8 @@ shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD,nn2,bots_verbos
           }
 
 /* calculate new footprint of board and area of footprint */
-          footprint[0] = max(FOOTPRINT[0], cells[id].bot);
-          footprint[1] = max(FOOTPRINT[1], cells[id].rhs);
+          footprint[0] = max(FOOTPRINT[0], cells[id].bot+1);
+          footprint[1] = max(FOOTPRINT[1], cells[id].rhs+1);
           area         = footprint[0] * footprint[1];
 
 /* if last cell */
