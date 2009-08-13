@@ -325,9 +325,9 @@ void cilkmerge(ELM *low1, ELM *high1, ELM *low2,
 	  swap_indices(low1, low2);
 	  swap_indices(high1, high2);
      }
-     if (high1 < low1) {
+     if (high2 < low2) {
 	  /* smaller range is empty */
-	  memcpy(lowdest, low2, sizeof(ELM) * (high2 - low2));
+	  memcpy(lowdest, low1, sizeof(ELM) * (high1 - low1));
 	  return;
      }
      if (high2 - low2 < MERGESIZE) {
