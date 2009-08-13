@@ -72,8 +72,8 @@ ELM *array, *tmp;
 
 /* MERGESIZE must be >= 2 */
 #define KILO 1024
-#define MERGESIZE (1)
-#define QUICKSIZE (1)
+#define MERGESIZE (2*KILO)
+#define QUICKSIZE (2*KILO)
 #define INSERTIONSIZE 20
 
 static unsigned long rand_nxt = 0;
@@ -327,14 +327,12 @@ void cilkmerge_par(ELM *low1, ELM *high1, ELM *low2, ELM *high2, ELM *lowdest)
 	  swap_indices(low1, low2);
 	  swap_indices(high1, high2);
      }
-#if 0
      if (high2 < low2) {
 	  /* smaller range is empty */
 	  memcpy(lowdest, low1, sizeof(ELM) * (high1 - low1));
 	  return;
      }
-#endif
-     if (high2 - low2 <= MERGESIZE) {
+     if (high2 - low2 < MERGESIZE) {
 	  seqmerge(low1, high1, low2, high2, lowdest);
 	  return;
      }
