@@ -428,7 +428,7 @@ int pairalign(int istart, int iend, int jstart, int jend)
 
 	#pragma omp parallel
 	{
-	#pragma omp for schedule(dynamic) private(i,n,si,sj,len1)
+	#pragma omp for schedule(dynamic) private(i,n,si,sj,len1,m)
 		for (si = 0; si < nseqs; si++) {
 			if ((n = seqlen_array[si+1]) != 0){
 				for (i = 1, len1 = 0; i <= n; i++) {
@@ -436,41 +436,43 @@ int pairalign(int istart, int iend, int jstart, int jend)
 					if ((c != gap_pos1) && (c != gap_pos2)) len1++;
 				}
 
-				for (sj = si + 1; sj < nseqs; sj++) {
-					#pragma omp task untied default(shared) \
-					private(i,m,gg,len2,mm_score) firstprivate(n,si,sj,len1) \
-					shared(seqlen_array,seq_array,gap_pos1,gap_pos2,pw_ge_penalty,pw_go_penalty,mat_avscore)
+				for (sj = si + 1; sj < nseqs; sj++) 
+				{
+					if ((m = seqlen_array[sj+1]) != 0)
 					{
-						if ((m = seqlen_array[sj+1]) != 0){
-							int se1, se2, sb1, sb2, maxscore, seq1, seq2, g, gh;
-							int displ[2*MAX_ALN_LENGTH+1];
-							int print_ptr, last_print;
+						#pragma omp task untied default(none) \
+						private(i,gg,len2,mm_score) firstprivate(m,n,si,sj,len1) \
+						shared(nseqs, bench_output,seqlen_array,seq_array,gap_pos1,gap_pos2,pw_ge_penalty,pw_go_penalty,mat_avscore)
+						{
+						int se1, se2, sb1, sb2, maxscore, seq1, seq2, g, gh;
+						int displ[2*MAX_ALN_LENGTH+1];
+						int print_ptr, last_print;
 
-							for (i = 1, len2 = 0; i <= m; i++) {
-								char c = seq_array[sj+1][i];
-								if ((c != gap_pos1) && (c != gap_pos2)) len2++;
-							}
+						for (i = 1, len2 = 0; i <= m; i++) {
+							char c = seq_array[sj+1][i];
+							if ((c != gap_pos1) && (c != gap_pos2)) len2++;
+						}
 
-							gh = 10 * pw_ge_penalty;
-							gg = pw_go_penalty + log((double) MIN(n, m));
-							g  = (mat_avscore <= 0) ? 20 * gg : 2 * mat_avscore * gg;
+						gh = 10 * pw_ge_penalty;
+						gg = pw_go_penalty + log((double) MIN(n, m));
+						g  = (mat_avscore <= 0) ? 20 * gg : 2 * mat_avscore * gg;
 
-							seq1 = si + 1;
-							seq2 = sj + 1;
+						seq1 = si + 1;
+						seq2 = sj + 1;
 
-							forward_pass(&seq_array[seq1][0], &seq_array[seq2][0], n, m, &se1, &se2, &maxscore, g, gh);
-							reverse_pass(&seq_array[seq1][0], &seq_array[seq2][0], se1, se2, &sb1, &sb2, maxscore, g, gh);
+						forward_pass(&seq_array[seq1][0], &seq_array[seq2][0], n, m, &se1, &se2, &maxscore, g, gh);
+						reverse_pass(&seq_array[seq1][0], &seq_array[seq2][0], se1, se2, &sb1, &sb2, maxscore, g, gh);
 
-							print_ptr  = 1;
-							last_print = 0;
+						print_ptr  = 1;
+						last_print = 0;
 
-							diff(sb1-1, sb2-1, se1-sb1+1, se2-sb2+1, 0, 0, &print_ptr, &last_print, displ, seq1, seq2, g, gh);
-							mm_score = tracepath(sb1, sb2, &print_ptr, &last_print, displ, seq1, seq2);
+						diff(sb1-1, sb2-1, se1-sb1+1, se2-sb2+1, 0, 0, &print_ptr, &last_print, displ, seq1, seq2, g, gh);
+						mm_score = tracepath(sb1, sb2, &print_ptr, &last_print, displ, seq1, seq2);
 
-							if (len1 == 0 || len2 == 0) mm_score  = 0.0;
-							else                        mm_score /= (double) MIN(len1,len2);
+						if (len1 == 0 || len2 == 0) mm_score  = 0.0;
+						else                        mm_score /= (double) MIN(len1,len2);
 
-							bench_output[si*nseqs+sj] = mm_score;
+						bench_output[si*nseqs+sj] = mm_score;
 						}
 					}
 				}
@@ -643,16 +645,25 @@ void align_end ()
 int align_verify ()
 {
 	int i,j;
+	int result = BOTS_RESULT_SUCCESSFUL;
 	
 	for(i = 0; i<nseqs; i++)
 	{
 		for(j = 0; j<nseqs; j++)
 		{
 			if (bench_output[i*nseqs+j] != seq_output[i*nseqs+j])
-				return BOTS_RESULT_UNSUCCESSFUL;
+			{
+				if (bots_verbose_mode >= BOTS_VERBOSE_DEFAULT)
+				{
+					fprintf(stdout, "Error: Optimized prot. (%3d:%3d)=%5d Sequential prot. (%3d:%3d)=%5d\n",
+						i+1, j+1, (int) bench_output[i*nseqs+j],
+						i+1, j+1, (int) seq_output[i*nseqs+j]);
+				}
+				result = BOTS_RESULT_UNSUCCESSFUL;
+			}
 		}
 	}
-	return BOTS_RESULT_SUCCESSFUL;
+	return result;
 }
 		
 
