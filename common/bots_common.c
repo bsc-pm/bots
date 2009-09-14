@@ -125,7 +125,7 @@ void bots_print_results()
    char str_speed_up[15];
    char str_number_of_tasks[15];
    char str_number_of_tasks_per_second[15];
-   char str_exec_date[15];
+   char str_exec_date[128];
    char str_exec_message[128];
    char str_architecture[128];
    char str_load_avg[128];
