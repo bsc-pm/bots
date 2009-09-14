@@ -239,7 +239,8 @@ void bots_print_usage()
    fprintf(stderr, "               0 - no benchmark output.\n");
    fprintf(stderr, "               1 - detailed list format.\n");
    fprintf(stderr, "               2 - detailed row format.\n");
-   fprintf(stderr, "               3 - abridged row format.\n");
+   fprintf(stderr, "               3 - abridged list format.\n");
+   fprintf(stderr, "               4 - abridged row format.\n");
    fprintf(stderr, "  -z         : Print row header (if output format is a row variant).\n");
    fprintf(stderr, "\n");
 #ifdef KERNEL_SEQ_CALL
