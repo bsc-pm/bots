@@ -71,8 +71,9 @@ parse_class_file ()
 			value=${line#*=}
 	
 			case $key in
-				sizes) CLASS_INPUTS="$CLASS_INPUTS $value";;
-				inputs) CLASS_INPUTS="$CLASS_INPUTS $value";;
+				sizes)  eval ${class}_input=$value;;
+				inputs) eval ${class}_input=$value;;
+				cutoff) eval ${class}_cutoff=$value;;
 			esac
 		fi
 	done < $file
@@ -169,8 +170,8 @@ set_values ()
 
 	if [ "$ARG_INPUTS" ]; then
 		INPUTS=$ARG_INPUTS
-	elif [ "$CLASS_INPUTS" ]; then
-		INPUTS=$CLASS_INPUTS
+	elif [ "$ARG_CLASSES" ]; then
+		INPUTS=
 	else
 		INPUTS=$DEF_INPUTS
 	fi 
@@ -240,20 +241,81 @@ exec_app ()
 	exit 1
 }
 
-exec_all_verbatim ()
+exec_all ()
 {
-
-#echo "cpus: $CPUS"
-#echo "versions: $VERSIONS"
-#echo "inputs: $INPUTS"
+local mode=$1
 
 for args in $INPUTS; do
 serial_run=no
 for cpu in $CPUS; do
 for version in $VERSIONS; do
 
+case $mode in
+  size) INPUT="-n $args"; size=$args
+	;;
+  file) INPUT="-f $args"; file=$args
+        if [ ! -e $file ]; then
+	  if [ -e $INPUTS_DIR/$APP/$file ]; then
+		file=$INPUTS_DIR/$APP/$file
+	  else
+	      echo "Warning: Unknown input $file (skipping)"
+	      continue
+	  fi
+        fi
+	;;
+  pair) pair=$args
+        p1=${pair%x*}
+        p2=${pair#*x}
+        INPUT="-n $p1 -m $p2"
+	;;
+esac
 
-exec_app $APP $version $cpus $args
+[ "$VERBOSE" ] && echo "Executing $APP($version) with $cpus CPUS"
+exec_app $APP $version $cpus $INPUT $VERIFY $EXTRA
+
+done
+done
+done
+
+for class in $(echo $ARG_CLASSES | tr , ' '); do
+serial_run=no
+for cpu in $CPUS; do
+for version in $VERSIONS; do
+
+case $mode in
+  size) eval "size=\$${class}_input"
+        INPUT="-n $size"
+	;;
+  file) eval "file=\$${class}_input"
+        INPUT="-f $file"
+        if [ ! -e $file ]; then
+	  if [ -e $INPUTS_DIR/$APP/$file ]; then
+		file=$INPUTS_DIR/$APP/$file
+	  else
+	      echo "Warning: Unknown input $file (skipping)"
+	      continue
+	  fi
+        fi
+	;;
+  pair) eval "pair=\$${class}_input"
+        p1=${pair%x*}
+        p2=${pair#*x}
+        INPUT="-n $p1 -m $p2"
+	;;
+esac
+
+CLASS=
+eval "cutoff=\$${class}_cutoff"
+if [ $cutoff ]; then
+   case $version in
+        omp-tasks-if_clause | omp-tasks-manual)  CLASS="$CLASS -x $cutoff" ;;
+   esac
+   
+fi
+
+
+[ "$VERBOSE" ] && echo "Executing $APP($version) with $cpus CPUS"
+exec_app $APP $version $cpus $INPUT $CLASS $VERIFY $EXTRA
 
 done
 done
@@ -262,69 +324,17 @@ done
 
 exec_all_sizes ()
 {
-
-#echo "cpus: $CPUS"
-#echo "versions: $VERSIONS"
-#echo "inputs: $INPUTS"
-
-for size in $INPUTS; do
-serial_run=no
-for cpus in $CPUS; do
-for version in $VERSIONS; do
-
-[ "$VERBOSE" ] && echo "Executing $APP($version) with $cpus CPUS and size $size"
-exec_app $APP $version $cpus -n $size $VERIFY $EXTRA 
-
-done
-done
-done
+   exec_all size
 }
 
 exec_all_files ()
 {
-
-#echo "cpus: $CPUS"
-#echo "versions: $VERSIONS"
-#echo "inputs: $INPUTS"
-
-for file in $INPUTS; do
-serial_run=no
-for cpus in $CPUS; do
-for version in $VERSIONS; do
-
-if [ ! -e $file ]; then
-	if [ -e $INPUTS_DIR/$APP/$file ]; then
-		file=$INPUTS_DIR/$APP/$file
-	else
-		echo "Warning: Unknown input $file (skipping)"
-		continue
-	fi
-fi 
-
-[ "$VERBOSE" ] && echo "Executing $APP($version) with $cpus CPUS and input file $file"
-exec_app $APP $version $cpus -f $file $VERIFY $EXTRA
-
-done
-done
-done
+   exec_all file
 }
 
 exec_all_pairs ()
 {
-for pair in $INPUTS; do
-serial_run=no
-for cpus in $CPUS; do
-for version in $VERSIONS; do
-
-
-[ "$VERBOSE" ] && echo "Executing $APP($version) with $cpus CPUS and input $pair"
-p1=${pair%x*}
-p2=${pair#*x}
-exec_app $APP $version $cpus -n $p1 -m $p2 $VERIFY $EXTRA 
-
-done
-done
-done
+   exec_all pair
 }
 
 if [ -z "$APP" ]; then
