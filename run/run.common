@@ -84,7 +84,13 @@ compute_max_cpus ()
 {
 #TODO: Add other systems here
 	case $(uname -s) in
-		"Linux") max_cpus=$(cat /proc/cpuinfo  | grep ^processor | wc -l)
+		"Linux")
+		      if [ -f /proc/$$/cpuset ]; then
+		        cpuset=`cat /proc/$$/cpuset`
+			max_cpus=$(cat /dev/cpuset/$cpuset/cpus | sed "s/\(.*\)-\(.*\)/\2-\1+1/" | bc)
+		      else
+		        max_cpus=$(cat /proc/cpuinfo  | grep ^processor | wc -l)
+	              fi
 				;;
 		"AIX") max_cpus=$(lsdev -Sa -Cc processor | wc -l)
 				;;
@@ -247,7 +253,7 @@ local mode=$1
 
 for args in $INPUTS; do
 serial_run=no
-for cpu in $CPUS; do
+for cpus in $CPUS; do
 for version in $VERSIONS; do
 
 case $mode in
@@ -279,7 +285,7 @@ done
 
 for class in $(echo $ARG_CLASSES | tr , ' '); do
 serial_run=no
-for cpu in $CPUS; do
+for cpus in $CPUS; do
 for version in $VERSIONS; do
 
 case $mode in
