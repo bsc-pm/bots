@@ -54,7 +54,7 @@ parse_class_file ()
 	while read line; do
 		if [ "${line:0:1}" = "[" ]; then
 			local n=${#line}
-			class=${line:1:n-2}
+			local class=${line:1:n-2}
 
 			# is one of the class definitions we want to load?
 			# otherwise skip
@@ -247,9 +247,11 @@ exec_all_verbatim ()
 #echo "versions: $VERSIONS"
 #echo "inputs: $INPUTS"
 
+for args in $INPUTS; do
+serial_run=no
 for cpu in $CPUS; do
 for version in $VERSIONS; do
-for args in $INPUTS; do
+
 
 exec_app $APP $version $cpus $args
 
@@ -265,12 +267,13 @@ exec_all_sizes ()
 #echo "versions: $VERSIONS"
 #echo "inputs: $INPUTS"
 
+for size in $INPUTS; do
+serial_run=no
 for cpus in $CPUS; do
 for version in $VERSIONS; do
-for size in $INPUTS; do
 
 [ "$VERBOSE" ] && echo "Executing $APP($version) with $cpus CPUS and size $size"
-exec_app $APP $version $cpus -n $size $VERIFY $EXTRA
+exec_app $APP $version $cpus -n $size $VERIFY $EXTRA 
 
 done
 done
@@ -284,9 +287,10 @@ exec_all_files ()
 #echo "versions: $VERSIONS"
 #echo "inputs: $INPUTS"
 
+for file in $INPUTS; do
+serial_run=no
 for cpus in $CPUS; do
 for version in $VERSIONS; do
-for file in $INPUTS; do
 
 if [ ! -e $file ]; then
 	if [ -e $INPUTS_DIR/$APP/$file ]; then
@@ -307,14 +311,16 @@ done
 
 exec_all_pairs ()
 {
+for pair in $INPUTS; do
+serial_run=no
 for cpus in $CPUS; do
 for version in $VERSIONS; do
-for pair in $INPUTS; do
+
 
 [ "$VERBOSE" ] && echo "Executing $APP($version) with $cpus CPUS and input $pair"
 p1=${pair%x*}
 p2=${pair#*x}
-exec_app $APP $version $cpus -n $p1 -m $p2 $VERIFY $EXTRA
+exec_app $APP $version $cpus -n $p1 -m $p2 $VERIFY $EXTRA 
 
 done
 done
@@ -329,5 +335,3 @@ BIN=$BASE_DIR/bin
 RUN=$BASE_DIR/run
 CLASS_DIR=$BASE_DIR/config/classes
 INPUTS_DIR=$BASE_DIR/inputs
-
-serial_run=no
