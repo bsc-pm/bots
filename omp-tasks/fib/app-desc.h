@@ -41,7 +41,7 @@ void fib0_seq (int);
 //#define KERNEL_SEQ_FINI
 
 
-#define KERNEL_CHECK fib_verify()
-#define BOTS_APP_CHECK_USES_SEQ_RESULT
+#define KERNEL_CHECK fib_verify(bots_arg_size)
 
 #define BOTS_CUTOFF_DEF_VALUE 4
+
