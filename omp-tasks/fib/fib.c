@@ -111,6 +111,9 @@ void fib0_seq (int n)
 
 int fib_verify ()
 {
-	return par_res == seq_res;
+	int result;
+	if (par_res == seq_res) result = BOTS_RESULT_SUCCESSFUL;
+	else result = BOTS_RESULT_SUCCESSFUL;
+	return result;
 }
 
