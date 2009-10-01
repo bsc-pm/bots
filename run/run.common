@@ -54,7 +54,7 @@ parse_class_file ()
 	while read line; do
 		if [ "${line:0:1}" = "[" ]; then
 			local n=${#line}
-			class=${line:1:n-2}
+			local class=${line:1:n-2}
 
 			# is one of the class definitions we want to load?
 			# otherwise skip
@@ -71,8 +71,9 @@ parse_class_file ()
 			value=${line#*=}
 	
 			case $key in
-				sizes) CLASS_INPUTS="$CLASS_INPUTS $value";;
-				inputs) CLASS_INPUTS="$CLASS_INPUTS $value";;
+				sizes)  eval ${class}_input=$value;;
+				inputs) eval ${class}_input=$value;;
+				cutoff) eval ${class}_cutoff=$value;;
 			esac
 		fi
 	done < $file
@@ -83,7 +84,13 @@ compute_max_cpus ()
 {
 #TODO: Add other systems here
 	case $(uname -s) in
-		"Linux") max_cpus=$(cat /proc/cpuinfo  | grep ^processor | wc -l)
+		"Linux")
+		      if [ -f /proc/$$/cpuset ]; then
+		        cpuset=`cat /proc/$$/cpuset`
+			max_cpus=$(cat /dev/cpuset/$cpuset/cpus | sed "s/\(.*\)-\(.*\)/\2-\1+1/" | bc)
+		      else
+		        max_cpus=$(cat /proc/cpuinfo  | grep ^processor | wc -l)
+	              fi
 				;;
 		"AIX") max_cpus=$(lsdev -Sa -Cc processor | wc -l)
 				;;
@@ -169,8 +176,8 @@ set_values ()
 
 	if [ "$ARG_INPUTS" ]; then
 		INPUTS=$ARG_INPUTS
-	elif [ "$CLASS_INPUTS" ]; then
-		INPUTS=$CLASS_INPUTS
+	elif [ "$ARG_CLASSES" ]; then
+		INPUTS=
 	else
 		INPUTS=$DEF_INPUTS
 	fi 
@@ -240,18 +247,81 @@ exec_app ()
 	exit 1
 }
 
-exec_all_verbatim ()
+exec_all ()
 {
+local mode=$1
 
-#echo "cpus: $CPUS"
-#echo "versions: $VERSIONS"
-#echo "inputs: $INPUTS"
-
-for cpu in $CPUS; do
-for version in $VERSIONS; do
 for args in $INPUTS; do
+serial_run=no
+for cpus in $CPUS; do
+for version in $VERSIONS; do
 
-exec_app $APP $version $cpus $args
+case $mode in
+  size) INPUT="-n $args"; size=$args
+	;;
+  file) INPUT="-f $args"; file=$args
+        if [ ! -e $file ]; then
+	  if [ -e $INPUTS_DIR/$APP/$file ]; then
+		file=$INPUTS_DIR/$APP/$file
+	  else
+	      echo "Warning: Unknown input $file (skipping)"
+	      continue
+	  fi
+        fi
+	;;
+  pair) pair=$args
+        p1=${pair%x*}
+        p2=${pair#*x}
+        INPUT="-n $p1 -m $p2"
+	;;
+esac
+
+[ "$VERBOSE" ] && echo "Executing $APP($version) with $cpus CPUS"
+exec_app $APP $version $cpus $INPUT $VERIFY $EXTRA
+
+done
+done
+done
+
+for class in $(echo $ARG_CLASSES | tr , ' '); do
+serial_run=no
+for cpus in $CPUS; do
+for version in $VERSIONS; do
+
+case $mode in
+  size) eval "size=\$${class}_input"
+        INPUT="-n $size"
+	;;
+  file) eval "file=\$${class}_input"
+        INPUT="-f $file"
+        if [ ! -e $file ]; then
+	  if [ -e $INPUTS_DIR/$APP/$file ]; then
+		file=$INPUTS_DIR/$APP/$file
+	  else
+	      echo "Warning: Unknown input $file (skipping)"
+	      continue
+	  fi
+        fi
+	;;
+  pair) eval "pair=\$${class}_input"
+        p1=${pair%x*}
+        p2=${pair#*x}
+        INPUT="-n $p1 -m $p2"
+	;;
+esac
+
+CLASS=
+eval "cutoff=\$${class}_cutoff"
+if [ $cutoff ]; then
+   case $version in
+        omp-tasks-if_clause | omp-tasks-manual)  CLASS="$CLASS -x $cutoff" ;;
+   esac
+   
+fi
+
+
+[ "$VERBOSE" ] && echo "Executing $APP($version) with $cpus CPUS"
+exec_app $APP $version $cpus $INPUT $CLASS $VERIFY $EXTRA
 
 done
 done
@@ -260,65 +330,17 @@ done
 
 exec_all_sizes ()
 {
-
-#echo "cpus: $CPUS"
-#echo "versions: $VERSIONS"
-#echo "inputs: $INPUTS"
-
-for cpus in $CPUS; do
-for version in $VERSIONS; do
-for size in $INPUTS; do
-
-[ "$VERBOSE" ] && echo "Executing $APP($version) with $cpus CPUS and size $size"
-exec_app $APP $version $cpus -n $size $VERIFY $EXTRA
-
-done
-done
-done
+   exec_all size
 }
 
 exec_all_files ()
 {
-
-#echo "cpus: $CPUS"
-#echo "versions: $VERSIONS"
-#echo "inputs: $INPUTS"
-
-for cpus in $CPUS; do
-for version in $VERSIONS; do
-for file in $INPUTS; do
-
-if [ ! -e $file ]; then
-	if [ -e $INPUTS_DIR/$APP/$file ]; then
-		file=$INPUTS_DIR/$APP/$file
-	else
-		echo "Warning: Unknown input $file (skipping)"
-		continue
-	fi
-fi 
-
-[ "$VERBOSE" ] && echo "Executing $APP($version) with $cpus CPUS and input file $file"
-exec_app $APP $version $cpus -f $file $VERIFY $EXTRA
-
-done
-done
-done
+   exec_all file
 }
 
 exec_all_pairs ()
 {
-for cpus in $CPUS; do
-for version in $VERSIONS; do
-for pair in $INPUTS; do
-
-[ "$VERBOSE" ] && echo "Executing $APP($version) with $cpus CPUS and input $pair"
-p1=${pair%x*}
-p2=${pair#*x}
-exec_app $APP $version $cpus -n $p1 -m $p2 $VERIFY $EXTRA
-
-done
-done
-done
+   exec_all pair
 }
 
 if [ -z "$APP" ]; then
@@ -329,5 +351,3 @@ BIN=$BASE_DIR/bin
 RUN=$BASE_DIR/run
 CLASS_DIR=$BASE_DIR/config/classes
 INPUTS_DIR=$BASE_DIR/inputs
-
-serial_run=no

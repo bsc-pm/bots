@@ -20,6 +20,9 @@
 
 #include "bots.h"
 
+#define FIB_RESULTS_PRE 41
+int fib_results[FIB_RESULTS_PRE] = {0,1,1,2,3,5,8,13,21,34,55,89,144,233,377,610,987,1597,2584,4181,6765,10946,17711,28657,46368,75025,121393,196418,317811,514229,832040,1346269,2178309,3524578,5702887,9227465,14930352,24157817,39088169,63245986,102334155};
+
 int fib_seq (int n)
 {
 	int x, y;
@@ -109,8 +112,32 @@ void fib0_seq (int n)
 	printf("Fibonacci result for %d is %d\n",n,seq_res);
 }
 
-int fib_verify ()
+int fib_verify_value(int n)
 {
-	return par_res == seq_res;
+	int x, y;
+	if (n < FIB_RESULTS_PRE) return fib_results[FIB_RESULTS_PRE];
+
+	x = fib_verify_value(n - 1);
+	y = fib_verify_value(n - 2);
+
+	return x + y;
+}
+int fib_verify (int n)
+{
+	int result;
+
+	if (bots_sequential_flag)
+	{
+		if (par_res == seq_res) result = BOTS_RESULT_SUCCESSFUL;
+		else result = BOTS_RESULT_SUCCESSFUL;
+	}
+	else
+	{
+		seq_res = fib_verify_value(n);
+		if (par_res == seq_res) result = BOTS_RESULT_SUCCESSFUL;
+		else result = BOTS_RESULT_SUCCESSFUL;
+	}
+
+	return result;
 }
 

@@ -18,6 +18,11 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA            #
 ##############################################################################################
 
+config_ready=$(wildcard $(BASE_DIR)/config/make.config)
+ifeq ($(config_ready),)
+   $(error Configure script not executed. Please run ./configure in the base directory)
+endif
+
 include $(BASE_DIR)/config/make.config
 
 # Don't change below this line

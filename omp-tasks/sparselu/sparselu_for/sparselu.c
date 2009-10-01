@@ -33,13 +33,22 @@
 int checkmat (float *M, float *N)
 {
    int i, j;
+   float r_err;
+
    for (i = 0; i < bots_arg_size_1; i++) 
    {
       for (j = 0; j < bots_arg_size_1; j++) 
       {
-         if(M[i*bots_arg_size_1+j] != N[i*bots_arg_size_1+j])
+         r_err = M[i*bots_arg_size_1+j] - N[i*bots_arg_size_1+j];
+         if (r_err < 0.0 ) r_err = -r_err;
+         r_err = r_err / M[i*bots_arg_size_1+j];
+         if(r_err > EPSILON)
          {
-            if (bots_verbose_mode) fprintf(stderr, "Checking failure: A[%d][%d] = %f instead of B[%d][%d] = %f\n",i,j, M[i*bots_arg_size_1+j], i,j, N[i*bots_arg_size_1+j]);
+            if (bots_verbose_mode)
+            {
+               fprintf(stderr, "Checking failure: A[%d][%d]=%f  B[%d][%d]=%f; Relative Error=%f\n",
+                  i,j, M[i*bots_arg_size_1+j], i,j, N[i*bots_arg_size_1+j], r_err);
+            }
             return FALSE;
          }
       }
@@ -99,7 +108,7 @@ void genmat (float *M[])
          }
       }
    }
-   fprintf(stderr,"allo = %d, no = %d, total = %d, factor = %f\n",a,b,a+b,(float)((float)a/(float)(a+b)));
+   if (bots_verbose_mode >= BOTS_VERBOSE_DEBUG) fprintf(stderr,"allo = %d, no = %d, total = %d, factor = %f\n",a,b,a+b,(float)((float)a/(float)(a+b)));
 }
 /***********************************************************************
  * print_structure: 

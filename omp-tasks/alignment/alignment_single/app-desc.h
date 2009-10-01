@@ -20,7 +20,7 @@
 
 #include "omp-tasks-app.h"
 
-#define BOTS_APP_NAME "Protein alignment"
+#define BOTS_APP_NAME "Protein alignment (Single version)"
 #define BOTS_APP_PARAMETERS_DESC "%s"
 #define BOTS_APP_PARAMETERS_LIST ,bots_arg_file
 

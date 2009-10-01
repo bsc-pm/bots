@@ -125,7 +125,7 @@ void bots_print_results()
    char str_speed_up[15];
    char str_number_of_tasks[15];
    char str_number_of_tasks_per_second[15];
-   char str_exec_date[15];
+   char str_exec_date[128];
    char str_exec_message[128];
    char str_architecture[128];
    char str_load_avg[128];
@@ -200,6 +200,8 @@ Architecture;Processors;Load Avg-1;Load Avg-5;Load Avg-15;\
 Comp Date;Comp Time;Comp Message;CC;CFLAGS;LD;LDFLAGS\n");
             break;
          case 3:
+            break;
+         case 4:
 fprintf(stdout,
 "Benchmark;Parameters;Model;Cutoff;Resources;Result;\
 Time;Sequential;Speed-up;\
@@ -289,6 +291,26 @@ Tasks;Tasks/Sec;\n");
          fprintf(stdout,"\n");
          break;
       case 3:
+	 fprintf(stdout, "\n");
+         fprintf(stdout, "Program             = %s\n", str_name); /*fix*/
+         fprintf(stdout, "Parameters          = %s\n", str_parameters); /*fix*/
+         fprintf(stdout, "Model               = %s\n", str_model); 
+         fprintf(stdout, "Embedded cut-off    = %s\n", str_cutoff); 
+         fprintf(stdout, "# of Threads        = %s\n", str_resources);
+         fprintf(stdout, "Verification        = %s\n", str_result);
+
+         fprintf(stdout, "Time Program        = %s seconds\n", str_time_program);
+	 if (bots_sequential_flag) {
+           fprintf(stdout, "Time Sequential     = %s seconds\n", str_time_sequential);
+           fprintf(stdout, "Speed-up            = %s\n", str_speed_up);
+	 }
+
+         if ( bots_number_of_tasks > 0 ) {
+           fprintf(stdout, "Tasks               = %s\n", str_number_of_tasks);
+           fprintf(stdout, "Tasks/Sec           = %s\n", str_number_of_tasks_per_second);
+	 }
+         break;
+      case 4:
          fprintf(stdout,"%s;%s;%s;%s;%s;%s;", 
               str_name, 
               str_parameters, 

@@ -18,30 +18,10 @@
 /*  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA            */
 /**********************************************************************************************/
 
-#include "omp-tasks-app.h"
+#define EOS '\0'
+#define MAXLINE 512
 
-#define BOTS_APP_NAME "Fibonacci"
-#define BOTS_APP_PARAMETERS_DESC "N=%d"
-#define BOTS_APP_PARAMETERS_LIST ,bots_arg_size
-
-#define BOTS_APP_USES_ARG_SIZE
-#define BOTS_APP_DEF_ARG_SIZE 10
-#define BOTS_APP_DESC_ARG_SIZE "Number to compute"
-
-int fib_verify();
-void fib0 (int);
-void fib0_seq (int);
-
-//#define KERNEL_INIT
-#define KERNEL_CALL fib0(bots_arg_size)
-//#define KERNEL_FINI
-
-//#define KERNEL_SEQ_INIT
-#define KERNEL_SEQ_CALL fib0_seq(bots_arg_size)
-//#define KERNEL_SEQ_FINI
-
-
-#define KERNEL_CHECK fib_verify(bots_arg_size)
-
-#define BOTS_CUTOFF_DEF_VALUE 4
+#define NUMRES       32	  /* max size of comparison matrix */
+#define MAXNAMES     30	  /* max chars read for seq. names */
+#define FILENAMELEN 256   /* max file name length */
 
