@@ -2,11 +2,13 @@
 inputs=35
 
 [small]
-inputs=45
+inputs=10
+cutoff=5
 
 [medium]
 inputs=50
 
 [large]
 inputs=53
+cutoff=20
 

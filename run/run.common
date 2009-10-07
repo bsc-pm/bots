@@ -1,5 +1,6 @@
 DEF_CPUS=all
 DEF_VERSIONS=all
+DEF_LABELS=all
 
 print_help()
 {
@@ -32,6 +33,8 @@ parse_args ()
 			"-h") 	print_help $0; exit 
 				;;
 			"-i")   shift; ARG_INPUTS=$1
+				;;
+			"-l")	shift; ARG_LABELS=$1
 				;;
 			"-v")   shift; ARG_VERSIONS=$1
 				;;
@@ -142,7 +145,7 @@ expand_cpus ()
 expand_versions ()
 {
 	if [ "$VERSIONS" = "all" ]; then
-		VERSIONS=$(ls $BIN/$APP* | sed "s|$BIN/$APP.||g")
+		VERSIONS=$(ls $BIN/$APP* | sed s@.*/@@ | cut -d. -f3 | sort | uniq )
 	else
 		VERSIONS=$(echo $VERSIONS | tr , '  ')
 	fi
@@ -151,6 +154,15 @@ expand_versions ()
 expand_inputs ()
 {
 	INPUTS=$(echo $INPUTS | tr , '  ')
+}
+
+expand_labels ()
+{
+	if [ "$LABELS" = "all" ]; then
+		LABELS=$(ls $BIN/$APP* | sed s@.*/@@ | cut -d. -f2 | sort | uniq )
+	else
+		LABELS=$(echo $LABELS | tr , '  ')
+	fi
 }
 
 set_values ()
@@ -173,6 +185,13 @@ set_values ()
 		VERSIONS=$DEF_VERSIONS
 	fi 
 	expand_versions
+
+	if [ "$ARG_LABELS" ]; then
+		LABELS=$ARG_LABELS
+	else
+		LABELS=$DEF_LABELS
+	fi
+	expand_labels
 
 	if [ "$ARG_INPUTS" ]; then
 		INPUTS=$ARG_INPUTS
@@ -210,12 +229,12 @@ exec_external ()
 	local version=$3
 	shift 3
 
-	local bin=$BIN/$app.$version
+	local bin=$BIN/$app.$label.$version
 	local args="$*"
 
 	local EXEC=$EXEC_MANAGER
 	[ "$file" ] && local basefile=$(basename $file | tr -d .)
-	EXEC=$(echo $EXEC | sed s/%app%/$app/ | sed s/%cpus%/$cpus/ | sed s/%version%/$version/ )
+	EXEC=$(echo $EXEC | sed s/%app%/$app/ | sed s/%cpus%/$cpus/ | sed s/%version%/$version/ | sed s/%label%/$label/)
 	EXEC=$(echo $EXEC | sed s@%bin%@$bin@ | sed "s@%args%@$args@" | sed "s@%command%@$bin $args@" )
 	if [ "$file" -o "$size" -o "$pair" ]; then
 		EXEC=$(echo $EXEC | sed s@%input%@${basefile}${size}${pair}@ )
@@ -227,9 +246,10 @@ exec_external ()
 exec_app ()
 {
 	app=$1
-	version=$2
-	cpus=$3
-	shift 3
+	label=$2
+	version=$3
+	cpus=$4
+	shift 4
 
 	if (echo $version | grep serial) > /dev/null; then
 	   if [ "$serial_run" = "yes" ]; then
@@ -239,9 +259,9 @@ exec_app ()
 	   fi
 	fi
 
-	[ "$EXEC_MANAGER" ] && exec_external $cpus $app $version $* && return
-	(echo $version | grep serial) > /dev/null && exec_serial $cpus $app.$version $* && return
-	(echo $version | grep omp) > /dev/null && exec_omp $cpus $app.$version $* && return
+	[ "$EXEC_MANAGER" ] && exec_external $cpus $app $label $version $* && return
+	(echo $version | grep serial) > /dev/null && exec_serial $cpus $app.$label.$version $* && return
+	(echo $version | grep omp) > /dev/null && exec_omp $cpus $app.$label.$version $* && return
 
 	echo "FATAL ERROR: Don't know how to execute $version"
 	exit 1
@@ -251,6 +271,7 @@ exec_all ()
 {
 local mode=$1
 
+for label in $LABELS; do
 for args in $INPUTS; do
 serial_run=no
 for cpus in $CPUS; do
@@ -276,14 +297,16 @@ case $mode in
 	;;
 esac
 
-[ "$VERBOSE" ] && echo "Executing $APP($version) with $cpus CPUS"
-exec_app $APP $version $cpus $INPUT $VERIFY $EXTRA
+[ "$VERBOSE" ] && echo "Executing $APP($label,$version) with $cpus CPUS"
+exec_app $APP $label $version $cpus $INPUT $VERIFY $EXTRA
 
+done
 done
 done
 done
 
 for class in $(echo $ARG_CLASSES | tr , ' '); do
+for label in $LABELS; do
 serial_run=no
 for cpus in $CPUS; do
 for version in $VERSIONS; do
@@ -320,9 +343,10 @@ if [ $cutoff ]; then
 fi
 
 
-[ "$VERBOSE" ] && echo "Executing $APP($version) with $cpus CPUS"
-exec_app $APP $version $cpus $INPUT $CLASS $VERIFY $EXTRA
+[ "$VERBOSE" ] && echo "Executing $APP ($label,$version) with $cpus CPUS"
+exec_app $APP $label $version $cpus $INPUT $CLASS $VERIFY $EXTRA
 
+done
 done
 done
 done
