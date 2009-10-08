@@ -226,8 +226,9 @@ exec_external ()
 {
 	local cpus=$1
 	local app=$2
-	local version=$3
-	shift 3
+	local label=$3
+	local version=$4
+	shift 4
 
 	local bin=$BIN/$app.$label.$version
 	local args="$*"
