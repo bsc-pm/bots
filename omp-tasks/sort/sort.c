@@ -369,7 +369,7 @@ void cilksort_par(ELM *low, ELM *tmp, long size)
       * Then:
       *   1) recursively sort A, B, C, and D (in parallel)
       *   2) merge A and B into tmp1, and C and D into tmp2 (in parallel)
-      *   3) merbe tmp1 and tmp2 into the original array
+      *   3) merge tmp1 and tmp2 into the original array
       */
      long quarter = size / 4;
      ELM *A, *B, *C, *D, *tmpA, *tmpB, *tmpC, *tmpD;
