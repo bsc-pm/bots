@@ -282,7 +282,7 @@ for version in $VERSIONS; do
 case $mode in
   size) INPUT="-n $args"; size=$args
 	;;
-  file) INPUT="-f $args"; file=$args
+  file) file=$args
         if [ ! -e $file ]; then
 	  if [ -e $INPUTS_DIR/$APP/$file ]; then
 		file=$INPUTS_DIR/$APP/$file
@@ -291,6 +291,7 @@ case $mode in
 	      continue
 	  fi
         fi
+	INPUT="-f $file"
 	;;
   pair) pair=$args
         p1=${pair%x*}
@@ -318,7 +319,6 @@ case $mode in
         INPUT="-n $size"
 	;;
   file) eval "file=\$${class}_input"
-        INPUT="-f $file"
         if [ ! -e $file ]; then
 	  if [ -e $INPUTS_DIR/$APP/$file ]; then
 		file=$INPUTS_DIR/$APP/$file
@@ -327,6 +327,7 @@ case $mode in
 	      continue
 	  fi
         fi
+        INPUT="-f $file"
 	;;
   pair) eval "pair=\$${class}_input"
         p1=${pair%x*}
