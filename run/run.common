@@ -12,6 +12,7 @@ print_help()
 	echo "-debug			Show extra messages"
 	echo "-h			Prints this help"
 	echo "-i inputs_list		List of inputs to use for executions"
+	echo "-l label_list		List of labels (compilers) to use for executions"
 	echo "-v versions_list		List of versions of the benchmark to use for execution"
 	echo "-verbose 0|1|2		Set application verbosity"
 	echo "-of			Output format (TODO)"
