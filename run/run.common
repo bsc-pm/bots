@@ -89,7 +89,7 @@ compute_max_cpus ()
 #TODO: Add other systems here
 	case $(uname -s) in
 		"Linux")
-		      if [ -f /proc/$$/cpuset ]; then
+		      if [ -f /proc/$$/cpuset -a -d /dev/cpuset ]; then
 		        cpuset=`cat /proc/$$/cpuset`
 			max_cpus=$(cat /dev/cpuset/$cpuset/cpus | sed "s/\(.*\)-\(.*\)/\2-\1+1/" | bc)
 		      else
