@@ -204,6 +204,6 @@ else
 	echo "I didn't find a GNU-compatible make. You'll need it to compile the benchmarks"
 fi
 
-echo "You further refine your configuration in config/make.config"
+echo "You can further refine your configuration in config/make.config"
 echo "Use the scripts in the run directory to execute them"
 

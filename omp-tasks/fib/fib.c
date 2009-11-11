@@ -122,6 +122,7 @@ int fib_verify_value(int n)
 
 	return x + y;
 }
+
 int fib_verify (int n)
 {
 	int result;
