@@ -159,6 +159,50 @@ void nqueens(int n, int j, char *a, int *solutions, int depth)
 #endif
 }
 
+#elif defined(FINAL_CUTOFF)
+
+void nqueens(int n, int j, char *a, int *solutions, int depth)
+{
+	int i;
+	int *csols;
+
+
+	if (n == j) {
+		/* good solution, count it */
+#ifndef FORCE_TIED_TASKS
+		*solutions = 1;
+#else
+		mycount++;
+#endif
+		return;
+	}
+
+
+#ifndef FORCE_TIED_TASKS
+	*solutions = 0;
+	csols = alloca(n*sizeof(int));
+	memset(csols,0,n*sizeof(int));
+#endif
+
+     	/* try each possible position for queen <j> */
+	for (i = 0; i < n; i++) {
+ 		#pragma omp task untied final(depth+1 >= bots_cutoff_value)
+		{
+	  		/* allocate a temporary array and copy <a> into it */
+	  		char * b = alloca((j + 1) * sizeof(char));
+	  		memcpy(b, a, j * sizeof(char));
+	  		b[j] = i;
+	  		if (ok(j + 1, b))
+	       			nqueens(n, j + 1, b,&csols[i],depth+1);
+		}
+	}
+	#pragma omp taskwait
+
+#ifndef FORCE_TIED_TASKS
+	for ( i = 0; i < n; i++) *solutions += csols[i];
+#endif
+}
+
 
 #elif defined(MANUAL_CUTOFF)
 

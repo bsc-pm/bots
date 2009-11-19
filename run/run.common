@@ -340,7 +340,8 @@ CLASS=
 eval "cutoff=\$${class}_cutoff"
 if [ $cutoff ]; then
    case $version in
-        omp-tasks-if_clause | omp-tasks-manual)  CLASS="$CLASS -x $cutoff" ;;
+        omp-tasks-if_clause | omp-tasks-manual | omp-tasks-final | omp-tasks-final-ser)  
+		CLASS="$CLASS -x $cutoff" ;;
    esac
    
 fi
