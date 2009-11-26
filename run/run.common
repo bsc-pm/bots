@@ -12,6 +12,7 @@ print_help()
 	echo "-debug			Show extra messages"
 	echo "-h			Prints this help"
 	echo "-i inputs_list		List of inputs to use for executions"
+	echo "-l label_list		List of labels (compilers) to use for executions"
 	echo "-v versions_list		List of versions of the benchmark to use for execution"
 	echo "-verbose 0|1|2		Set application verbosity"
 	echo "-of			Output format (TODO)"
@@ -88,7 +89,7 @@ compute_max_cpus ()
 #TODO: Add other systems here
 	case $(uname -s) in
 		"Linux")
-		      if [ -f /proc/$$/cpuset ]; then
+		      if [ -f /proc/$$/cpuset -a -d /dev/cpuset ]; then
 		        cpuset=`cat /proc/$$/cpuset`
 			max_cpus=$(cat /dev/cpuset/$cpuset/cpus | sed "s/\(.*\)-\(.*\)/\2-\1+1/" | bc)
 		      else
@@ -281,7 +282,7 @@ for version in $VERSIONS; do
 case $mode in
   size) INPUT="-n $args"; size=$args
 	;;
-  file) INPUT="-f $args"; file=$args
+  file) file=$args
         if [ ! -e $file ]; then
 	  if [ -e $INPUTS_DIR/$APP/$file ]; then
 		file=$INPUTS_DIR/$APP/$file
@@ -290,6 +291,7 @@ case $mode in
 	      continue
 	  fi
         fi
+	INPUT="-f $file"
 	;;
   pair) pair=$args
         p1=${pair%x*}
@@ -317,7 +319,6 @@ case $mode in
         INPUT="-n $size"
 	;;
   file) eval "file=\$${class}_input"
-        INPUT="-f $file"
         if [ ! -e $file ]; then
 	  if [ -e $INPUTS_DIR/$APP/$file ]; then
 		file=$INPUTS_DIR/$APP/$file
@@ -326,6 +327,7 @@ case $mode in
 	      continue
 	  fi
         fi
+        INPUT="-f $file"
 	;;
   pair) eval "pair=\$${class}_input"
         p1=${pair%x*}
