@@ -51,6 +51,23 @@ int fib (int n,int d)
 	return x + y;
 }
 
+#elif defined(FINAL_CUTOFF)
+
+int fib (int n,int d)
+{
+	int x, y;
+	if (n < 2) return n;
+
+	#pragma omp task untied shared(x) firstprivate(n) final(d+1 >= bots_cutoff_value)
+	x = fib(n - 1,d+1);
+
+	#pragma omp task untied shared(y) firstprivate(n) final(d+1 >= bots_cutoff_value)
+	y = fib(n - 2,d+1);
+
+	#pragma omp taskwait
+	return x + y;
+}
+
 #elif defined(MANUAL_CUTOFF)
 
 int fib (int n, int d)
@@ -98,7 +115,7 @@ void fib0 (int n)
 {
 	#pragma omp parallel
 	#pragma omp single
-#if defined(MANUAL_CUTOFF) || defined(IF_CUTOFF)
+#if defined(MANUAL_CUTOFF) || defined(IF_CUTOFF) || defined(FINAL_CUTOFF)
 	par_res = fib(n,0);
 #else
 	par_res = fib(n);
