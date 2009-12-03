@@ -235,7 +235,7 @@ exec_external ()
 
 	local EXEC=$EXEC_MANAGER
 	[ "$file" ] && local basefile=$(basename $file | tr -d .)
-	EXEC=$(echo $EXEC | sed s/%app%/$app/ | sed s/%cpus%/$cpus/ | sed s/%version%/$version/ | sed s/%label%/$label/)
+	EXEC=$(echo $EXEC | sed s/%app%/$app/ | sed s/%cpus%/$cpus/ | sed s/%version%/$version/ | sed s/%cutoff%/$cutoff/ | sed s/%label%/$label/)
 	EXEC=$(echo $EXEC | sed s@%bin%@$bin@ | sed "s@%args%@$args@" | sed "s@%command%@$bin $args@" )
 	if [ "$file" -o "$size" -o "$pair" ]; then
 		EXEC=$(echo $EXEC | sed s@%input%@${basefile}${size}${pair}@ )
