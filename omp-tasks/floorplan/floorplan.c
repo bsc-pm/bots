@@ -32,9 +32,6 @@
 #define max(a, b) ((a > b) ? a : b)
 #define min(a, b) ((a < b) ? a : b)
 
-int number_of_tasks;
-#pragma omp threadprivate(number_of_tasks)
-
 int solution = -1;
 
 typedef int  coor[2];
@@ -289,7 +286,6 @@ shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD,nn2,bots_verbos
 if(level<bots_cutoff_value)
 {
 	  struct cell cells[N+1];
-	  number_of_tasks++;
 	  memcpy(cells,CELLS,sizeof(struct cell)*(N+1));
 /* extent of shape */
           cells[id].top = NWS[j][0];
@@ -327,7 +323,89 @@ if(level<bots_cutoff_value)
 
 /* if area is less than best area */
           } else if (area < MIN_AREA) {
-                nn2 += add_cell(cells[id].next, footprint, board,cells,level+1);
+// 	    #pragma omp atomic
+//                 nn2 += add_cell(cells[id].next, footprint, board,cells,level+1);
+
+                int tmp = add_cell(cells[id].next, footprint, board,cells,level+1);
+		__sync_fetch_and_add(&nn2,tmp);
+/* if area is greater than or equal to best area, prune search */
+          } else {
+
+             if (bots_verbose_mode >= BOTS_VERBOSE_DEBUG) printf("T  %d, %d\n", area, MIN_AREA);
+
+	  }
+_end:;
+}
+      }
+}
+#pragma omp taskwait
+return nn2;
+}
+
+#elif defined(FINAL_CUTOFF)
+
+static int add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS,int level) {
+  int  i, j, nn, area, nn2;
+
+  ibrd board;
+  coor footprint, NWS[DMAX];
+
+  nn2 = 0;
+/* for each possible shape */
+  for (i = 0; i < CELLS[id].n; i++) {
+/* compute all possible locations for nw corner */
+      nn = starts(id, i, NWS, CELLS);
+      nn2 += nn;
+/* for all possible locations */
+      for (j = 0; j < nn; j++) {
+#pragma omp task default(none) untied private(board, footprint,area) \
+firstprivate(NWS,i,j,id,nn,level) \
+shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD,nn2,bots_verbose_mode) \
+final(level+1 >= bots_cutoff_value)
+{
+	  struct cell cells[N+1];
+	  memcpy(cells,CELLS,sizeof(struct cell)*(N+1));
+/* extent of shape */
+          cells[id].top = NWS[j][0];
+          cells[id].bot = cells[id].top + cells[id].alt[i][0] - 1;
+          cells[id].lhs = NWS[j][1];
+          cells[id].rhs = cells[id].lhs + cells[id].alt[i][1] - 1;
+
+          memcpy(board, BOARD, sizeof(ibrd));
+
+/* if the cell cannot be layed down, prune search */
+          if (! lay_down(id, board, cells)) {
+             if (bots_verbose_mode >= BOTS_VERBOSE_DEBUG) printf("Chip %d, shape %d does not fit\n", id, i);
+             goto _end;
+          }
+
+/* calculate new footprint of board and area of footprint */
+          footprint[0] = max(FOOTPRINT[0], cells[id].bot+1);
+          footprint[1] = max(FOOTPRINT[1], cells[id].rhs+1);
+          area         = footprint[0] * footprint[1];
+
+/* if last cell */
+          if (cells[id].next == 0) {
+
+/* if area is minimum, update global values */
+		  if (area < MIN_AREA) {
+#pragma omp critical
+			  if (area < MIN_AREA) {
+				  MIN_AREA         = area;
+				  MIN_FOOTPRINT[0] = footprint[0];
+				  MIN_FOOTPRINT[1] = footprint[1];
+				  memcpy(BEST_BOARD, board, sizeof(ibrd));
+				  if (bots_verbose_mode >= BOTS_VERBOSE_DEBUG) printf("N  %d\n", MIN_AREA);
+			  }
+		  }
+
+/* if area is less than best area */
+          } else if (area < MIN_AREA) {
+// 	    #pragma omp atomic
+//                 nn2 += add_cell(cells[id].next, footprint, board,cells,level+1);
+
+                int tmp = add_cell(cells[id].next, footprint, board,cells,level+1);
+		__sync_fetch_and_add(&nn2,tmp);
 /* if area is greater than or equal to best area, prune search */
           } else {
 
@@ -402,10 +480,15 @@ shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD,bots_verbose_mo
 
 /* if area is less than best area */
           } else if (area < MIN_AREA) {
-	     if(level+1 < bots_cutoff_value )
-                nn2 += add_cell(cells[id].next, footprint, board,cells,level+1);
-	     else
-		nn2 += add_cell_ser(cells[id].next, footprint, board,cells);
+	     if(level+1 < bots_cutoff_value ) {
+// 	       #pragma omp atomic
+                int tmp = add_cell(cells[id].next, footprint, board,cells,level+1);
+		__sync_fetch_and_add(&nn2,tmp);
+	     } else {
+// 	       #pragma omp atomic
+		int tmp = add_cell_ser(cells[id].next, footprint, board,cells);
+		__sync_fetch_and_add(&nn2,tmp);
+	     }
 
 /* if area is greater than or equal to best area, prune search */
           } else {
@@ -443,7 +526,6 @@ firstprivate(NWS,i,j,id,nn) \
 shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD,nn2,bots_verbose_mode) 
 {
 	  struct cell cells[N+1];
-	  number_of_tasks++;
 	  memcpy(cells,CELLS,sizeof(struct cell)*(N+1));
 /* extent of shape */
           cells[id].top = NWS[j][0];
@@ -481,7 +563,11 @@ shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD,nn2,bots_verbos
 
 /* if area is less than best area */
           } else if (area < MIN_AREA) {
-	      nn2 += add_cell(cells[id].next, footprint, board,cells);
+// 	    #pragma omp atomic
+// 	      nn2 += add_cell(cells[id].next, footprint, board,cells);
+
+                int tmp = add_cell(cells[id].next, footprint, board,cells);
+		__sync_fetch_and_add(&nn2,tmp);
 /* if area is greater than or equal to best area, prune search */
           } else {
 
@@ -530,9 +616,8 @@ void compute_floorplan (void)
 
 #pragma omp parallel
 {
-      number_of_tasks = 0;
 #pragma omp single
-#if defined(MANUAL_CUTOFF) || defined(IF_CUTOFF)
+#if defined(MANUAL_CUTOFF) || defined(IF_CUTOFF) || defined(FINAL_CUTOFF)
        bots_number_of_tasks = add_cell(1, footprint, board, gcells,0);
 #else
        bots_number_of_tasks = add_cell(1, footprint, board, gcells);
