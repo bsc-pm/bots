@@ -24,7 +24,7 @@
 CUTOFF_VERSIONS = manual if_clause final final_ser
 #TIED_VERSIONS = yes
 APP_FLAGS=-k 
-APP_FLAGS=-k --pass-through -g 
+#APP_FLAGS=-k --pass-through -g 
 
 BASE_DIR = ../../
 
