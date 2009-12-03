@@ -52,7 +52,11 @@ static int solutions[] = {
 };
 #define MAX_SOLUTIONS sizeof(solutions)/sizeof(int)
 
+int mycount=0;
+#pragma omp threadprivate(mycount)
+
 int total_count;
+
 
 /*
  * <a> contains array of <n> queen positions.  Returns 1
@@ -75,43 +79,209 @@ int ok(int n, char *a)
      return 1;
 }
 
-void nqueens (int n, int j, char *a, int *solutions)
+void nqueens_ser (int n, int j, char *a, int *solutions)
 {
 	int i,res;
 
 	if (n == j) {
 		/* good solution, count it */
+#ifndef FORCE_TIED_TASKS
 		*solutions = 1;
+#else
+		mycount++;
+#endif
 		return;
 	}
 
+#ifndef FORCE_TIED_TASKS
 	*solutions = 0;
+#endif
+
 
      	/* try each possible position for queen <j> */
 	for (i = 0; i < n; i++) {
 		{
+	  		/* allocate a temporary array and copy <a> into it */
 	  		a[j] = i;
 	  		if (ok(j + 1, a)) {
-	       			nqueens(n, j + 1, a,&res);
+	       			nqueens_ser(n, j + 1, a,&res);
+#ifndef FORCE_TIED_TASKS
 				*solutions += res;
+#endif
 			}
 		}
 	}
 }
 
+#if defined(IF_CUTOFF)
+
+void nqueens(int n, int j, char *a, int *solutions, int depth)
+{
+	int i;
+	int *csols;
+
+
+	if (n == j) {
+		/* good solution, count it */
+#ifndef FORCE_TIED_TASKS
+		*solutions = 1;
+#else
+		mycount++;
+#endif
+		return;
+	}
+
+
+#ifndef FORCE_TIED_TASKS
+	*solutions = 0;
+	csols = alloca(n*sizeof(int));
+	memset(csols,0,n*sizeof(int));
+#endif
+
+     	/* try each possible position for queen <j> */
+	for (i = 0; i < n; i++) {
+ 		#pragma omp task untied if(depth < bots_cutoff_value)
+		{
+	  		/* allocate a temporary array and copy <a> into it */
+	  		char * b = alloca((j + 1) * sizeof(char));
+	  		memcpy(b, a, j * sizeof(char));
+	  		b[j] = i;
+	  		if (ok(j + 1, b))
+	       			nqueens(n, j + 1, b,&csols[i],depth+1);
+		}
+	}
+
+#ifndef FORCE_TIED_TASKS
+	#pragma omp taskwait
+	for ( i = 0; i < n; i++) *solutions += csols[i];
+#endif
+}
+
+
+#elif defined(MANUAL_CUTOFF)
+
+void nqueens(int n, int j, char *a, int *solutions, int depth)
+{
+	int i;
+	int *csols;
+
+
+	if (n == j) {
+		/* good solution, count it */
+#ifndef FORCE_TIED_TASKS
+		*solutions = 1;
+#else
+		mycount++;
+#endif
+		return;
+	}
+
+
+#ifndef FORCE_TIED_TASKS
+	*solutions = 0;
+	csols = alloca(n*sizeof(int));
+	memset(csols,0,n*sizeof(int));
+#endif
+
+     	/* try each possible position for queen <j> */
+	for (i = 0; i < n; i++) {
+		if ( depth < bots_cutoff_value ) {
+ 			#pragma omp task untied
+			{
+	  			/* allocate a temporary array and copy <a> into it */
+	  			char * b = alloca((j + 1) * sizeof(char));
+	  			memcpy(b, a, j * sizeof(char));
+	  			b[j] = i;
+	  			if (ok(j + 1, b))
+	       				nqueens(n, j + 1, b,&csols[i],depth+1);
+			}
+		} else {
+  			a[j] = i;
+  			if (ok(j + 1, a))
+       				nqueens_ser(n, j + 1, a,&csols[i]);
+		}
+	}
+
+#ifndef FORCE_TIED_TASKS
+	#pragma omp taskwait
+	for ( i = 0; i < n; i++) *solutions += csols[i];
+#endif
+}
+
+
+#else 
+
+void nqueens(int n, int j, char *a, int *solutions, int depth)
+{
+	int i;
+	int *csols;
+
+
+	if (n == j) {
+		/* good solution, count it */
+#ifndef FORCE_TIED_TASKS
+		*solutions = 1;
+#else
+		mycount++;
+#endif
+		return;
+	}
+
+
+#ifndef FORCE_TIED_TASKS
+	*solutions = 0;
+	csols = alloca(n*sizeof(int));
+	memset(csols,0,n*sizeof(int));
+#endif
+
+     	/* try each possible position for queen <j> */
+	for (i = 0; i < n; i++) {
+ 		#pragma omp task untied
+		{
+	  		/* allocate a temporary array and copy <a> into it */
+	  		char * b = alloca((j + 1) * sizeof(char));
+	  		memcpy(b, a, j * sizeof(char));
+	  		b[j] = i;
+	  		if (ok(j + 1, b))
+	       			nqueens(n, j + 1, b,&csols[i],depth);
+		}
+	}
+
+#ifndef FORCE_TIED_TASKS
+	#pragma omp taskwait
+	for ( i = 0; i < n; i++) *solutions += csols[i];
+#endif
+}
+
+#endif
+
 void find_queens (int size)
 {
-	char *a;
-
 	total_count=0;
-	a = alloca(size * sizeof(char));
-	nqueens(size, 0, a, &total_count);
+
+	#pragma omp parallel
+	{
+		#pragma omp single
+		{
+			char *a;
+
+			a = alloca(size * sizeof(char));
+			nqueens(size, 0, a, &total_count,0);
+		}
+#ifdef FORCE_TIED_TASKS
+		#pragma omp atomic
+			total_count += mycount;
+#endif
+	}
 }
+
 
 int verify_queens (int size)
 {
 	if ( size > MAX_SOLUTIONS ) return BOTS_RESULT_NA;
+
+
 	if ( total_count == solutions[size-1]) return BOTS_RESULT_SUCCESSFUL;
+
 	return BOTS_RESULT_UNSUCCESSFUL;
 }
-
