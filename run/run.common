@@ -12,6 +12,7 @@ print_help()
 	echo "-debug			Show extra messages"
 	echo "-h			Prints this help"
 	echo "-i inputs_list		List of inputs to use for executions"
+	echo "-l label_list		List of labels (compilers) to use for executions"
 	echo "-v versions_list		List of versions of the benchmark to use for execution"
 	echo "-verbose 0|1|2		Set application verbosity"
 	echo "-of			Output format (TODO)"
@@ -88,7 +89,7 @@ compute_max_cpus ()
 #TODO: Add other systems here
 	case $(uname -s) in
 		"Linux")
-		      if [ -f /proc/$$/cpuset ]; then
+		      if [ -f /proc/$$/cpuset -a -d /dev/cpuset ]; then
 		        cpuset=`cat /proc/$$/cpuset`
 			max_cpus=$(cat /dev/cpuset/$cpuset/cpus | sed "s/\(.*\)-\(.*\)/\2-\1+1/" | bc)
 		      else
@@ -339,7 +340,7 @@ CLASS=
 eval "cutoff=\$${class}_cutoff"
 if [ $cutoff ]; then
    case $version in
-        omp-tasks-if_clause | omp-tasks-manual)  CLASS="$CLASS -x $cutoff" ;;
+        omp-tasks-if_clause* | omp-tasks-manual*)  CLASS="$CLASS -x $cutoff" ;;
    esac
    
 fi

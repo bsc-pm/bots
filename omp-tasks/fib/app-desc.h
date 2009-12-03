@@ -28,7 +28,7 @@
 #define BOTS_APP_DEF_ARG_SIZE 10
 #define BOTS_APP_DESC_ARG_SIZE "Number to compute"
 
-int fib_verify();
+int fib_verify(int);
 void fib0 (int);
 void fib0_seq (int);
 
@@ -43,5 +43,5 @@ void fib0_seq (int);
 
 #define KERNEL_CHECK fib_verify(bots_arg_size)
 
-#define BOTS_CUTOFF_DEF_VALUE 4
+#define BOTS_CUTOFF_DEF_VALUE 10
 

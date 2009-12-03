@@ -327,6 +327,7 @@ if(level<bots_cutoff_value)
 
 /* if area is less than best area */
           } else if (area < MIN_AREA) {
+		#pragma omp atomic
                 nn2 += add_cell(cells[id].next, footprint, board,cells,level+1);
 /* if area is greater than or equal to best area, prune search */
           } else {
@@ -403,8 +404,10 @@ shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD,bots_verbose_mo
 /* if area is less than best area */
           } else if (area < MIN_AREA) {
 	     if(level+1 < bots_cutoff_value )
+		#pragma omp atomic
                 nn2 += add_cell(cells[id].next, footprint, board,cells,level+1);
 	     else
+		#pragma omp atomic
 		nn2 += add_cell_ser(cells[id].next, footprint, board,cells);
 
 /* if area is greater than or equal to best area, prune search */
@@ -481,6 +484,7 @@ shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD,nn2,bots_verbos
 
 /* if area is less than best area */
           } else if (area < MIN_AREA) {
+              #pragma omp atomic
 	      nn2 += add_cell(cells[id].next, footprint, board,cells);
 /* if area is greater than or equal to best area, prune search */
           } else {

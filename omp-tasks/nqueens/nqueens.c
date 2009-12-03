@@ -102,11 +102,9 @@ void nqueens_ser (int n, int j, char *a, int *solutions)
 	for (i = 0; i < n; i++) {
 		{
 	  		/* allocate a temporary array and copy <a> into it */
-	  		char * b = alloca((j + 1) * sizeof(char));
-	  		memcpy(b, a, j * sizeof(char));
-	  		b[j] = i;
-	  		if (ok(j + 1, b)) {
-	       			nqueens_ser(n, j + 1, b,&res);
+	  		a[j] = i;
+	  		if (ok(j + 1, a)) {
+	       			nqueens_ser(n, j + 1, a,&res);
 #ifndef FORCE_TIED_TASKS
 				*solutions += res;
 #endif
@@ -152,9 +150,9 @@ void nqueens(int n, int j, char *a, int *solutions, int depth)
 	       			nqueens(n, j + 1, b,&csols[i],depth+1);
 		}
 	}
-	#pragma omp taskwait
 
 #ifndef FORCE_TIED_TASKS
+	#pragma omp taskwait
 	for ( i = 0; i < n; i++) *solutions += csols[i];
 #endif
 }
@@ -198,16 +196,14 @@ void nqueens(int n, int j, char *a, int *solutions, int depth)
 	       				nqueens(n, j + 1, b,&csols[i],depth+1);
 			}
 		} else {
-  			char * b = alloca((j + 1) * sizeof(char));
- 			memcpy(b, a, j * sizeof(char));
-  			b[j] = i;
-  			if (ok(j + 1, b))
-       				nqueens_ser(n, j + 1, b,&csols[i]);
+  			a[j] = i;
+  			if (ok(j + 1, a))
+       				nqueens_ser(n, j + 1, a,&csols[i]);
 		}
 	}
-	#pragma omp taskwait
 
 #ifndef FORCE_TIED_TASKS
+	#pragma omp taskwait
 	for ( i = 0; i < n; i++) *solutions += csols[i];
 #endif
 }
@@ -250,9 +246,9 @@ void nqueens(int n, int j, char *a, int *solutions, int depth)
 	       			nqueens(n, j + 1, b,&csols[i],depth);
 		}
 	}
-	#pragma omp taskwait
 
 #ifndef FORCE_TIED_TASKS
+	#pragma omp taskwait
 	for ( i = 0; i < n; i++) *solutions += csols[i];
 #endif
 }
