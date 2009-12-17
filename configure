@@ -4,6 +4,8 @@ while [ "$#" -gt 0  ]; do
 	case $1 in
 		--debug) debug=yes
 				;;
+		--compiler) shift; COMPILER=$1
+				;;
 		*) echo "Unknown option $1 (skipping)"
 			;;
 	esac
@@ -19,37 +21,39 @@ SUN=`cc -xopenmp &> /dev/null && echo "yes"`
 
 nc=0
 
-if [ "$GCC" = "yes" ]; then
+if [ -z "$COMPILER" ]; then
+
+   if [ "$GCC" = "yes" ]; then
 	let nc=nc+1
 	COMPILERS[nc]="gcc"
-fi
+   fi
 
-if [ "$MCC" = "yes" ]; then
+   if [ "$MCC" = "yes" ]; then
 	let nc=nc+1
 	COMPILERS[nc]="mcc"
-fi
+   fi
 
-if [ "$ICC" = "yes" ]; then
+   if [ "$ICC" = "yes" ]; then
 	let nc=nc+1
 	COMPILERS[nc]="icc"
-fi
+   fi
 
-if [ "$XLC" = "yes" ]; then
+   if [ "$XLC" = "yes" ]; then
 	let nc=nc+1
 	COMPILERS[nc]="xlc"
-fi
+   fi
 
-if [ "$PGI" = "yes" ]; then
+   if [ "$PGI" = "yes" ]; then
         let nc=nc+1
         COMPILERS[nc]="pgi"
-fi
+   fi
 
-if [ "$SUN" = "yes" ]; then
+   if [ "$SUN" = "yes" ]; then
         let nc=nc+1        
         COMPILERS[nc]="sunstudio"
-fi     
+   fi     
 
-if [ "$nc" -gt "0" ]; then
+   if [ "$nc" -gt "0" ]; then
 	echo "The following compilers are recognized: "
 	n=1
 	for comp in ${COMPILERS[*]}; do
@@ -60,9 +64,10 @@ if [ "$nc" -gt "0" ]; then
 	read 
 
 	COMPILER=${COMPILERS[$REPLY]}
-else
+   else
 	echo "No suitable compiler was detected"
 	echo "An empty make.config will be generated"
+   fi
 fi
 
 if [ "$COMPILER" = "gcc" ]; then
