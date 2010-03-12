@@ -13,7 +13,7 @@ while [ "$#" -gt 0  ]; do
 done
 
 GCC=`gcc -x c -c -fopenmp /dev/null &>/dev/null  && echo "yes"`
-MCC=`mcc -v &> /dev/null && echo "yes"`
+MCC=`mcc --v &> /dev/null && echo "yes"`
 ICC=`icc -v &> /dev/null && echo "yes"`
 XLC=`xlc -qversion &> /dev/null && echo "yes"`
 PGI=`pgcc &> /dev/null && echo "yes"`
