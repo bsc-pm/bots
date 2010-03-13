@@ -110,9 +110,9 @@ if [ "$COMPILER" = "mcc" ]; then
 	[ "$debug" = "yes" ] && DEBUG=-g
 
 	OPT_FLAGS=-O3
-	CC_FLAGS=$DEBUG
+	CC_FLAGS="$DEBUG --no-openmp"
 	OMPC_FLAGS=$DEBUG
-	CLINK_FLAGS=$DEBUG
+	CLINK_FLAGS="$DEBUG --no-openmp"
 	OMPLINK_FLAGS=$DEBUG
 fi
 
