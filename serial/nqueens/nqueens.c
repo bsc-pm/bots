@@ -85,6 +85,8 @@ void nqueens (int n, int j, char *a, int *solutions)
 		return;
 	}
 
+	*solutions = 0;
+
      	/* try each possible position for queen <j> */
 	for (i = 0; i < n; i++) {
 		{
