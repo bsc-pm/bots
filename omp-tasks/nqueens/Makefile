@@ -22,8 +22,7 @@
 #PROGRAM_OBJS=
 
 CUTOFF_VERSIONS = manual if_clause final final_ser
-#TIED_VERSIONS = yes
-APP_FLAGS=-k
+TIED_VERSIONS = yes
 
 BASE_DIR = ../../
 

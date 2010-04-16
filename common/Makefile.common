@@ -190,12 +190,6 @@ $(BIN_DIR)/$(PROGRAM).$(LABEL).$(SUB)$(VERSION)-manual: main-manual.o $(MANUAL_P
 $(BIN_DIR)/$(PROGRAM).$(LABEL).$(SUB)$(VERSION)-if_clause: main-if.o $(IF_PROGRAM_OBJS) Makefile $(COMMON_DIR)/Makefile.common $(COMMON_OBJS) 
 	$(OMPLINK) $(OMPLINK_ALL_FLAGS) -o $@ main-if.o $(IF_PROGRAM_OBJS) $(LIBS) $(COMMON_OBJS)
 
-$(BIN_DIR)/$(PROGRAM).$(LABEL).$(SUB)$(VERSION)-final: main-final.o $(FINAL_PROGRAM_OBJS) Makefile $(COMMON_DIR)/Makefile.common $(COMMON_OBJS) 
-	$(OMPLINK) $(OMPLINK_ALL_FLAGS) -o $@ main-final.o $(FINAL_PROGRAM_OBJS) $(LIBS) $(COMMON_OBJS)
-
-$(BIN_DIR)/$(PROGRAM).$(LABEL).$(SUB)$(VERSION)-final_ser: main-final_ser.o $(FINAL_SER_PROGRAM_OBJS) Makefile $(COMMON_DIR)/Makefile.common $(COMMON_OBJS) 
-	$(OMPLINK) $(OMPLINK_ALL_FLAGS) -o $@ main-final_ser.o $(FINAL_SER_PROGRAM_OBJS) $(LIBS) $(COMMON_OBJS)
-
 $(BIN_DIR)/$(PROGRAM).$(LABEL).$(SUB)$(VERSION)-tied: main-tied.o $(TIED_PROGRAM_OBJS) Makefile $(COMMON_DIR)/Makefile.common $(COMMON_OBJS)
 	$(OMPLINK) $(OMPLINK_ALL_FLAGS) -o $@ main-tied.o $(TIED_PROGRAM_OBJS) $(LIBS) $(COMMON_OBJS)
 
@@ -205,6 +199,24 @@ $(BIN_DIR)/$(PROGRAM).$(LABEL).$(SUB)$(VERSION)-manual-tied: main-manual-tied.o 
 $(BIN_DIR)/$(PROGRAM).$(LABEL).$(SUB)$(VERSION)-if_clause-tied: main-if-tied.o $(TIED_IF_PROGRAM_OBJS) Makefile $(COMMON_DIR)/Makefile.common $(COMMON_OBJS)
 	$(OMPLINK) $(OMPLINK_ALL_FLAGS) -o $@ main-if-tied.o $(TIED_IF_PROGRAM_OBJS) $(LIBS) $(COMMON_OBJS)
 
+ifdef USE_FINAL_CLAUSE
+
+$(BIN_DIR)/$(PROGRAM).$(LABEL).$(SUB)$(VERSION)-final: main-final.o $(FINAL_PROGRAM_OBJS) Makefile $(COMMON_DIR)/Makefile.common $(COMMON_OBJS) 
+	$(OMPLINK) $(OMPLINK_ALL_FLAGS) -o $@ main-final.o $(FINAL_PROGRAM_OBJS) $(LIBS) $(COMMON_OBJS)
+$(BIN_DIR)/$(PROGRAM).$(LABEL).$(SUB)$(VERSION)-final_ser: main-final_ser.o $(FINAL_SER_PROGRAM_OBJS) Makefile $(COMMON_DIR)/Makefile.common $(COMMON_OBJS) 
+	$(OMPLINK) $(OMPLINK_ALL_FLAGS) -o $@ main-final_ser.o $(FINAL_SER_PROGRAM_OBJS) $(LIBS) $(COMMON_OBJS)
+
+$(BIN_DIR)/$(PROGRAM).$(LABEL).$(SUB)$(VERSION)-final-tied: 
+$(BIN_DIR)/$(PROGRAM).$(LABEL).$(SUB)$(VERSION)-final_ser-tied: 
+
+else
+
+$(BIN_DIR)/$(PROGRAM).$(LABEL).$(SUB)$(VERSION)-final: 
+$(BIN_DIR)/$(PROGRAM).$(LABEL).$(SUB)$(VERSION)-final_ser: 
+$(BIN_DIR)/$(PROGRAM).$(LABEL).$(SUB)$(VERSION)-final-tied: 
+$(BIN_DIR)/$(PROGRAM).$(LABEL).$(SUB)$(VERSION)-final_ser-tied: 
+
+endif
 
 endif
 

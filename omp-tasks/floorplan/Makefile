@@ -22,7 +22,7 @@
 #PROGRAM_OBJS=
 
 CUTOFF_VERSIONS = manual if_clause final final_ser
-#TIED_VERSIONS = yes
+TIED_VERSIONS = yes
 
 BASE_DIR = ../../
 
