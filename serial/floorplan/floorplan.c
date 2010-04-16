@@ -212,9 +212,7 @@ static int add_cell (int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS)
       nn2 += nn;
 /* for all possible locations */
       for (j = 0; j < nn; j++) {
-	  struct cell cells[N+1];
-
-	  memcpy(cells,CELLS,sizeof(struct cell)*(N+1));
+          struct cell *cells = CELLS;
 /* extent of shape */
           cells[id].top = NWS[j][0];
           cells[id].bot = cells[id].top + cells[id].alt[i][0] - 1;

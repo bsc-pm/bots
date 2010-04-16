@@ -21,8 +21,11 @@
 #LIBS = 
 #PROGRAM_OBJS=
 
-CUTOFF_VERSIONS = manual if_clause
-TIED_VERSIONS = yes
+CUTOFF_VERSIONS = manual if_clause final final_ser
+CUTOFF_VERSIONS = final 
+#TIED_VERSIONS = yes
+APP_FLAGS=-k 
+#APP_FLAGS=-k --pass-through -g 
 
 BASE_DIR = ../../
 
