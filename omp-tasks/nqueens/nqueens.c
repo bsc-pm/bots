@@ -30,6 +30,7 @@
 #include <memory.h>
 #include <alloca.h>
 #include "bots.h"
+#include <omp.h>
 
 
 /* Checking information */
@@ -168,7 +169,7 @@ void nqueens(int n, int j, char *a, int *solutions, int depth)
 	if (n == j) {
 		/* good solution, count it */
 #ifndef FORCE_TIED_TASKS
-		*solutions = 1;
+		*solutions += 1;
 #else
 		mycount++;
 #endif
@@ -177,27 +178,40 @@ void nqueens(int n, int j, char *a, int *solutions, int depth)
 
 
 #ifndef FORCE_TIED_TASKS
-	*solutions = 0;
-	csols = alloca(n*sizeof(int));
-	memset(csols,0,n*sizeof(int));
+        char final = omp_in_final();
+        if ( !final ) {
+	  *solutions = 0;
+	  csols = alloca(n*sizeof(int));
+	  memset(csols,0,n*sizeof(int));
+        }
 #endif
 
      	/* try each possible position for queen <j> */
 	for (i = 0; i < n; i++) {
  		#pragma omp task untied final(depth+1 >= bots_cutoff_value)
 		{
+                        char *b;
+                        int *sol;
+			if ( omp_in_final() && depth+1 > bots_cutoff_value ) {
+		           b = a;
+                           sol = solutions;
+                        } else {
 	  		/* allocate a temporary array and copy <a> into it */
-	  		char * b = alloca((j + 1) * sizeof(char));
-	  		memcpy(b, a, j * sizeof(char));
+	  		   b = alloca((j + 1) * sizeof(char));
+	  		   memcpy(b, a, j * sizeof(char));
+                           sol = &csols[i];
+                        } 
 	  		b[j] = i;
 	  		if (ok(j + 1, b))
-	       			nqueens(n, j + 1, b,&csols[i],depth+1);
+	       			nqueens(n, j + 1, b,sol,depth+1);
 		}
 	}
 
 #ifndef FORCE_TIED_TASKS
+       if ( !final ) {
 	#pragma omp taskwait
 	for ( i = 0; i < n; i++) *solutions += csols[i];
+       }
 #endif
 }
 
