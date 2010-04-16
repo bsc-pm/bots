@@ -132,7 +132,7 @@ void fib0_seq (int n)
 int fib_verify_value(int n)
 {
 	int result = 1;
-	if (n < FIB_RESULTS_PRE) return fib_results[FIB_RESULTS_PRE];
+	if (n < FIB_RESULTS_PRE) return fib_results[n];
 
 	while ( n > 1 ) {
 		result += n-1 + n-2;
