@@ -18,22 +18,19 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA            #
 ##############################################################################################
 
-DIRS=fib alignment nqueens sort strassen sparselu fft floorplan health uts
+LIBS = -lm
+PROGRAM_OBJS=uts.o brg_sha1.o
 
-RECURSIVE=all-recursive clean-recursive dist-clean-recursive
+CUTOFF_VERSIONS = manual if_clause
+TIED_VERSIONS = YES
 
-all: all-recursive
-clean: clean-recursive
-dist-clean: dist-clean-recursive
+BASE_DIR = ../../
 
-$(RECURSIVE): 
-	@failcom='exit 1';\
-        target=`echo $@ | sed s/-recursive//`; \
-        for subdir in $(DIRS); do \
-                (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$target) \
-          || eval $$failcom; \
-        done;
+#
+# Don't change below here 
+#
 
-dist: dist-clean
-	echo "TODO"
+include ../Makefile.version
+include $(BASE_DIR)/common/Makefile.common
+
 
