@@ -194,7 +194,7 @@ void bots_print_results()
 fprintf(stdout,
 "Benchmark;Parameters;Model;Cutoff;Resources;Result;\
 Time;Sequential;Speed-up;\
-Tasks;Tasks/Sec;\
+Nodes;Nodes/Sec;\
 Exec Date;Exec Time;Exec Message;\
 Architecture;Processors;Load Avg-1;Load Avg-5;Load Avg-15;\
 Comp Date;Comp Time;Comp Message;CC;CFLAGS;LD;LDFLAGS\n");
@@ -205,7 +205,7 @@ Comp Date;Comp Time;Comp Message;CC;CFLAGS;LD;LDFLAGS\n");
 fprintf(stdout,
 "Benchmark;Parameters;Model;Cutoff;Resources;Result;\
 Time;Sequential;Speed-up;\
-Tasks;Tasks/Sec;\n");
+Nodes;Nodes/Sec;\n");
             break;
          default:
             break;
@@ -233,8 +233,8 @@ Tasks;Tasks/Sec;\n");
 	 }
 
          if ( bots_number_of_tasks > 0 ) {
-           fprintf(stdout, "Tasks               = %s\n", str_number_of_tasks);
-           fprintf(stdout, "Tasks/Sec           = %s\n", str_number_of_tasks_per_second);
+           fprintf(stdout, "Nodes               = %s\n", str_number_of_tasks);
+           fprintf(stdout, "Nodes/Sec           = %s\n", str_number_of_tasks_per_second);
 	 }
 
          fprintf(stdout, "Execution Date      = %s\n", str_exec_date);
@@ -306,8 +306,8 @@ Tasks;Tasks/Sec;\n");
 	 }
 
          if ( bots_number_of_tasks > 0 ) {
-           fprintf(stdout, "Tasks               = %s\n", str_number_of_tasks);
-           fprintf(stdout, "Tasks/Sec           = %s\n", str_number_of_tasks_per_second);
+           fprintf(stdout, "Nodes               = %s\n", str_number_of_tasks);
+           fprintf(stdout, "Nodes/Sec           = %s\n", str_number_of_tasks_per_second);
 	 }
          break;
       case 4:
