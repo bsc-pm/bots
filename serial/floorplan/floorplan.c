@@ -140,10 +140,16 @@ static int lay_down(int id, ibrd board, struct cell *cells) {
 }
 
 
+#define read_integer(file,var) \
+  if ( fscanf(file, "%d", &var) == EOF ) {\
+	printf(" Bogus input file\n");\
+	exit(-1);\
+  }
+
 static void read_inputs() {
   int i, j, n;
 
-  fscanf(inputFile, "%d", &n);
+  read_integer(inputFile,n);
   N = n;
   
   gcells = (struct cell *) malloc((n + 1) * sizeof(struct cell));
@@ -160,24 +166,23 @@ static void read_inputs() {
 
   for (i = 1; i < n + 1; i++) {
 
-      fscanf(inputFile, "%d", & (gcells[i].n));
+      read_integer(inputFile, gcells[i].n);
       gcells[i].alt = (coor *) malloc(gcells[i].n * sizeof(coor));
 
       for (j = 0; j < gcells[i].n; j++) {
-          fscanf(inputFile, "%d", & (gcells[i].alt[j][0]));
-          fscanf(inputFile, "%d", & (gcells[i].alt[j][1]));
+          read_integer(inputFile, gcells[i].alt[j][0]);
+          read_integer(inputFile, gcells[i].alt[j][1]);
       }
 
-      fscanf(inputFile, "%d", & (gcells[i].left));
-      fscanf(inputFile, "%d", & (gcells[i].above));
-      fscanf(inputFile, "%d", & (gcells[i].next));
+      read_integer(inputFile, gcells[i].left);
+      read_integer(inputFile, gcells[i].above);
+      read_integer(inputFile, gcells[i].next);
       }
 
   if (!feof(inputFile)) {
-      fscanf(inputFile,"%d", &solution);
+      read_integer(inputFile, solution);
   }
 }
-
 
 static void write_outputs() {
   int i, j;
@@ -195,7 +200,6 @@ static void write_outputs() {
     }  
   }
 }
-
 
 static int add_cell (int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS) 
 {
