@@ -297,8 +297,8 @@ int uts_check_result ( void )
       if (bots_verbose_mode >= BOTS_VERBOSE_DEFAULT) fprintf(stdout,"Tree size value is non valid.\n");
    }
 
-// Those variables are not computed in current implementation
-// and tree is allocated in stack frame during execution
+// These variables are not computed in current implementation but are included in test file
+// Tree is allocated in stack frame during execution and cannot be chased again
 #if 0
    if ( maxTreeDepth != exp_tree_depth ) {
       answer = BOTS_RESULT_UNSUCCESSFUL;
