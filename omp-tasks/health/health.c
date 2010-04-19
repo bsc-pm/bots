@@ -558,12 +558,13 @@ void my_print(struct Village *village)
 void read_input_data(char *filename)
 {
    FILE *fin;
+   int res;
 
    if ((fin = fopen(filename, "r")) == NULL) {
       fprintf(stdout, "Could not open sequence file (%s)\n", filename);
       exit (-1);
    }
-   fscanf(fin,"%d %d %d %d %d %d %ld %f %f %f %d %d %d %d %d %d %d %d %f", 
+   res = fscanf(fin,"%d %d %d %d %d %d %ld %f %f %f %d %d %d %d %d %d %d %d %f", 
              &sim_level,
              &sim_cities,
              &sim_population_ratio,
@@ -584,6 +585,10 @@ void read_input_data(char *filename)
              &res_inside,
              &res_avg_stay
    );
+   if ( res == EOF ) {
+      fprintf(stdout, "Bogus input file (%s)\n", filename);
+      exit(-1);
+   }
    fclose(fin);
 
    if (bots_verbose_mode >= BOTS_VERBOSE_DEFAULT)
