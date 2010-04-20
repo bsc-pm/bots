@@ -158,12 +158,12 @@ int readseqs(int first_seq, char *filename)
 	char *seq1, chartab[128];
 
 	if ((fin = fopen(filename, "r")) == NULL) {
-		message("Could not open sequence file (%s)\n", args[0]);
+		message("Could not open sequence file (%s)\n", filename);
 		exit (-1);
 	}
 
 	if ( fscanf(fin,"Number of sequences is %d", &no_seqs) == EOF ) {
-	        message("Sequence file is bogus (%s)\n", args[0]);
+	        message("Sequence file is bogus (%s)\n", filename);
 		exit(-1);
         };
 	

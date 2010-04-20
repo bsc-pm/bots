@@ -511,7 +511,7 @@ void pairalign_init (char *filename)
 
 
 	for (i = 1; i <= nseqs; i++)
-		message("Sequence %d: %s %6.d aa\n", i, names[i], seqlen_array[i]);
+		debug("Sequence %d: %s %6.d aa\n", i, names[i], seqlen_array[i]);
 
 	ktup	      =	 1;
 	window	      =	 5;
@@ -543,7 +543,7 @@ void align_end ()
 	for(i = 0; i<nseqs; i++)
 		for(j = 0; j<nseqs; j++)
 			if (bench_output[i*nseqs+j] != 0)
-				message("Benchmark sequences (%d:%d) Aligned. Score: %d\n", i+1 , j+1 , (int) bench_output[i*nseqs+j]);
+				debug("Benchmark sequences (%d:%d) Aligned. Score: %d\n", i+1 , j+1 , (int) bench_output[i*nseqs+j]);
 
 }
 
