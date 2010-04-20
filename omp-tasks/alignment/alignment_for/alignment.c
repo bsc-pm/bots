@@ -482,7 +482,7 @@ int pairalign(int istart, int iend, int jstart, int jend)
 			}
 		}
 	}
-        message(" complete!\n");
+        message(" completed!\n");
 	return 0;
 }
 
