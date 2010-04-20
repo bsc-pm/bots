@@ -194,7 +194,7 @@ int bots_arg_block = BOTS_APP_DEF_ARG_BLOCK;
 int bots_app_cutoff_value = BOTS_APP_DEF_ARG_CUTOFF;
 #endif
 
-#if defined(MANUAL_CUTOFF) || defined(IF_CUTOFF)
+#if defined(MANUAL_CUTOFF) || defined(IF_CUTOFF) || defined(FINAL_CUTOFF)
 int  bots_cutoff_value = BOTS_CUTOFF_DEF_VALUE;
 #endif
 
@@ -222,7 +222,7 @@ void bots_print_usage()
 #ifdef BOTS_APP_USES_ARG_FILE
    fprintf(stderr, "  -f <file>  : "BOTS_APP_DESC_ARG_FILE"\n");
 #endif
-#if defined(MANUAL_CUTOFF) || defined(IF_CUTOFF)
+#if defined(MANUAL_CUTOFF) || defined(IF_CUTOFF) || defined(FINAL_CUTOFF)
    fprintf(stderr, "  -x <value> : OpenMP tasks cut-off value (default=%d)\n",BOTS_CUTOFF_DEF_VALUE);
 #endif
 #ifdef BOTS_APP_USES_ARG_CUTOFF
@@ -352,7 +352,7 @@ bots_get_params_common(int argc, char **argv)
                if (argc == i) { bots_print_usage(); exit(100); }
                bots_verbose_mode = atoi(argv[i]);
                break;
-#if defined(MANUAL_CUTOFF) || defined(IF_CUTOFF)
+#if defined(MANUAL_CUTOFF) || defined(IF_CUTOFF) || defined(FINAL_CUTOFF)
 	    case 'x':
 	       argv[i][1] = '*';
                i++;
@@ -415,7 +415,7 @@ void bots_set_info ()
    sprintf(bots_parameters,BOTS_APP_PARAMETERS_DESC BOTS_APP_PARAMETERS_LIST);
    sprintf(bots_model,BOTS_MODEL_DESC);
 
-   sprintf(bots_resources,"%d", -1);
+   sprintf(bots_resources,"%d", omp_get_max_threads());
    /* compilation info (do not modify) */
    strcpy(bots_comp_date,CDATE);
    strcpy(bots_comp_message,CMESSAGE);
@@ -428,6 +428,8 @@ void bots_set_info ()
    sprintf(bots_cutoff,"manual (%d)",bots_cutoff_value);
 #elif defined(IF_CUTOFF) 
    sprintf(bots_cutoff,"pragma-if (%d)",bots_cutoff_value);
+#elif defined(FINAL_CUTOFF)
+   sprintf(bots_cutoff,"final (%d)",bots_cutoff_value);
 #else
    strcpy(bots_cutoff,"none");
 #endif
