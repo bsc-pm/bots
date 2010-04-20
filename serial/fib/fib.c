@@ -36,6 +36,6 @@ int fib (int n)
 void fib0 (int n)
 {
 	res = fib(n);
-	if (bots_verbose_mode >= BOTS_VERBOSE_DEFAULT) fprintf(stdout, "Fibonacci result for %d is %d\n",n,res);
+	message("Fibonacci result for %d is %d\n",n,res);
 }
 
