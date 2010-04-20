@@ -75,14 +75,17 @@ typedef enum { BOTS_VERBOSE_NONE=0,
 extern bots_verbose_mode_t bots_verbose_mode;
 
 #define message(msg, ...) \
-   if ( bots_verbose_mode >= BOTS_VERBOSE_DEFAULT ) {\
-     fprintf(stdout, msg , ##__VA_ARGS__);\
+   {\
+      if ( bots_verbose_mode >= BOTS_VERBOSE_DEFAULT ) {\
+        fprintf(stdout, msg , ##__VA_ARGS__);\
+      }\
    }
 
 #define debug(msg, ...) \
-   if ( bots_verbose_mode >= BOTS_VERBOSE_DEBUG ) {\
-     fprintf(stdout, "%s:%d:%s:" msg ,\
-              __FILE__, __LINE__,__func__,##__VA_ARGS__);\
+   {\
+      if ( bots_verbose_mode >= BOTS_VERBOSE_DEBUG ) {\
+       fprintf(stdout, "%s:%d:%s:" msg ,__FILE__, __LINE__,__func__,##__VA_ARGS__);\
+      }\
    }
 
 
