@@ -578,13 +578,8 @@ void pairalign_init (char *filename)
 
         message("Multiple Pairwise Alignment (%d sequences)\n",nseqs);
 
-	if (bots_verbose_mode >= BOTS_VERBOSE_DEFAULT)
-	{
-		for (i = 1; i <= nseqs; i++)
-			fprintf(stdout, "Sequence %d: %s %6.d aa\n", i, names[i], seqlen_array[i]);
-		fprintf(stdout, "Start of Pairwise alignments\n");
-		fprintf(stdout, "Aligning...\n");
-	}
+	for (i = 1; i <= nseqs; i++)
+		debug("Sequence %d: %s %6.d aa\n", i, names[i], seqlen_array[i]);
 
 	ktup          =  1;
 	window        =  5;
@@ -630,21 +625,11 @@ void align_seq()
 void align_end ()
 {
 	int i,j;
-	if (bots_verbose_mode >= BOTS_VERBOSE_DEFAULT)
-	{
-		for(i = 0; i<nseqs; i++)
-		{
-			for(j = 0; j<nseqs; j++)
-			{
-				if (bench_output[i*nseqs+j] != 0)
-				{
-					fprintf(stdout, "Benchmark sequences (%d:%d) Aligned. Score: %d\n",
-						i+1 , j+1 , (int) bench_output[i*nseqs+j]);
-				}
+	for(i = 0; i<nseqs; i++)
+		for(j = 0; j<nseqs; j++)
+			if (bench_output[i*nseqs+j] != 0)
+				debug("Benchmark sequences (%d:%d) Aligned. Score: %d\n", i+1 , j+1 , (int) bench_output[i*nseqs+j]);
 
-			}
-		}
-	}
 }
 
 int align_verify ()
