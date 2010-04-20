@@ -2,12 +2,25 @@
 
 OUTPUT=config/make.config
 
+show_help ()
+{
+   echo "$0 options:"
+   echo "--compiler name    Configures BOTS for given compiler"
+   echo "                   Supported compilers: GCC, ICC, SunStudio, PGI, XLC and  Mercurium"
+   echo "--debug            Enables debug flags"
+   echo "--help             Prints this help"
+}
+
 while [ "$#" -gt 0  ]; do
 	case $1 in
 		--debug) debug=yes
 				;;
 		--compiler) shift; COMPILER=$1
 				;;
+		--help) 
+			show_help
+			exit
+                        ;;
 		*) echo "Unknown option $1 (skipping)"
 			;;
 	esac
@@ -72,7 +85,7 @@ if [ -z "$COMPILER" ]; then
    fi
 fi
 
-if [ "$COMPILER" = "gcc" ]; then
+if [ "$COMPILER" = "gcc" -a "$GCC" = "yes" ]; then
 	CC=gcc
 	CLINK=$CC
 	OMPC="$CC -fopenmp"
@@ -87,7 +100,7 @@ if [ "$COMPILER" = "gcc" ]; then
 	OMPLINK_FLAGS=$DEBUG
 fi
 
-if [ "$COMPILER" = "icc" ]; then
+if [ "$COMPILER" = "icc" -a "$ICC" = "yes" ]; then
 	CC=icc
 	CLINK=$CC
 	OMPC="$CC -openmp"
@@ -103,7 +116,7 @@ if [ "$COMPILER" = "icc" ]; then
 fi
 
 
-if [ "$COMPILER" = "mcc" ]; then
+if [ "$COMPILER" = "mcc" -a "$MCC" = "yes" ]; then
 	CC=mcc
 	CLINK=$CC
 	OMPC=$CC
@@ -120,7 +133,7 @@ if [ "$COMPILER" = "mcc" ]; then
 	supports_final_clause=yes
 fi
 
-if [ "$COMPILER" = "xlc" ]; then
+if [ "$COMPILER" = "xlc" -a "$XLC" = "yes" ]; then
 	CC=xlc_r
 	CLINK=$CC
 	OMPC="$CC -qsmp=omp"
@@ -135,7 +148,7 @@ if [ "$COMPILER" = "xlc" ]; then
 	OMPLINK_FLAGS=-qthreaded $DEBUG
 fi
 
-if [ "$COMPILER" = "pgi" ]; then
+if [ "$COMPILER" = "pgi" -a "$PGI" = "yes" ]; then
         CC=pgcc
         CLINK=$CC
         OMPC="$CC -mp -Minfo=mp"
@@ -150,7 +163,7 @@ if [ "$COMPILER" = "pgi" ]; then
         OMPLINK_FLAGS=$DEBUG
 fi
 
-if [ "$COMPILER" = "sunstudio" ]; then
+if [ "$COMPILER" = "sunstudio" -a "$SUN" = "yes" ]; then
         CC=cc                         
         CLINK=$CC                     
         OMPC="$CC -xopenmp"           
@@ -163,6 +176,11 @@ if [ "$COMPILER" = "sunstudio" ]; then
         OMPC_FLAGS=$DEBUG
         CLINK_FLAGS=$DEBUG
         OMPLINK_FLAGS=$DEBUG
+fi
+
+if [ -z "$CC" ]; then
+  echo "Wrong compiler configuration"
+  exit 1
 fi
 
 if [ "$debug" = "yes" ]; then
