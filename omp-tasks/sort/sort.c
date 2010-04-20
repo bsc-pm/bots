@@ -425,7 +425,7 @@ void fill_array(ELM *arr, unsigned long size)
 
      my_srand(1);
      /* first, fill with integers 1..size */
-#pragma omp parallel for private(i) 
+//#pragma omp parallel for private(i) 
      for (i = 0; i < size; ++i) {
 	  arr[i] = i;
      }
