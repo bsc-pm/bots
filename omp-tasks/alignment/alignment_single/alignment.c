@@ -426,6 +426,7 @@ int pairalign(int istart, int iend, int jstart, int jend)
 	maxres = get_matrix(matptr, mat_xref, 10);
 	if (maxres == 0) return(-1);
 
+	message("Start aligning ");
 	#pragma omp parallel
 	{
 	#pragma omp single private(i,n,si,sj,len1,m)
@@ -447,6 +448,8 @@ int pairalign(int istart, int iend, int jstart, int jend)
 						int se1, se2, sb1, sb2, maxscore, seq1, seq2, g, gh;
 						int displ[2*MAX_ALN_LENGTH+1];
 						int print_ptr, last_print;
+
+						message(".");
 
 						for (i = 1, len2 = 0; i <= m; i++) {
 							char c = seq_array[sj+1][i];
@@ -479,6 +482,7 @@ int pairalign(int istart, int iend, int jstart, int jend)
 			}
 		}
 	}
+	message(" completed!\n");
 	return 0;
 }
 
@@ -569,9 +573,10 @@ void pairalign_init (char *filename)
 
 	init_matrix();
 
-	if (bots_verbose_mode >= BOTS_VERBOSE_DEFAULT) fprintf(stdout,"Multiple Pair Alignment\n");
 
 	nseqs = readseqs(1,filename);
+
+        message("Multiple Pairwise Alignment (%d sequences)\n",nseqs);
 
 	if (bots_verbose_mode >= BOTS_VERBOSE_DEFAULT)
 	{
@@ -653,12 +658,9 @@ int align_verify ()
 		{
 			if (bench_output[i*nseqs+j] != seq_output[i*nseqs+j])
 			{
-				if (bots_verbose_mode >= BOTS_VERBOSE_DEFAULT)
-				{
-					fprintf(stdout, "Error: Optimized prot. (%3d:%3d)=%5d Sequential prot. (%3d:%3d)=%5d\n",
-						i+1, j+1, (int) bench_output[i*nseqs+j],
-						i+1, j+1, (int) seq_output[i*nseqs+j]);
-				}
+                                message("Error: Optimized prot. (%3d:%3d)=%5d Sequential prot. (%3d:%3d)=%5d\n",
+                                        i+1, j+1, (int) bench_output[i*nseqs+j],
+                                        i+1, j+1, (int) seq_output[i*nseqs+j]);
 				result = BOTS_RESULT_UNSUCCESSFUL;
 			}
 		}
