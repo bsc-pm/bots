@@ -44,11 +44,8 @@ int checkmat (float *M, float *N)
          r_err = r_err / M[i*bots_arg_size_1+j];
          if(r_err > EPSILON)
          {
-            if (bots_verbose_mode)
-            {
-               fprintf(stderr, "Checking failure: A[%d][%d]=%f  B[%d][%d]=%f; Relative Error=%f\n",
-                  i,j, M[i*bots_arg_size_1+j], i,j, N[i*bots_arg_size_1+j], r_err);
-            }
+            message("Checking failure: A[%d][%d]=%f  B[%d][%d]=%f; Relative Error=%f\n",
+                    i,j, M[i*bots_arg_size_1+j], i,j, N[i*bots_arg_size_1+j], r_err);
             return FALSE;
          }
       }
@@ -86,7 +83,7 @@ void genmat (float *M[])
             M[ii*bots_arg_size+jj] = (float *) malloc(bots_arg_size_1*bots_arg_size_1*sizeof(float));
 	    if ((M[ii*bots_arg_size+jj] == NULL))
             {
-               fprintf(stderr, "Error: Out of memory\n");
+               message("Error: Out of memory\n");
                exit(101);
             }
             /* initializing matrix */
@@ -108,7 +105,7 @@ void genmat (float *M[])
          }
       }
    }
-   if (bots_verbose_mode >= BOTS_VERBOSE_DEBUG) fprintf(stderr,"allo = %d, no = %d, total = %d, factor = %f\n",a,b,a+b,(float)((float)a/(float)(a+b)));
+   debug("allo = %d, no = %d, total = %d, factor = %f\n",a,b,a+b,(float)((float)a/(float)(a+b)));
 }
 /***********************************************************************
  * print_structure: 
@@ -116,15 +113,15 @@ void genmat (float *M[])
 void print_structure(char *name, float *M[])
 {
    int ii, jj;
-   printf ("Structure for matrix %s @ 0x%p\n",name, M);
+   message("Structure for matrix %s @ 0x%p\n",name, M);
    for (ii = 0; ii < bots_arg_size; ii++) {
      for (jj = 0; jj < bots_arg_size; jj++) {
-        if (M[ii*bots_arg_size+jj]!=NULL) printf ("x");
-        else printf (" ");
+        if (M[ii*bots_arg_size+jj]!=NULL) {message("x");}
+        else message(" ");
      }
-     printf ("\n");
+     message("\n");
    }
-   printf ("\n");
+   message("\n");
 }
 /***********************************************************************
  * allocate_clean_block: 
@@ -143,7 +140,7 @@ float * allocate_clean_block()
   }
   else
   {
-      printf ("Error: Out of memory\n");
+      message("Error: Out of memory\n");
       exit (101);
   }
   return (q);
@@ -206,7 +203,7 @@ void sparselu_init (float ***pBENCH, char *pass)
 {
    *pBENCH = (float **) malloc(bots_arg_size*bots_arg_size*sizeof(float *));
    genmat(*pBENCH);
-   if (bots_verbose_mode) print_structure(pass, *pBENCH);
+   print_structure(pass, *pBENCH);
 }
 
 
@@ -282,7 +279,7 @@ void sparselu_par_call(float **BENCH)
 
 void sparselu_fini (float **BENCH, char *pass)
 {
-   if (bots_verbose_mode) print_structure(pass, BENCH);
+   print_structure(pass, BENCH);
 }
 
 int sparselu_check(float **SEQ, float **BENCH)

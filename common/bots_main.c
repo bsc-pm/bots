@@ -53,7 +53,7 @@ void bots_set_info();
 /* common flags */
 int bots_sequential_flag = FALSE;
 int bots_check_flag = FALSE;
-int bots_verbose_mode = BOTS_VERBOSE_DEFAULT;
+bots_verbose_mode_t bots_verbose_mode = BOTS_VERBOSE_DEFAULT;
 int bots_result = BOTS_RESULT_NOT_REQUESTED;
 int bots_output_format = 1;
 int bots_print_header = FALSE;
@@ -350,7 +350,7 @@ bots_get_params_common(int argc, char **argv)
                argv[i][1] = '*';
                i++;
                if (argc == i) { bots_print_usage(); exit(100); }
-               bots_verbose_mode = atoi(argv[i]);
+               bots_verbose_mode = (bots_verbose_mode_t) atoi(argv[i]);
                break;
 #if defined(MANUAL_CUTOFF) || defined(IF_CUTOFF) || defined(FINAL_CUTOFF)
 	    case 'x':
@@ -414,8 +414,8 @@ void bots_set_info ()
    sprintf(bots_name,BOTS_APP_NAME);
    sprintf(bots_parameters,BOTS_APP_PARAMETERS_DESC BOTS_APP_PARAMETERS_LIST);
    sprintf(bots_model,BOTS_MODEL_DESC);
-
    sprintf(bots_resources,"%d", omp_get_max_threads());
+
    /* compilation info (do not modify) */
    strcpy(bots_comp_date,CDATE);
    strcpy(bots_comp_message,CMESSAGE);

@@ -43,6 +43,7 @@
 
 #include "brg_sha1.h"
 #include "brg_endian.h"
+#include "bots.h"
 
 #if defined(__cplusplus)
 extern "C"
@@ -92,7 +93,7 @@ int rng_rand(RNG_state *mystate){
 	b = b & POS_MASK;
 	
 	r = (int) b;
-	//printf("b: %d\t, r: %d\n", b, r);
+	debug("b: %d\t, r: %d\n", b, r);
 	return r;
 }
 
@@ -120,7 +121,7 @@ char * rng_showstate(RNG_state *state, char *s){
 
 /* describe random number generator type into string */
 void rng_showtype( void ) {
-  fprintf(stdout, "SHA-1 (state size = %luB)\n", sizeof(struct state_t));
+  message("SHA-1 (state size = %luB)\n", sizeof(struct state_t));
 }
 
 /** END: UTS RNG Harness **/

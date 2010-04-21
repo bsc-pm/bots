@@ -425,7 +425,7 @@ void fill_array(ELM *arr, unsigned long size)
 
      my_srand(1);
      /* first, fill with integers 1..size */
-#pragma omp parallel for private(i) 
+//#pragma omp parallel for private(i) 
      for (i = 0; i < size; ++i) {
 	  arr[i] = i;
      }
@@ -441,10 +441,12 @@ void sort_init (int size)
 
 void sort_par (int size)
 {
-#pragma omp parallel
-#pragma omp single nowait
-#pragma omp task untied
-     cilksort_par(array, tmp, size);
+	message("Computing multisort algorithm (n=%d) ", size);
+	#pragma omp parallel
+	#pragma omp single nowait
+	#pragma omp task untied
+	     cilksort_par(array, tmp, size);
+	message(" completed!\n");
 }
 
 int sort_verify (int size)

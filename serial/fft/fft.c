@@ -44,6 +44,7 @@ void compute_w_coefficients(int n, int a, int b, COMPLEX * W)
      register int k;
      register REAL s, c;
 
+     message(".");
      if (b - a < 128) {
 	  twoPiOverN = 2.0 * 3.1415926535897932384626434 / n;
 	  for (k = a; k <= b; ++k) {
@@ -2908,6 +2909,7 @@ void fft_aux(int n, COMPLEX * in, COMPLEX * out, int *factors, COMPLEX * W, int 
      int r, m;
      int k;
 
+     message(".");
      /* special cases */
      if (n == 32) {
 	  fft_base_32(in, out);
@@ -2976,8 +2978,10 @@ void fft(int n, COMPLEX * in, COMPLEX * out)
      int r;
      COMPLEX *W;
 
+     message("Computing coefficients ");
      W = (COMPLEX *) malloc((n + 1) * sizeof(COMPLEX));
      compute_w_coefficients(n, 0, n / 2, W);
+     message(" completed!\n");
 
      /* 
       * find factors of n, first 8, then 4 and then primes in ascending
@@ -2989,7 +2993,9 @@ void fft(int n, COMPLEX * in, COMPLEX * out)
 	  l /= r;
      } while (l > 1);
 
+     message("Computing FFT ");
      fft_aux(n, in, out, factors, W, n);
+     message(" completed!\n");
 
      free(W);
      return;
@@ -3009,7 +3015,7 @@ int test_correctness(int n, COMPLEX *out1, COMPLEX *out2)
        if (d < -1.0e-10 || d > 1.0e-10) a /= d;
        if (a > error) error = a;
   }
-  if (bots_verbose_mode >= BOTS_VERBOSE_DEFAULT) printf("relative error=%e\n", error);
+  message("relative error=%e\n", error);
   if (error > 1e-3) return BOTS_RESULT_UNSUCCESSFUL;
   else return BOTS_RESULT_SUCCESSFUL;
 }

@@ -89,12 +89,10 @@ void nqueens (int n, int j, char *a, int *solutions)
 
      	/* try each possible position for queen <j> */
 	for (i = 0; i < n; i++) {
-		{
-	  		a[j] = i;
-	  		if (ok(j + 1, a)) {
-	       			nqueens(n, j + 1, a,&res);
-				*solutions += res;
-			}
+		a[j] = i;
+		if (ok(j + 1, a)) {
+		       	nqueens(n, j + 1, a,&res);
+			*solutions += res;
 		}
 	}
 }
@@ -105,7 +103,9 @@ void find_queens (int size)
 
 	total_count=0;
 	a = alloca(size * sizeof(char));
+	message("Computing N-Queens algorithm (n=%d) ", size);
 	nqueens(size, 0, a, &total_count);
+        message(" completed!\n");
 }
 
 int verify_queens (int size)

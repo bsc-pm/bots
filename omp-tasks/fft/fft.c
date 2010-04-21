@@ -44,6 +44,7 @@ void compute_w_coefficients(int n, int a, int b, COMPLEX * W)
      register int k;
      register REAL s, c;
 
+     message(".");
      if (b - a < 128) {
 	  twoPiOverN = 2.0 * 3.1415926535897932384626434 / n;
 	  for (k = a; k <= b; ++k) {
@@ -59,6 +60,7 @@ void compute_w_coefficients(int n, int a, int b, COMPLEX * W)
 	  compute_w_coefficients(n, a, ab, W);
           #pragma omp task untied
 	  compute_w_coefficients(n, ab + 1, b, W);
+          #pragma omp taskwait
      }
 }
 void compute_w_coefficients_seq(int n, int a, int b, COMPLEX * W)
@@ -135,6 +137,7 @@ void unshuffle(int a, int b, COMPLEX * in, COMPLEX * out, int r, int m)
 	  unshuffle(a, ab, in, out, r, m);
           #pragma omp task untied
 	  unshuffle(ab, b, in, out, r, m);
+          #pragma omp taskwait
      }
 }
 void unshuffle_seq(int a, int b, COMPLEX * in, COMPLEX * out, int r, int m)
@@ -212,6 +215,7 @@ void fft_twiddle_gen(int i, int i1, COMPLEX * in, COMPLEX * out, COMPLEX * W, in
 	  fft_twiddle_gen(i2, i1, in, out, W, nW,
 				nWdn, r, m);
      }
+     #pragma omp taskwait
 }
 void fft_twiddle_gen_seq(int i, int i1, COMPLEX * in, COMPLEX * out, COMPLEX * W,
                          int nW, int nWdn, int r, int m)
@@ -273,6 +277,7 @@ void fft_twiddle_2(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int n
 	  fft_twiddle_2(a, ab, in, out, W, nW, nWdn, m);
           #pragma omp task untied
 	  fft_twiddle_2(ab, b, in, out, W, nW, nWdn, m);
+          #pragma omp taskwait
      }
 }
 void fft_twiddle_2_seq(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int m)
@@ -326,6 +331,7 @@ void fft_unshuffle_2(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 	  fft_unshuffle_2(a, ab, in, out, m);
           #pragma omp task untied
 	  fft_unshuffle_2(ab, b, in, out, m);
+          #pragma omp taskwait
      }
 }
 void fft_unshuffle_2_seq(int a, int b, COMPLEX * in, COMPLEX * out, int m)
@@ -452,6 +458,7 @@ void fft_twiddle_4(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int n
 	  fft_twiddle_4(a, ab, in, out, W, nW, nWdn, m);
           #pragma omp task untied
 	  fft_twiddle_4(ab, b, in, out, W, nW, nWdn, m);
+          #pragma omp taskwait
      }
 }
 void fft_twiddle_4_seq(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int m)
@@ -543,6 +550,7 @@ void fft_unshuffle_4(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 	  fft_unshuffle_4(a, ab, in, out, m);
           #pragma omp task untied
 	  fft_unshuffle_4(ab, b, in, out, m);
+          #pragma omp taskwait
      }
 }
 void fft_unshuffle_4_seq(int a, int b, COMPLEX * in, COMPLEX * out, int m)
@@ -828,6 +836,7 @@ void fft_twiddle_8(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int n
 	  fft_twiddle_8(a, ab, in, out, W, nW, nWdn, m);
           #pragma omp task untied
 	  fft_twiddle_8(ab, b, in, out, W, nW, nWdn, m);
+          #pragma omp taskwait
      }
 }
 void fft_twiddle_8_seq(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int m)
@@ -1011,6 +1020,7 @@ void fft_unshuffle_8(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 	  fft_unshuffle_8(a, ab, in, out, m);
           #pragma omp task untied
 	  fft_unshuffle_8(ab, b, in, out, m);
+          #pragma omp taskwait
      }
 }
 void fft_unshuffle_8_seq(int a, int b, COMPLEX * in, COMPLEX * out, int m)
@@ -1672,6 +1682,7 @@ void fft_twiddle_16(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int 
 	  fft_twiddle_16(a, ab, in, out, W, nW, nWdn, m);
           #pragma omp task untied
 	  fft_twiddle_16(ab, b, in, out, W, nW, nWdn, m);
+          #pragma omp taskwait
      }
 }
 void fft_twiddle_16_seq(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int m)
@@ -2071,6 +2082,7 @@ void fft_unshuffle_16(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 	  fft_unshuffle_16(a, ab, in, out, m);
           #pragma omp task untied
 	  fft_unshuffle_16(ab, b, in, out, m);
+          #pragma omp taskwait
      }
 }
 void fft_unshuffle_16_seq(int a, int b, COMPLEX * in, COMPLEX * out, int m)
@@ -3612,6 +3624,7 @@ void fft_twiddle_32(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int 
 	  fft_twiddle_32(a, ab, in, out, W, nW, nWdn, m);
           #pragma omp task untied
 	  fft_twiddle_32(ab, b, in, out, W, nW, nWdn, m);
+          #pragma omp taskwait
      }
 }
 void fft_twiddle_32_seq(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int m)
@@ -4507,6 +4520,7 @@ void fft_unshuffle_32(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 	  fft_unshuffle_32(a, ab, in, out, m);
           #pragma omp task untied
 	  fft_unshuffle_32(ab, b, in, out, m);
+          #pragma omp taskwait
      }
 }
 void fft_unshuffle_32_seq(int a, int b, COMPLEX * in, COMPLEX * out, int m)
@@ -4610,6 +4624,7 @@ void fft_aux(int n, COMPLEX * in, COMPLEX * out, int *factors, COMPLEX * W, int 
      int r, m;
      int k;
 
+     message(".");
      /* special cases */
      if (n == 32) {
 	  fft_base_32(in, out);
@@ -4771,11 +4786,13 @@ void fft(int n, COMPLEX * in, COMPLEX * out)
      int r;
      COMPLEX *W;
 
+     message("Computing coefficients ");
      W = (COMPLEX *) malloc((n + 1) * sizeof(COMPLEX));
      #pragma omp parallel
      #pragma omp single
      #pragma omp task untied
      compute_w_coefficients(n, 0, n / 2, W);
+     message(" completed!\n");
 
      /* 
       * find factors of n, first 8, then 4 and then primes in ascending
@@ -4787,10 +4804,12 @@ void fft(int n, COMPLEX * in, COMPLEX * out)
 	  l /= r;
      } while (l > 1);
 
+     message("Computing FFT ");
      #pragma omp parallel
      #pragma omp single
      #pragma omp task untied
      fft_aux(n, in, out, factors, W, n);
+     message(" completed!\n");
 
      free(W);
      return;
@@ -4836,7 +4855,7 @@ int test_correctness(int n, COMPLEX *out1, COMPLEX *out2)
        if (d < -1.0e-10 || d > 1.0e-10) a /= d;
        if (a > error) error = a;
   }
-  if (bots_verbose_mode >= BOTS_VERBOSE_DEFAULT) printf("relative error=%e\n", error);
+  message("relative error=%e\n", error);
   if (error > 1e-3) return BOTS_RESULT_UNSUCCESSFUL;
   else return BOTS_RESULT_SUCCESSFUL;
 }
