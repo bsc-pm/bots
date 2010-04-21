@@ -117,7 +117,12 @@ fi
 
 
 if [ "$COMPILER" = "mcc" -a "$MCC" = "yes" ]; then
-	CC=mcc
+	case $(uname -i) in
+		x86_64) extras="-m32"
+                        ;;
+        esac
+
+	CC="mcc $extras"
 	CLINK=$CC
 	OMPC=$CC
 	OMPLINK=$CC
