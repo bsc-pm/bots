@@ -426,6 +426,7 @@ int pairalign(int istart, int iend, int jstart, int jend)
 	maxres = get_matrix(matptr, mat_xref, 10);
 	if (maxres == 0) return(-1);
 
+	message("Start aligning ");
 	#pragma omp parallel
 	{
 	#pragma omp single private(i,n,si,sj,len1,m)
@@ -440,13 +441,15 @@ int pairalign(int istart, int iend, int jstart, int jend)
 				{
 					if ((m = seqlen_array[sj+1]) != 0)
 					{
-						#pragma omp task untied default(none) \
+						#pragma omp task untied \
 						private(i,gg,len2,mm_score) firstprivate(m,n,si,sj,len1) \
 						shared(nseqs, bench_output,seqlen_array,seq_array,gap_pos1,gap_pos2,pw_ge_penalty,pw_go_penalty,mat_avscore)
 						{
 						int se1, se2, sb1, sb2, maxscore, seq1, seq2, g, gh;
 						int displ[2*MAX_ALN_LENGTH+1];
 						int print_ptr, last_print;
+
+						message(".");
 
 						for (i = 1, len2 = 0; i <= m; i++) {
 							char c = seq_array[sj+1][i];
@@ -479,6 +482,7 @@ int pairalign(int istart, int iend, int jstart, int jend)
 			}
 		}
 	}
+	message(" completed!\n");
 	return 0;
 }
 
@@ -569,17 +573,13 @@ void pairalign_init (char *filename)
 
 	init_matrix();
 
-	if (bots_verbose_mode >= BOTS_VERBOSE_DEFAULT) fprintf(stdout,"Multiple Pair Alignment\n");
 
 	nseqs = readseqs(1,filename);
 
-	if (bots_verbose_mode >= BOTS_VERBOSE_DEFAULT)
-	{
-		for (i = 1; i <= nseqs; i++)
-			fprintf(stdout, "Sequence %d: %s %6.d aa\n", i, names[i], seqlen_array[i]);
-		fprintf(stdout, "Start of Pairwise alignments\n");
-		fprintf(stdout, "Aligning...\n");
-	}
+        message("Multiple Pairwise Alignment (%d sequences)\n",nseqs);
+
+	for (i = 1; i <= nseqs; i++)
+		debug("Sequence %d: %s %6.d aa\n", i, names[i], seqlen_array[i]);
 
 	ktup          =  1;
 	window        =  5;
@@ -625,21 +625,11 @@ void align_seq()
 void align_end ()
 {
 	int i,j;
-	if (bots_verbose_mode >= BOTS_VERBOSE_DEFAULT)
-	{
-		for(i = 0; i<nseqs; i++)
-		{
-			for(j = 0; j<nseqs; j++)
-			{
-				if (bench_output[i*nseqs+j] != 0)
-				{
-					fprintf(stdout, "Benchmark sequences (%d:%d) Aligned. Score: %d\n",
-						i+1 , j+1 , (int) bench_output[i*nseqs+j]);
-				}
+	for(i = 0; i<nseqs; i++)
+		for(j = 0; j<nseqs; j++)
+			if (bench_output[i*nseqs+j] != 0)
+				debug("Benchmark sequences (%d:%d) Aligned. Score: %d\n", i+1 , j+1 , (int) bench_output[i*nseqs+j]);
 
-			}
-		}
-	}
 }
 
 int align_verify ()
@@ -653,12 +643,9 @@ int align_verify ()
 		{
 			if (bench_output[i*nseqs+j] != seq_output[i*nseqs+j])
 			{
-				if (bots_verbose_mode >= BOTS_VERBOSE_DEFAULT)
-				{
-					fprintf(stdout, "Error: Optimized prot. (%3d:%3d)=%5d Sequential prot. (%3d:%3d)=%5d\n",
-						i+1, j+1, (int) bench_output[i*nseqs+j],
-						i+1, j+1, (int) seq_output[i*nseqs+j]);
-				}
+                                message("Error: Optimized prot. (%3d:%3d)=%5d Sequential prot. (%3d:%3d)=%5d\n",
+                                        i+1, j+1, (int) bench_output[i*nseqs+j],
+                                        i+1, j+1, (int) seq_output[i*nseqs+j]);
 				result = BOTS_RESULT_UNSUCCESSFUL;
 			}
 		}

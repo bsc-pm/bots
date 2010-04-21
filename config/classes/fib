@@ -5,8 +5,13 @@ inputs=35
 inputs=10
 cutoff=5
 
+[t40]
+inputs=40
+cutoff=10
+
 [medium]
 inputs=50
+cutoff=10
 
 [large]
 inputs=53

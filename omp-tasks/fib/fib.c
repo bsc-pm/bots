@@ -51,6 +51,23 @@ int fib (int n,int d)
 	return x + y;
 }
 
+#elif defined(FINAL_CUTOFF)
+
+int fib (int n,int d)
+{
+	int x, y;
+	if (n < 2) return n;
+
+	#pragma omp task untied shared(x) firstprivate(n) final(d+1 >= bots_cutoff_value)
+	x = fib(n - 1,d+1);
+
+	#pragma omp task untied shared(y) firstprivate(n) final(d+1 >= bots_cutoff_value)
+	y = fib(n - 2,d+1);
+
+	#pragma omp taskwait
+	return x + y;
+}
+
 #elif defined(MANUAL_CUTOFF)
 
 int fib (int n, int d)
@@ -98,24 +115,24 @@ void fib0 (int n)
 {
 	#pragma omp parallel
 	#pragma omp single
-#if defined(MANUAL_CUTOFF) || defined(IF_CUTOFF)
+#if defined(MANUAL_CUTOFF) || defined(IF_CUTOFF) || defined(FINAL_CUTOFF)
 	par_res = fib(n,0);
 #else
 	par_res = fib(n);
 #endif
-	printf("Fibonacci result for %d is %d\n",n,par_res);
+	message("Fibonacci result for %d is %d\n",n,par_res);
 }
 
 void fib0_seq (int n)
 {
 	seq_res = fib_seq(n);
-	printf("Fibonacci result for %d is %d\n",n,seq_res);
+	message("Fibonacci result for %d is %d\n",n,seq_res);
 }
 
 int fib_verify_value(int n)
 {
 	int result = 1;
-	if (n < FIB_RESULTS_PRE) return fib_results[FIB_RESULTS_PRE];
+	if (n < FIB_RESULTS_PRE) return fib_results[n];
 
 	while ( n > 1 ) {
 		result += n-1 + n-2;

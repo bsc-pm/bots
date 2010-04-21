@@ -18,100 +18,28 @@
 /*  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA            */
 /**********************************************************************************************/
 
-/*
- * Original code from the Cilk project (by Keith Randall)
- * 
- * Copyright (c) 2000 Massachusetts Institute of Technology
- * Copyright (c) 2000 Matteo Frigo
- */
+#include "serial-app.h"
+#include "uts.h"
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <memory.h>
-#include <alloca.h>
-#include "bots.h"
+#define BOTS_APP_NAME "Unbalance Tree Search"
+#define BOTS_APP_PARAMETERS_DESC "%s"
+#define BOTS_APP_PARAMETERS_LIST ,bots_arg_file
+
+#define BOTS_APP_USES_ARG_FILE
+#define BOTS_APP_DEF_ARG_FILE "Input filename"
+#define BOTS_APP_DESC_ARG_FILE "UTS input file (mandatory)"
+
+#define BOTS_APP_INIT \
+  Node root; \
+  uts_read_file(bots_arg_file);
+
+#define KERNEL_INIT uts_initRoot(&root, type);
+
+#define KERNEL_CALL bots_number_of_tasks = serial_uts(&root);
+ 
+#define KERNEL_FINI uts_show_stats();
+
+#define KERNEL_CHECK uts_check_result();
 
 
-/* Checking information */
-
-static int solutions[] = {
-        1,
-        0,
-        0,
-        2,
-        10, /* 5 */
-        4,
-        40,
-        92,
-        352,
-        724, /* 10 */
-        2680,
-        14200,
-        73712,
-        365596,
-};
-#define MAX_SOLUTIONS sizeof(solutions)/sizeof(int)
-
-int total_count;
-
-/*
- * <a> contains array of <n> queen positions.  Returns 1
- * if none of the queens conflict, and returns 0 otherwise.
- */
-int ok(int n, char *a)
-{
-     int i, j;
-     char p, q;
-
-     for (i = 0; i < n; i++) {
-	  p = a[i];
-
-	  for (j = i + 1; j < n; j++) {
-	       q = a[j];
-	       if (q == p || q == p - (j - i) || q == p + (j - i))
-		    return 0;
-	  }
-     }
-     return 1;
-}
-
-void nqueens (int n, int j, char *a, int *solutions)
-{
-	int i,res;
-
-	if (n == j) {
-		/* good solution, count it */
-		*solutions = 1;
-		return;
-	}
-
-	*solutions = 0;
-
-     	/* try each possible position for queen <j> */
-	for (i = 0; i < n; i++) {
-		a[j] = i;
-		if (ok(j + 1, a)) {
-		       	nqueens(n, j + 1, a,&res);
-			*solutions += res;
-		}
-	}
-}
-
-void find_queens (int size)
-{
-	char *a;
-
-	total_count=0;
-	a = alloca(size * sizeof(char));
-	message("Computing N-Queens algorithm (n=%d) ", size);
-	nqueens(size, 0, a, &total_count);
-        message(" completed!\n");
-}
-
-int verify_queens (int size)
-{
-	if ( size > MAX_SOLUTIONS ) return BOTS_RESULT_NA;
-	if ( total_count == solutions[size-1]) return BOTS_RESULT_SUCCESSFUL;
-	return BOTS_RESULT_UNSUCCESSFUL;
-}
 

@@ -613,7 +613,7 @@ int compare_matrix(int n, REAL *A, int an, REAL *B, int bn)
 
 	       c = c / ELEM(A, an, i, j);
 	       if (c > EPSILON) {
-		    if (bots_verbose_mode >= BOTS_VERBOSE_DEFAULT) printf("Strassen: Wrong answer!\n");
+		    message("Strassen: Wrong answer!\n");
 		    return BOTS_RESULT_UNSUCCESSFUL;
 	       }
 	  }
@@ -631,6 +631,8 @@ REAL *alloc_matrix(int n)
 
 void strassen_main(REAL *A, REAL *B, REAL *C, int n)
 {
-   OptimizedStrassenMultiply(C, A, B, n, n, n, n, 1);
+	message("Computing Strassen algorithm (n=%d) ", n);
+	OptimizedStrassenMultiply(C, A, B, n, n, n, n, 1);
+	message(" completed!\n");
 }
 

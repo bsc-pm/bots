@@ -64,7 +64,7 @@ void strassen_main(REAL *A, REAL *B, REAL *C, int n);
 #define BOTS_APP_INIT\
     double *A, *B, *C;\
     if ((bots_arg_size & (bots_arg_size - 1)) != 0 || (bots_arg_size % 16) != 0) {\
-        printf("Error: matrix size (%d) must be a power of 2 and a multiple of %d\n", bots_arg_size, 16);\
+        message("Error: matrix size (%d) must be a power of 2 and a multiple of %d\n", bots_arg_size, 16);\
         exit (1);\
     }\
     A = (double *) malloc (bots_arg_size * bots_arg_size * sizeof(double));\

@@ -140,10 +140,16 @@ static int lay_down(int id, ibrd board, struct cell *cells) {
 }
 
 
+#define read_integer(file,var) \
+  if ( fscanf(file, "%d", &var) == EOF ) {\
+	message(" Bogus input file\n");\
+	exit(-1);\
+  }
+
 static void read_inputs() {
   int i, j, n;
 
-  fscanf(inputFile, "%d", &n);
+  read_integer(inputFile,n);
   N = n;
   
   gcells = (struct cell *) malloc((n + 1) * sizeof(struct cell));
@@ -160,42 +166,37 @@ static void read_inputs() {
 
   for (i = 1; i < n + 1; i++) {
 
-      fscanf(inputFile, "%d", & (gcells[i].n));
+      read_integer(inputFile, gcells[i].n);
       gcells[i].alt = (coor *) malloc(gcells[i].n * sizeof(coor));
 
       for (j = 0; j < gcells[i].n; j++) {
-          fscanf(inputFile, "%d", & (gcells[i].alt[j][0]));
-          fscanf(inputFile, "%d", & (gcells[i].alt[j][1]));
+          read_integer(inputFile, gcells[i].alt[j][0]);
+          read_integer(inputFile, gcells[i].alt[j][1]);
       }
 
-      fscanf(inputFile, "%d", & (gcells[i].left));
-      fscanf(inputFile, "%d", & (gcells[i].above));
-      fscanf(inputFile, "%d", & (gcells[i].next));
+      read_integer(inputFile, gcells[i].left);
+      read_integer(inputFile, gcells[i].above);
+      read_integer(inputFile, gcells[i].next);
       }
 
   if (!feof(inputFile)) {
-      fscanf(inputFile,"%d", &solution);
+      read_integer(inputFile, solution);
   }
 }
-
 
 static void write_outputs() {
   int i, j;
 
-  if (bots_verbose_mode >= BOTS_VERBOSE_DEFAULT)
-  {
-    printf("Minimum area = %d\n\n", MIN_AREA);
+    message("Minimum area = %d\n\n", MIN_AREA);
 
     for (i = 0; i < MIN_FOOTPRINT[0]; i++) {
       for (j = 0; j < MIN_FOOTPRINT[1]; j++) {
-          if (BEST_BOARD[i][j] == 0) printf(" ");
-          else                       printf("%c", 'A' + BEST_BOARD[i][j] - 1);
+          if (BEST_BOARD[i][j] == 0) {message(" ");}
+          else                       message("%c", 'A' + BEST_BOARD[i][j] - 1);
       } 
-      printf("\n");
+      message("\n");
     }  
-  }
 }
-
 
 static int add_cell (int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS) 
 {
@@ -212,9 +213,7 @@ static int add_cell (int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS)
       nn2 += nn;
 /* for all possible locations */
       for (j = 0; j < nn; j++) {
-	  struct cell cells[N+1];
-
-	  memcpy(cells,CELLS,sizeof(struct cell)*(N+1));
+          struct cell *cells = CELLS;
 /* extent of shape */
           cells[id].top = NWS[j][0];
           cells[id].bot = cells[id].top + cells[id].alt[i][0] - 1;
@@ -225,7 +224,7 @@ static int add_cell (int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS)
 
 /* if the cell cannot be layed down, prune search */
           if (! lay_down(id, board, cells)) {
-             if (bots_verbose_mode >= BOTS_VERBOSE_DEBUG) printf("Chip %d, shape %d does not fit\n", id, i);
+             debug("Chip %d, shape %d does not fit\n", id, i);
              goto _end;
           }
 
@@ -244,7 +243,7 @@ static int add_cell (int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS)
 				  MIN_FOOTPRINT[0] = footprint[0];
 				  MIN_FOOTPRINT[1] = footprint[1];
 				  memcpy(BEST_BOARD, board, sizeof(ibrd));
-				  if (bots_verbose_mode >= BOTS_VERBOSE_DEBUG) printf("N  %d\n", MIN_AREA);
+				  debug("N  %d\n", MIN_AREA);
 			  }
 		  }
 
@@ -253,7 +252,7 @@ static int add_cell (int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS)
              nn2 += add_cell(cells[id].next, footprint, board,cells);
 /* if area is greater than or equal to best area, prune search */
           } else {
-             if (bots_verbose_mode >= BOTS_VERBOSE_DEBUG) printf("T  %d, %d\n", area, MIN_AREA);
+             debug("T  %d, %d\n", area, MIN_AREA);
 	  }
 _end:;  
 }
@@ -271,7 +270,7 @@ void floorplan_init (char *filename)
     inputFile = fopen(filename, "r");
     
     if(NULL == inputFile) {
-        printf("couldn't open %s for reading\n", filename);
+        message("Couldn't open %s for reading\n", filename);
         exit(1);
     }
     
@@ -291,8 +290,9 @@ void compute_floorplan (void)
     /* footprint of initial board is zero */
     footprint[0] = 0;
     footprint[1] = 0;
-
+    message("Computing floorplan ");
     bots_number_of_tasks = add_cell(1, footprint, board, gcells);
+    message(" completed!\n");
 
 }
 
