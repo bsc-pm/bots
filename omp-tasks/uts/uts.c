@@ -199,11 +199,9 @@ counter_t parallel_uts ( Node *root )
    counter_t num_nodes;
 
    #pragma omp parallel  
-   {
-      #pragma omp single
-      #pragma omp task
+      #pragma omp single nowait
+      #pragma omp task untied
       num_nodes = parTreeSearch( 0, root, getNumRootChildren(root) );
-   }
 
    return num_nodes;
 }
