@@ -112,7 +112,7 @@ int computeGranularity = 1;
 /***********************************************************
  * expected results for execution
  ***********************************************************/
-int        exp_tree_size = 0;
+counter_t  exp_tree_size = 0;
 int        exp_tree_depth = 0;
 counter_t  exp_num_leaves = 0;
 /***********************************************************
@@ -269,7 +269,7 @@ void uts_show_stats( void )
    int chunkSize = 0;
 
    message("\n");
-   message("Tree size                            = %llu\n", bots_number_of_tasks );
+   message("Tree size                            = %llu\n", (unsigned long long) bots_number_of_tasks );
    message("Maximum tree depth                   = %d\n", maxTreeDepth );
    message("Chunk size                           = %d\n", chunkSize );
    message("Number of leaves                     = %llu (%.2f%%)\n", nLeaves, nLeaves/(float)bots_number_of_tasks*100.0 ); 

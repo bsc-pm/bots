@@ -286,7 +286,7 @@ static int add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS,int l
       nnl += nn;
 /* for all possible locations */
       for (j = 0; j < nn; j++) {
-#pragma omp task default(none) untied private(board, footprint,area) \
+#pragma omp task untied private(board, footprint,area) \
 firstprivate(NWS,i,j,id,nn,level) \
 shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD,nnc,bots_verbose_mode) \
 if(level<bots_cutoff_value)
@@ -361,7 +361,7 @@ static int add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS,int l
       nnl += nn;
 /* for all possible locations */
       for (j = 0; j < nn; j++) {
-#pragma omp task default(none) untied private(footprint,area) \
+#pragma omp task untied private(footprint,area) \
 firstprivate(NWS,i,j,id,nn,level,bots_cutoff_value) \
 shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD,nnc,bots_verbose_mode) \
 final(level >= bots_cutoff_value)
@@ -445,7 +445,7 @@ static int add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS,int l
       nnl += nn;
 /* for all possible locations */
       for (j = 0; j < nn; j++) {
-#pragma omp task untied default(none) private(board, footprint,area) \
+#pragma omp task untied private(board, footprint,area) \
 firstprivate(NWS,i,j,id,nn,level,bots_cutoff_value) shared(nnc) \
 shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD,bots_verbose_mode)
 {
@@ -527,7 +527,7 @@ static int add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS) {
       nnl += nn;
 /* for all possible locations */
       for (j = 0; j < nn; j++) {
-#pragma omp task untied default(none) private(board, footprint,area) \
+#pragma omp task untied private(board, footprint,area) \
 firstprivate(NWS,i,j,id,nn) \
 shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD,nnc,bots_verbose_mode) 
 {

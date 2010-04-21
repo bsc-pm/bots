@@ -350,7 +350,7 @@ bots_get_params_common(int argc, char **argv)
                argv[i][1] = '*';
                i++;
                if (argc == i) { bots_print_usage(); exit(100); }
-               bots_verbose_mode = atoi(argv[i]);
+               bots_verbose_mode = (bots_verbose_mode_t) atoi(argv[i]);
                break;
 #if defined(MANUAL_CUTOFF) || defined(IF_CUTOFF) || defined(FINAL_CUTOFF)
 	    case 'x':
