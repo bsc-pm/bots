@@ -441,7 +441,7 @@ int pairalign(int istart, int iend, int jstart, int jend)
 				{
 					if ((m = seqlen_array[sj+1]) != 0)
 					{
-						#pragma omp task untied default(none) \
+						#pragma omp task untied \
 						private(i,gg,len2,mm_score) firstprivate(m,n,si,sj,len1) \
 						shared(nseqs, bench_output,seqlen_array,seq_array,gap_pos1,gap_pos2,pw_ge_penalty,pw_go_penalty,mat_avscore)
 						{
