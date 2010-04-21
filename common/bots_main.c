@@ -415,7 +415,7 @@ void bots_set_info ()
    sprintf(bots_parameters,BOTS_APP_PARAMETERS_DESC BOTS_APP_PARAMETERS_LIST);
    sprintf(bots_model,BOTS_MODEL_DESC);
 
-//   sprintf(bots_resources,"%d", omp_get_max_threads());
+   sprintf(bots_resources,"%d", omp_get_max_threads());
    /* compilation info (do not modify) */
    strcpy(bots_comp_date,CDATE);
    strcpy(bots_comp_message,CMESSAGE);
