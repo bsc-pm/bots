@@ -316,6 +316,7 @@ void find_queens (int size)
 {
 	total_count=0;
 
+        message("Computing N-Queens algorithm (n=%d) ", size);
 	#pragma omp parallel
 	{
 		#pragma omp single
@@ -330,15 +331,13 @@ void find_queens (int size)
 			total_count += mycount;
 #endif
 	}
+	message(" completed!\n");
 }
 
 
 int verify_queens (int size)
 {
 	if ( size > MAX_SOLUTIONS ) return BOTS_RESULT_NA;
-
-
 	if ( total_count == solutions[size-1]) return BOTS_RESULT_SUCCESSFUL;
-
 	return BOTS_RESULT_UNSUCCESSFUL;
 }

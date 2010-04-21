@@ -433,7 +433,9 @@ void sort_init (int size)
 
 void sort (int size)
 {
-     cilksort(array, tmp, size);
+        message("Computing multisort algorithm (n=%d) ", size);
+	cilksort(array, tmp, size);
+	message(" completed!\n");
 }
 
 int sort_verify (int size)

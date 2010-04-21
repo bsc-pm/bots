@@ -441,10 +441,12 @@ void sort_init (int size)
 
 void sort_par (int size)
 {
-#pragma omp parallel
-#pragma omp single nowait
-#pragma omp task untied
-     cilksort_par(array, tmp, size);
+	message("Computing multisort algorithm (n=%d) ", size);
+	#pragma omp parallel
+	#pragma omp single nowait
+	#pragma omp task untied
+	     cilksort_par(array, tmp, size);
+	message(" completed!\n");
 }
 
 int sort_verify (int size)
