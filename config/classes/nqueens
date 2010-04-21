@@ -1,11 +1,13 @@
 [test]
 inputs=10
+cutoff=5
 
 [small]
 inputs=13
 
 [medium]
 inputs=14
+cutoff=8
 
 [large]
 inputs=15

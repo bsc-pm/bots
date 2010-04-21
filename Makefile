@@ -17,3 +17,5 @@ $(RECURSIVE): $(DIRS)
 dist: dist-clean
 	echo "TODO"
 
+wipe: dist-clean-recursive
+	rm -f bin/*
