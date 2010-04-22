@@ -196,11 +196,9 @@ counter_t parallel_uts ( Node *root )
 
    message("Computing Unbalance Tree Search algorithm ");
    #pragma omp parallel  
-   {
-      #pragma omp single
-      #pragma omp task
-      num_nodes = parTreeSearch( 0, root, getNumRootChildren(root) );
-   }
+      #pragma omp single nowait
+      #pragma omp task untied
+        num_nodes = parTreeSearch( 0, root, getNumRootChildren(root) );
    message(" completed!");
 
    return num_nodes;
