@@ -1,0 +1,12 @@
+[test]
+inputs=test.input
+
+[small]
+inputs=small.input
+
+[medium]
+inputs=medium.input
+
+[large]
+inputs=large.input
+
