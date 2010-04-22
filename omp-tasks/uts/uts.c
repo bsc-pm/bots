@@ -372,19 +372,5 @@ int uts_check_result ( void )
       message("Tree size value is non valid.\n");
    }
 
-// These variables are not computed in current implementation but are included in test file
-// Tree is allocated in stack frame during execution and cannot be chased again
-#if 0
-   if ( maxTreeDepth != exp_tree_depth ) {
-      answer = BOTS_RESULT_UNSUCCESSFUL;
-      message("Tree depth value is non valid.\n");
-   }
-
-   if ( nLeaves != exp_num_leaves ) {
-      answer = BOTS_RESULT_UNSUCCESSFUL;
-      message("Number of leaves is non valid.\n");
-   }
-#endif
-
    return answer;
 }
