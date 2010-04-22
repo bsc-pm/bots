@@ -65,14 +65,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "bots.h"
+#include "app-desc.h"
 
 typedef long ELM;
-
-/* MERGESIZE must be >= 2 */
-#define KILO 1024
-#define MERGESIZE (2*KILO)
-#define QUICKSIZE (2*KILO)
-#define INSERTIONSIZE 20
 
 static unsigned long rand_nxt = 0;
 
@@ -184,7 +179,7 @@ void seqquick(ELM *low, ELM *high)
 {
      ELM *p;
 
-     while (high - low >= INSERTIONSIZE) {
+     while (high - low >= bots_app_cutoff_value_2) {
 	  p = seqpart(low, high);
 	  seqquick(low, p);
 	  low = p + 1;
@@ -330,7 +325,7 @@ void cilkmerge(ELM *low1, ELM *high1, ELM *low2,
 	  memcpy(lowdest, low1, sizeof(ELM) * (high1 - low1));
 	  return;
      }
-     if (high2 - low2 < MERGESIZE) {
+     if (high2 - low2 < bots_app_cutoff_value ) {
 	  seqmerge(low1, high1, low2, high2, lowdest);
 	  return;
      }
@@ -368,7 +363,7 @@ void cilksort(ELM *low, ELM *tmp, long size)
      long quarter = size / 4;
      ELM *A, *B, *C, *D, *tmpA, *tmpB, *tmpC, *tmpD;
 
-     if (size < QUICKSIZE) {
+     if (size < bots_app_cutoff_value_1) {
 	  /* quicksort when less than 1024 elements */
 	  seqquick(low, low + size - 1);
 	  return;
@@ -393,55 +388,85 @@ void cilksort(ELM *low, ELM *tmp, long size)
      cilkmerge(tmpA, tmpC - 1, tmpC, tmpA + size - 1, A);
 }
 
-void scramble_array(ELM *arr, unsigned long size)
+ELM *array, *tmp;
+
+void scramble_array( void )
 {
      unsigned long i;
      unsigned long j;
 
-     for (i = 0; i < size; ++i) {
+     for (i = 0; i < bots_arg_size; ++i) {
 	  j = my_rand();
-	  j = j % size;
-	  swap(arr[i], arr[j]);
+	  j = j % bots_arg_size;
+	  swap(array[i], array[j]);
      }
 }
 
-void fill_array(ELM *arr, unsigned long size)
+void fill_array( void )
 {
      unsigned long i;
 
      my_srand(1);
 
      /* first, fill with integers 1..size */
-     for (i = 0; i < size; ++i) {
-	  arr[i] = i;
+     for (i = 0; i < bots_arg_size; ++i) {
+	  array[i] = i;
+     }
+}
+
+void sort_init ( void )
+{
+     /* Checking arguments */
+     if (bots_arg_size < 4) {
+        message("%s can not be less than 4, using 4 as a parameter.\n", BOTS_APP_DESC_ARG_SIZE );
+        bots_arg_size = 4;
      }
 
-     /* then, scramble randomly */
-     scramble_array(arr, size);
+     if (bots_app_cutoff_value < 2) {
+        message("%s can not be less than 2, using 2 as a parameter.\n", BOTS_APP_DESC_ARG_CUTOFF);
+        bots_app_cutoff_value = 2;
+     }
+     else if (bots_app_cutoff_value > bots_arg_size ) {
+        message("%s can not be greather than vector size, using %d as a parameter.\n", BOTS_APP_DESC_ARG_CUTOFF, bots_arg_size);
+        bots_app_cutoff_value = bots_arg_size;
+     }
+
+     if (bots_app_cutoff_value_1 > bots_arg_size ) {
+        message("%s can not be greather than vector size, using %d as a parameter.\n", BOTS_APP_DESC_ARG_CUTOFF_1, bots_arg_size);
+        bots_app_cutoff_value_1 = bots_arg_size;
+     }
+     if (bots_app_cutoff_value_2 > bots_arg_size ) {
+        message("%s can not be greather than vector size, using %d as a parameter.\n", BOTS_APP_DESC_ARG_CUTOFF_2, bots_arg_size);
+        bots_app_cutoff_value_2 = bots_arg_size;
+     }
+
+     if (bots_app_cutoff_value_2 > bots_app_cutoff_value_1) {
+        message("%s can not be greather than %s, using %d as a parameter.\n",
+               BOTS_APP_DESC_ARG_CUTOFF_2,
+               BOTS_APP_DESC_ARG_CUTOFF_1,
+               bots_app_cutoff_value_1
+       );
+        bots_app_cutoff_value_2 = bots_app_cutoff_value_1;
+     }
+
+     array = (ELM *) malloc(bots_arg_size * sizeof(ELM));
+     tmp = (ELM *) malloc(bots_arg_size * sizeof(ELM));
+
+     fill_array();
+     scramble_array();
 }
 
-
-ELM *array, *tmp;
-
-void sort_init (int size)
+void sort ( void )
 {
-     array = (ELM *) malloc(size * sizeof(ELM));
-     tmp = (ELM *) malloc(size * sizeof(ELM));
-
-     fill_array(array, size);
-}
-
-void sort (int size)
-{
-        message("Computing multisort algorithm (n=%d) ", size);
-	cilksort(array, tmp, size);
+        message("Computing multisort algorithm (n=%d) ", bots_arg_size);
+	cilksort(array, tmp, bots_arg_size);
 	message(" completed!\n");
 }
 
-int sort_verify (int size)
+int sort_verify ( void )
 {
      int i, success = 1;
-     for (i = 0; i < size; ++i)
+     for (i = 0; i < bots_arg_size; ++i)
 	  if (array[i] != i) success = 0;
 
      return success ? BOTS_RESULT_SUCCESSFUL : BOTS_RESULT_UNSUCCESSFUL;

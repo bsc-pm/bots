@@ -194,6 +194,26 @@ int bots_arg_block = BOTS_APP_DEF_ARG_BLOCK;
 int bots_app_cutoff_value = BOTS_APP_DEF_ARG_CUTOFF;
 #endif
 
+#ifdef BOTS_APP_USES_ARG_CUTOFF_1
+#ifndef BOTS_APP_DEF_ARG_CUTOFF_1
+#error "Default value for argument cutoff  must be specified (#define BOTS_APP_DEF_ARG_CUTOFF_1)"
+#endif
+#ifndef BOTS_APP_DESC_ARG_CUTOFF_1
+#error "Help description for argument cutoff must be specified (#define BOTS_APP_DESC_ARG_CUTOFF_1)"
+#endif
+int bots_app_cutoff_value_1 = BOTS_APP_DEF_ARG_CUTOFF_1;
+#endif
+
+#ifdef BOTS_APP_USES_ARG_CUTOFF_2
+#ifndef BOTS_APP_DEF_ARG_CUTOFF_2
+#error "Default value for argument cutoff  must be specified (#define BOTS_APP_DEF_ARG_CUTOFF_2)"
+#endif
+#ifndef BOTS_APP_DESC_ARG_CUTOFF_2
+#error "Help description for argument cutoff must be specified (#define BOTS_APP_DESC_ARG_CUTOFF_2)"
+#endif
+int bots_app_cutoff_value_2 = BOTS_APP_DEF_ARG_CUTOFF_2;
+#endif
+
 #if defined(MANUAL_CUTOFF) || defined(IF_CUTOFF) || defined(FINAL_CUTOFF)
 int  bots_cutoff_value = BOTS_CUTOFF_DEF_VALUE;
 #endif
@@ -226,7 +246,13 @@ void bots_print_usage()
    fprintf(stderr, "  -x <value> : OpenMP tasks cut-off value (default=%d)\n",BOTS_CUTOFF_DEF_VALUE);
 #endif
 #ifdef BOTS_APP_USES_ARG_CUTOFF
-   fprintf(stderr, "  -y <value> : Application cut-off value (default=%d)\n", BOTS_APP_DEF_ARG_CUTOFF);
+   fprintf(stderr, "  -y <value> : "BOTS_APP_DESC_ARG_CUTOFF"(default=%d)\n", BOTS_APP_DEF_ARG_CUTOFF);
+#endif
+#ifdef BOTS_APP_USES_ARG_CUTOFF_1
+   fprintf(stderr, "  -a <value> : "BOTS_APP_DESC_ARG_CUTOFF_1"(default=%d)\n", BOTS_APP_DEF_ARG_CUTOFF_1);
+#endif
+#ifdef BOTS_APP_USES_ARG_CUTOFF_2
+   fprintf(stderr, "  -b <value> : "BOTS_APP_DESC_ARG_CUTOFF_2"(default=%d)\n", BOTS_APP_DEF_ARG_CUTOFF_2);
 #endif
 
    fprintf(stderr, "\n");
@@ -271,6 +297,22 @@ bots_get_params_common(int argc, char **argv)
       {
          switch (argv[i][1])
          {
+#ifdef BOTS_APP_USES_ARG_CUTOFF_1
+	    case 'a':
+	       argv[i][1] = '*';
+               i++;
+               if (argc == i) { bots_print_usage(); exit(100); }
+               bots_app_cutoff_value_1 = atoi(argv[i]);
+               break;
+#endif
+#ifdef BOTS_APP_USES_ARG_CUTOFF_2
+	    case 'b':
+	       argv[i][1] = '*';
+               i++;
+               if (argc == i) { bots_print_usage(); exit(100); }
+               bots_app_cutoff_value_2 = atoi(argv[i]);
+               break;
+#endif
             case 'c': /* set/unset check mode */
                argv[i][1] = '*';
                //i++;
@@ -296,12 +338,12 @@ bots_get_params_common(int argc, char **argv)
                argv[i][1] = '*';
                bots_print_usage();
                exit (100);
-#ifdef BOTS_APP_USES_ARG_SIZE
-            case 'n': /* read argument size 0 */
+#ifdef BOTS_APP_USES_ARG_SIZE_2
+            case 'l': /* read argument size 2 */
                argv[i][1] = '*';
                i++;
                if (argc == i) { bots_print_usage(); exit(100); }
-               bots_arg_size = atoi(argv[i]);
+               bots_arg_size_2 = atoi(argv[i]);
                break;
 #endif
 #ifdef BOTS_APP_USES_ARG_SIZE_1
@@ -312,12 +354,12 @@ bots_get_params_common(int argc, char **argv)
                bots_arg_size_1 = atoi(argv[i]);
                break;
 #endif
-#ifdef BOTS_APP_USES_ARG_SIZE_2
-            case 'l': /* read argument size 2 */
+#ifdef BOTS_APP_USES_ARG_SIZE
+            case 'n': /* read argument size 0 */
                argv[i][1] = '*';
                i++;
                if (argc == i) { bots_print_usage(); exit(100); }
-               bots_arg_size_2 = atoi(argv[i]);
+               bots_arg_size = atoi(argv[i]);
                break;
 #endif
 #ifdef BOTS_APP_USES_ARG_BLOCK
@@ -447,9 +489,8 @@ main(int argc, char* argv[])
 #endif
 
    bots_get_params(argc,argv);
-   bots_set_info();
-
    BOTS_APP_INIT;
+   bots_set_info();
 
 #ifdef KERNEL_SEQ_CALL
 #ifdef BOTS_APP_CHECK_USES_SEQ_RESULT
