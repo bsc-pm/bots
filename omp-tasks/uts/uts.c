@@ -152,10 +152,8 @@ int uts_numChildren(Node *parent)
   int numChildren = 0;
 
   /* Determine the number of children */
-  if (parent->height == 0)
-     numChildren = (int) floor(b_0);
-  else 
-     numChildren = uts_numChildren_bin(parent);
+  if (parent->height == 0) numChildren = (int) floor(b_0);
+  else numChildren = uts_numChildren_bin(parent);
   
   // limit number of children
   // only a BIN root can have more than MAXNUMCHILDREN

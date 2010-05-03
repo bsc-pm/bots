@@ -119,59 +119,37 @@ counter_t  exp_num_leaves = 0;
  *  FUNCTIONS                                              *
  ***********************************************************/
 
-// Interpret 32 bit positive integer as value on [0,1)
-double rng_toProb(int n)
-{
-  if (n < 0) {
-    printf("*** toProb: rand n = %d out of range\n",n);
-  }
-  return ((n<0)? 0.0 : ((double) n)/2147483648.0);
-}
-
 void uts_initRoot(Node * root, int type)
 {
    root->height = 0;
    root->numChildren = -1;      // means not yet determined
    rng_init(root->state.state, rootId);
-
-   printf("Root node of type %d at %p\n",type, root);
 }
 
-
-int uts_numChildren_bin(Node * parent)
-{
-  // distribution is identical everywhere below root
-  int    v = rng_rand(parent->state.state);	
-  double d = rng_toProb(v);
-
-  return (d < nonLeafProb) ? nonLeafBF : 0;
-}
-
-int uts_numChildren(Node *parent)
+int uts_numChildren(Node *node)
 {
   int numChildren = 0;
 
-  /* Determine the number of children */
-  if (parent->height == 0)
-     numChildren = (int) floor(b_0);
-  else 
-     numChildren = uts_numChildren_bin(parent);
-  
-  // limit number of children
-  // only a BIN root can have more than MAXNUMCHILDREN
-  if (parent->height == 0) {
-    int rootBF = (int) ceil(b_0);
-    if (numChildren > rootBF) {
-      message("*** Number of children of root truncated from %d to %d\n", numChildren, rootBF);
-      numChildren = rootBF;
-    }
+  // determine the number of children
+  if (node->height == 0) numChildren = (int) floor(b_0);
+  else
+  {
+    // distribution is identical everywhere below root
+    int    v = rng_rand(node->state.state);	
+    double d = rng_toProb(v);
+    numChildren = (d < nonLeafProb) ? nonLeafBF : 0;
   }
-  else {
+  
+  // limit number of children (only a BIN root can have more than MAXNUMCHILDREN)
+  if (node->height != 0) {
     if (numChildren > MAXNUMCHILDREN) {
       message("*** Number of children truncated from %d to %d\n", numChildren, MAXNUMCHILDREN);
       numChildren = MAXNUMCHILDREN;
     }
   }
+
+  /* including info into node */
+  node->numChildren = numChildren;
 
   return numChildren;
 }
@@ -180,50 +158,33 @@ int uts_numChildren(Node *parent)
  * Recursive depth-first implementation                    *
  ***********************************************************/
 
-int getNumRootChildren(Node *root)
-{
-  int numChildren;
-
-  numChildren = uts_numChildren(root);
-  root->numChildren = numChildren;
-
-  return numChildren;
-}
-
 counter_t serial_uts ( Node *root )
 {
    counter_t num_nodes;
    message("Computing Unbalance Tree Search algorithm ");
-   num_nodes = serTreeSearch( 0, root, getNumRootChildren(root) );
+   num_nodes = serTreeSearch( 0, root, uts_numChildren(root) );
    message(" completed!\n");
    return num_nodes;
 }
 
 counter_t serTreeSearch(int depth, Node *parent, int numChildren) 
 {
-  Node n[numChildren], *nodePtr;
-  int i, j;
   counter_t subtreesize = 1, partialCount[numChildren];
+  Node n[numChildren];
+  int i, j;
 
   // Recurse on the children
   for (i = 0; i < numChildren; i++) {
-     nodePtr = &n[i];
-
-     nodePtr->height = parent->height + 1;
-
+     n[i].height = parent->height + 1;
      // The following line is the work (one or more SHA-1 ops)
      for (j = 0; j < computeGranularity; j++) {
-        rng_spawn(parent->state.state, nodePtr->state.state, i);
+        rng_spawn(parent->state.state, n[i].state.state, i);
      }
-
-     nodePtr->numChildren = uts_numChildren(nodePtr);
-
-        partialCount[i] = serTreeSearch(depth+1, nodePtr, nodePtr->numChildren);
+     partialCount[i] = serTreeSearch(depth+1, &n[i], uts_numChildren(&n[i]));
   }
-
-  for (i = 0; i < numChildren; i++) {
-     subtreesize += partialCount[i];
-  }
+ 
+  // computing total size
+  for (i = 0; i < numChildren; i++) subtreesize += partialCount[i];
   
   return subtreesize;
 }
