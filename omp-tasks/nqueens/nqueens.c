@@ -316,7 +316,7 @@ void find_queens (int size)
 {
 	total_count=0;
 
-        message("Computing N-Queens algorithm (n=%d) ", size);
+        bots_message("Computing N-Queens algorithm (n=%d) ", size);
 	#pragma omp parallel
 	{
 		#pragma omp single
@@ -331,7 +331,7 @@ void find_queens (int size)
 			total_count += mycount;
 #endif
 	}
-	message(" completed!\n");
+	bots_message(" completed!\n");
 }
 
 

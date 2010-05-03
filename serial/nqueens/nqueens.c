@@ -103,9 +103,9 @@ void find_queens (int size)
 
 	total_count=0;
 	a = alloca(size * sizeof(char));
-	message("Computing N-Queens algorithm (n=%d) ", size);
+	bots_message("Computing N-Queens algorithm (n=%d) ", size);
 	nqueens(size, 0, a, &total_count);
-        message(" completed!\n");
+        bots_message(" completed!\n");
 }
 
 int verify_queens (int size)

@@ -53,7 +53,7 @@ int compare_matrix(int n, REAL *A, int an, REAL *B, int bn);
 #define BOTS_APP_INIT\
     double *A, *B, *C, *D;\
     if ((bots_arg_size & (bots_arg_size - 1)) != 0 || (bots_arg_size % 16) != 0) {\
-        message("Error: matrix size (%d) must be a power of 2 and a multiple of %d\n", bots_arg_size, 16);\
+        bots_message("Error: matrix size (%d) must be a power of 2 and a multiple of %d\n", bots_arg_size, 16);\
         exit (1);\
     }\
     A = (double *) malloc (bots_arg_size * bots_arg_size * sizeof(double));\

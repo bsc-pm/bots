@@ -36,6 +36,6 @@ int fib (int n)
 void fib0 (int n)
 {
 	res = fib(n);
-	message("Fibonacci result for %d is %d\n",n,res);
+	bots_message("Fibonacci result for %d is %d\n",n,res);
 }
 

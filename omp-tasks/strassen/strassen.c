@@ -1248,7 +1248,7 @@ int compare_matrix(int n, REAL *A, int an, REAL *B, int bn)
 
 	       c = c / ELEM(A, an, i, j);
 	       if (c > EPSILON) {
-		    message("Strassen: Wrong answer!\n");
+		    bots_message("Strassen: Wrong answer!\n");
 		    return BOTS_RESULT_UNSUCCESSFUL;
 	       }
 	  }
@@ -1266,17 +1266,17 @@ REAL *alloc_matrix(int n)
 
 void strassen_main_par(REAL *A, REAL *B, REAL *C, int n)
 {
-	message("Computing parallel Strassen algorithm (n=%d) ", n);
+	bots_message("Computing parallel Strassen algorithm (n=%d) ", n);
 	#pragma omp parallel
 	#pragma omp single
 	#pragma omp task untied     
 		OptimizedStrassenMultiply_par(C, A, B, n, n, n, n, 1);
-	message(" completed!\n");
+	bots_message(" completed!\n");
 }
 void strassen_main_seq(REAL *A, REAL *B, REAL *C, int n)
 {
-	message("Computing sequential Strassen algorithm (n=%d) ", n);
+	bots_message("Computing sequential Strassen algorithm (n=%d) ", n);
 	OptimizedStrassenMultiply_seq(C, A, B, n, n, n, n, 1);
-	message(" completed!\n");
+	bots_message(" completed!\n");
 }
 

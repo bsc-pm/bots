@@ -44,7 +44,7 @@ int checkmat (float *M, float *N)
          r_err = r_err / M[i*bots_arg_size_1+j];
          if(r_err > EPSILON)
          {
-            message("Checking failure: A[%d][%d]=%f  B[%d][%d]=%f; Relative Error=%f\n",
+            bots_message("Checking failure: A[%d][%d]=%f  B[%d][%d]=%f; Relative Error=%f\n",
                     i,j, M[i*bots_arg_size_1+j], i,j, N[i*bots_arg_size_1+j], r_err);
             return FALSE;
          }
@@ -83,7 +83,7 @@ void genmat (float *M[])
             M[ii*bots_arg_size+jj] = (float *) malloc(bots_arg_size_1*bots_arg_size_1*sizeof(float));
 	    if ((M[ii*bots_arg_size+jj] == NULL))
             {
-               message("Error: Out of memory\n");
+               bots_message("Error: Out of memory\n");
                exit(101);
             }
             /* initializing matrix */
@@ -105,7 +105,7 @@ void genmat (float *M[])
          }
       }
    }
-   debug("allo = %d, no = %d, total = %d, factor = %f\n",a,b,a+b,(float)((float)a/(float)(a+b)));
+   bots_debug("allo = %d, no = %d, total = %d, factor = %f\n",a,b,a+b,(float)((float)a/(float)(a+b)));
 }
 /***********************************************************************
  * print_structure: 
@@ -113,15 +113,15 @@ void genmat (float *M[])
 void print_structure(char *name, float *M[])
 {
    int ii, jj;
-   message("Structure for matrix %s @ 0x%p\n",name, M);
+   bots_message("Structure for matrix %s @ 0x%p\n",name, M);
    for (ii = 0; ii < bots_arg_size; ii++) {
      for (jj = 0; jj < bots_arg_size; jj++) {
-        if (M[ii*bots_arg_size+jj]!=NULL) {message("x");}
-        else message(" ");
+        if (M[ii*bots_arg_size+jj]!=NULL) {bots_message("x");}
+        else bots_message(" ");
      }
-     message("\n");
+     bots_message("\n");
    }
-   message("\n");
+   bots_message("\n");
 }
 /***********************************************************************
  * allocate_clean_block: 
@@ -140,7 +140,7 @@ float * allocate_clean_block()
   }
   else
   {
-      message("Error: Out of memory\n");
+      bots_message("Error: Out of memory\n");
       exit (101);
   }
   return (q);
@@ -240,6 +240,8 @@ void sparselu_par_call(float **BENCH)
 {
    int ii, jj, kk;
    
+   bots_message("Computing SparseLU Factorization (%dx%d matrix with %dx%d blocks) ",
+           bots_arg_size,bots_arg_size,bots_arg_size_1,bots_arg_size_1);
 #pragma omp parallel private(kk)
    {
    for (kk=0; kk<bots_arg_size; kk++) 
@@ -275,6 +277,7 @@ void sparselu_par_call(float **BENCH)
 
    }
    }
+   bots_message(" completed!\n");
 }
 
 void sparselu_fini (float **BENCH, char *pass)

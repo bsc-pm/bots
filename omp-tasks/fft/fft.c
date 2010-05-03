@@ -4784,13 +4784,13 @@ void fft(int n, COMPLEX * in, COMPLEX * out)
      int r;
      COMPLEX *W;
 
-     message("Computing coefficients ");
+     bots_message("Computing coefficients ");
      W = (COMPLEX *) malloc((n + 1) * sizeof(COMPLEX));
      #pragma omp parallel
      #pragma omp single
      #pragma omp task untied
      compute_w_coefficients(n, 0, n / 2, W);
-     message(" completed!\n");
+     bots_message(" completed!\n");
 
      /* 
       * find factors of n, first 8, then 4 and then primes in ascending
@@ -4802,12 +4802,12 @@ void fft(int n, COMPLEX * in, COMPLEX * out)
 	  l /= r;
      } while (l > 1);
 
-     message("Computing FFT ");
+     bots_message("Computing FFT ");
      #pragma omp parallel
      #pragma omp single
      #pragma omp task untied
      fft_aux(n, in, out, factors, W, n);
-     message(" completed!\n");
+     bots_message(" completed!\n");
 
      free(W);
      return;
@@ -4853,7 +4853,7 @@ int test_correctness(int n, COMPLEX *out1, COMPLEX *out2)
        if (d < -1.0e-10 || d > 1.0e-10) a /= d;
        if (a > error) error = a;
   }
-  message("relative error=%e\n", error);
+  bots_message("relative error=%e\n", error);
   if (error > 1e-3) return BOTS_RESULT_UNSUCCESSFUL;
   else return BOTS_RESULT_SUCCESSFUL;
 }

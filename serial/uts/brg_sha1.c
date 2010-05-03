@@ -92,7 +92,7 @@ int rng_rand(RNG_state *mystate)
    uint32 b =  (mystate[16] << 24) | (mystate[17] << 16) | (mystate[18] << 8) | (mystate[19] << 0);
    b = b & POS_MASK;
    r = (int) b;
-   debug("b: %d\t, r: %d\n", b, r);
+   bots_debug("b: %d\t, r: %d\n", b, r);
    return r;
 }
 
@@ -129,7 +129,7 @@ char * rng_showstate(RNG_state *state, char *s){
 
 /* describe random number generator type into string */
 void rng_showtype( void ) {
-  message("SHA-1 (state size = %luB)\n", sizeof(struct state_t));
+  bots_message("SHA-1 (state size = %luB)\n", sizeof(struct state_t));
 }
 
 /** END: UTS RNG Harness **/

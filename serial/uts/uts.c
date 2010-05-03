@@ -143,7 +143,7 @@ int uts_numChildren(Node *node)
   // limit number of children (only a BIN root can have more than MAXNUMCHILDREN)
   if (node->height != 0) {
     if (numChildren > MAXNUMCHILDREN) {
-      message("*** Number of children truncated from %d to %d\n", numChildren, MAXNUMCHILDREN);
+      bots_debug("*** Number of children truncated from %d to %d\n", numChildren, MAXNUMCHILDREN);
       numChildren = MAXNUMCHILDREN;
     }
   }
@@ -161,9 +161,9 @@ int uts_numChildren(Node *node)
 counter_t serial_uts ( Node *root )
 {
    counter_t num_nodes;
-   message("Computing Unbalance Tree Search algorithm ");
+   bots_message("Computing Unbalance Tree Search algorithm ");
    num_nodes = serTreeSearch( 0, root, uts_numChildren(root) );
-   message(" completed!\n");
+   bots_message(" completed!\n");
    return num_nodes;
 }
 
@@ -194,7 +194,7 @@ void uts_read_file ( char *filename )
    FILE *fin;
 
    if ((fin = fopen(filename, "r")) == NULL) {
-      message( "Could not open input file (%s)\n", filename);
+      bots_message( "Could not open input file (%s)\n", filename);
       exit (-1);
    }
    fscanf(fin,"%lf %lf %d %d %d %llu %d %llu",
@@ -212,16 +212,16 @@ void uts_read_file ( char *filename )
    computeGranularity = max(1,computeGranularity);
 
       // Printing input data
-   message("\n");
-   message("Root branching factor                = %f\n", b_0);
-   message("Root seed (0 <= 2^31)                = %d\n", rootId);
-   message("Probability of non-leaf node         = %f\n", nonLeafProb);
-   message("Number of children for non-leaf node = %d\n", nonLeafBF);
-   message("E(n)                                 = %f\n", (double) ( nonLeafProb * nonLeafBF ) );
-   message("E(s)                                 = %f\n", (double) ( 1.0 / (1.0 - nonLeafProb * nonLeafBF) ) );
-   message("Compute granularity                  = %d\n", computeGranularity);
-   message("Tree type                            = %d (%s)\n", type, uts_trees_str[type]);
-   message("Random number generator              = "); rng_showtype();
+   bots_message("\n");
+   bots_message("Root branching factor                = %f\n", b_0);
+   bots_message("Root seed (0 <= 2^31)                = %d\n", rootId);
+   bots_message("Probability of non-leaf node         = %f\n", nonLeafProb);
+   bots_message("Number of children for non-leaf node = %d\n", nonLeafBF);
+   bots_message("E(n)                                 = %f\n", (double) ( nonLeafProb * nonLeafBF ) );
+   bots_message("E(s)                                 = %f\n", (double) ( 1.0 / (1.0 - nonLeafProb * nonLeafBF) ) );
+   bots_message("Compute granularity                  = %d\n", computeGranularity);
+   bots_message("Tree type                            = %d (%s)\n", type, uts_trees_str[type]);
+   bots_message("Random number generator              = "); rng_showtype();
 }
 
 void uts_show_stats( void )
@@ -229,13 +229,13 @@ void uts_show_stats( void )
    int nPes = atoi(bots_resources);
    int chunkSize = 0;
 
-   message("\n");
-   message("Tree size                            = %llu\n", (unsigned long long) bots_number_of_tasks );
-   message("Maximum tree depth                   = %d\n", maxTreeDepth );
-   message("Chunk size                           = %d\n", chunkSize );
-   message("Number of leaves                     = %llu (%.2f%%)\n", nLeaves, nLeaves/(float)bots_number_of_tasks*100.0 ); 
-   message("Wallclock time                       = %.3f sec\n", bots_time_program );
-   message("Overall performance                  = %.0f nodes/sec\n", (bots_number_of_tasks / bots_time_program) );
+   bots_message("\n");
+   bots_message("Tree size                            = %llu\n", (unsigned long long) bots_number_of_tasks );
+   bots_message("Maximum tree depth                   = %d\n", maxTreeDepth );
+   bots_message("Chunk size                           = %d\n", chunkSize );
+   bots_message("Number of leaves                     = %llu (%.2f%%)\n", nLeaves, nLeaves/(float)bots_number_of_tasks*100.0 ); 
+   bots_message("Wallclock time                       = %.3f sec\n", bots_time_program );
+   bots_message("Overall performance                  = %.0f nodes/sec\n", (bots_number_of_tasks / bots_time_program) );
 }
 
 int uts_check_result ( void )
@@ -244,7 +244,7 @@ int uts_check_result ( void )
 
    if ( bots_number_of_tasks != exp_tree_size ) {
       answer = BOTS_RESULT_UNSUCCESSFUL;
-      message("Tree size value is non valid.\n");
+      bots_message("Tree size value is non valid.\n");
    }
 
    return answer;

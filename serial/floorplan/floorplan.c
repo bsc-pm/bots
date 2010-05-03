@@ -142,7 +142,7 @@ static int lay_down(int id, ibrd board, struct cell *cells) {
 
 #define read_integer(file,var) \
   if ( fscanf(file, "%d", &var) == EOF ) {\
-	message(" Bogus input file\n");\
+	bots_message(" Bogus input file\n");\
 	exit(-1);\
   }
 
@@ -187,14 +187,14 @@ static void read_inputs() {
 static void write_outputs() {
   int i, j;
 
-    message("Minimum area = %d\n\n", MIN_AREA);
+    bots_message("Minimum area = %d\n\n", MIN_AREA);
 
     for (i = 0; i < MIN_FOOTPRINT[0]; i++) {
       for (j = 0; j < MIN_FOOTPRINT[1]; j++) {
-          if (BEST_BOARD[i][j] == 0) {message(" ");}
-          else                       message("%c", 'A' + BEST_BOARD[i][j] - 1);
+          if (BEST_BOARD[i][j] == 0) {bots_message(" ");}
+          else                       bots_message("%c", 'A' + BEST_BOARD[i][j] - 1);
       } 
-      message("\n");
+      bots_message("\n");
     }  
 }
 
@@ -224,7 +224,7 @@ static int add_cell (int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS)
 
 /* if the cell cannot be layed down, prune search */
           if (! lay_down(id, board, cells)) {
-             debug("Chip %d, shape %d does not fit\n", id, i);
+             bots_debug("Chip %d, shape %d does not fit\n", id, i);
              goto _end;
           }
 
@@ -243,7 +243,7 @@ static int add_cell (int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS)
 				  MIN_FOOTPRINT[0] = footprint[0];
 				  MIN_FOOTPRINT[1] = footprint[1];
 				  memcpy(BEST_BOARD, board, sizeof(ibrd));
-				  debug("N  %d\n", MIN_AREA);
+				  bots_debug("N  %d\n", MIN_AREA);
 			  }
 		  }
 
@@ -252,7 +252,7 @@ static int add_cell (int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS)
              nn2 += add_cell(cells[id].next, footprint, board,cells);
 /* if area is greater than or equal to best area, prune search */
           } else {
-             debug("T  %d, %d\n", area, MIN_AREA);
+             bots_debug("T  %d, %d\n", area, MIN_AREA);
 	  }
 _end:;  
 }
@@ -270,7 +270,7 @@ void floorplan_init (char *filename)
     inputFile = fopen(filename, "r");
     
     if(NULL == inputFile) {
-        message("Couldn't open %s for reading\n", filename);
+        bots_message("Couldn't open %s for reading\n", filename);
         exit(1);
     }
     
@@ -290,9 +290,9 @@ void compute_floorplan (void)
     /* footprint of initial board is zero */
     footprint[0] = 0;
     footprint[1] = 0;
-    message("Computing floorplan ");
+    bots_message("Computing floorplan ");
     bots_number_of_tasks = add_cell(1, footprint, board, gcells);
-    message(" completed!\n");
+    bots_message(" completed!\n");
 
 }
 
