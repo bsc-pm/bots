@@ -44,7 +44,6 @@ void compute_w_coefficients(int n, int a, int b, COMPLEX * W)
      register int k;
      register REAL s, c;
 
-     message(".");
      if (b - a < 128) {
 	  twoPiOverN = 2.0 * 3.1415926535897932384626434 / n;
 	  for (k = a; k <= b; ++k) {
@@ -2909,7 +2908,6 @@ void fft_aux(int n, COMPLEX * in, COMPLEX * out, int *factors, COMPLEX * W, int 
      int r, m;
      int k;
 
-     message(".");
      /* special cases */
      if (n == 32) {
 	  fft_base_32(in, out);
