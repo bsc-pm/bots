@@ -152,8 +152,8 @@ void nqueens(int n, int j, char *a, int *solutions, int depth)
 		}
 	}
 
-#ifndef FORCE_TIED_TASKS
 	#pragma omp taskwait
+#ifndef FORCE_TIED_TASKS
 	for ( i = 0; i < n; i++) *solutions += csols[i];
 #endif
 }
@@ -207,9 +207,9 @@ void nqueens(int n, int j, char *a, int *solutions, int depth)
 		}
 	}
 
+	#pragma omp taskwait
 #ifndef FORCE_TIED_TASKS
        if ( !final ) {
-	#pragma omp taskwait
 	for ( i = 0; i < n; i++) *solutions += csols[i];
        }
 #endif
@@ -259,8 +259,8 @@ void nqueens(int n, int j, char *a, int *solutions, int depth)
 		}
 	}
 
-#ifndef FORCE_TIED_TASKS
 	#pragma omp taskwait
+#ifndef FORCE_TIED_TASKS
 	for ( i = 0; i < n; i++) *solutions += csols[i];
 #endif
 }
@@ -304,8 +304,8 @@ void nqueens(int n, int j, char *a, int *solutions, int depth)
 		}
 	}
 
-#ifndef FORCE_TIED_TASKS
 	#pragma omp taskwait
+#ifndef FORCE_TIED_TASKS
 	for ( i = 0; i < n; i++) *solutions += csols[i];
 #endif
 }
