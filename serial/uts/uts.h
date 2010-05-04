@@ -79,8 +79,6 @@ void   uts_print_params();
 
 void   uts_showStats( void );
 
-double rng_toProb(int n);
-
 /* Common tree routines */
 void   uts_initRoot(Node * root, int type);
 int    uts_numChildren(Node *parent);

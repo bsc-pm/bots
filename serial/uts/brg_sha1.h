@@ -75,6 +75,8 @@ struct state_t {
 void   rng_init(RNG_state *state, int seed);
 void   rng_spawn(RNG_state *mystate, RNG_state *newstate, int spawnNumber);
 int    rng_rand(RNG_state *mystate);
+double rng_toProb(int n);
+
 int    rng_nextrand(RNG_state *mystate);
 char * rng_showstate(RNG_state *state, char *s);
 void   rng_showtype( void );

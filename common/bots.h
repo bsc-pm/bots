@@ -77,20 +77,40 @@ typedef enum { BOTS_VERBOSE_NONE=0,
 
 extern bots_verbose_mode_t bots_verbose_mode;
 
-#define message(msg, ...) \
+#define bots_message(msg, ...) \
    {\
       if ( bots_verbose_mode >= BOTS_VERBOSE_DEFAULT ) {\
         fprintf(stdout, msg , ##__VA_ARGS__);\
       }\
    }
 
-#define debug(msg, ...) \
+#ifdef BOTS_DEBUG
+#define bots_debug(msg, ...) \
    {\
       if ( bots_verbose_mode >= BOTS_VERBOSE_DEBUG ) {\
        fprintf(stdout, "%s:%d:%s:" msg ,__FILE__, __LINE__,__func__,##__VA_ARGS__);\
       }\
    }
+#else
+#define bots_debug(msg, ...)
+#endif
 
+// FIXME: Remove these macro versions
+#if 0
+#define message(msg, ...) \
+   {\
+      if ( bots_verbose_mode >= BOTS_VERBOSE_DEFAULT ) {\
+        fprintf(stdout, "OLD_MACRO_USSAGE:" msg , ##__VA_ARGS__);\
+      }\
+   }
+
+#define debug(msg, ...) \
+   {\
+      if ( bots_verbose_mode >= BOTS_VERBOSE_DEBUG ) {\
+       fprintf(stdout, "OLD_MACRO_USSAGE:%s:%d:%s:" msg ,__FILE__, __LINE__,__func__,##__VA_ARGS__);\
+      }\
+   }
+#endif
 
 #define FALSE 0
 #define TRUE 1

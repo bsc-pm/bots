@@ -454,9 +454,9 @@ void my_print(struct Village *village)
    {
       p = plist;
       plist = plist->forward; 
-      message("[pid:%d]",p->id);
+      bots_message("[pid:%d]",p->id);
    }
-   message("[vid:%d]\n",village->id);
+   bots_message("[vid:%d]\n",village->id);
 
 }
 /**********************************************************************/
@@ -466,7 +466,7 @@ void read_input_data(char *filename)
    int res;
 
    if ((fin = fopen(filename, "r")) == NULL) {
-      message("Could not open sequence file (%s)\n", filename);
+      bots_message("Could not open sequence file (%s)\n", filename);
       exit (-1);
    }
    res = fscanf(fin,"%d %d %d %d %d %d %ld %f %f %f %d %d %d %d %d %d %d %d %f", 
@@ -491,23 +491,23 @@ void read_input_data(char *filename)
              &res_avg_stay
    );
    if ( res == EOF ) {
-      message("Bogus input file (%s)\n", filename);
+      bots_message("Bogus input file (%s)\n", filename);
       exit(-1);
    }
    fclose(fin);
 
       // Printing input data
-   message("\n");
-   message("Number of levels    = %d\n", (int) sim_level);
-   message("Cities per level    = %d\n", (int) sim_cities);
-   message("Population ratio    = %d\n", (int) sim_population_ratio);
-   message("Simulation time     = %d\n", (int) sim_time);
-   message("Assess time         = %d\n", (int) sim_assess_time);
-   message("Convalescence time  = %d\n", (int) sim_convalescence_time);
-   message("Initial seed        = %d\n", (int) sim_seed);
-   message("Get sick prob.      = %f\n", (float) sim_get_sick_p);
-   message("Convalescence prob. = %f\n", (float) sim_convalescence_p);
-   message("Realloc prob.       = %f\n", (float) sim_realloc_p);
+   bots_message("\n");
+   bots_message("Number of levels    = %d\n", (int) sim_level);
+   bots_message("Cities per level    = %d\n", (int) sim_cities);
+   bots_message("Population ratio    = %d\n", (int) sim_population_ratio);
+   bots_message("Simulation time     = %d\n", (int) sim_time);
+   bots_message("Assess time         = %d\n", (int) sim_assess_time);
+   bots_message("Convalescence time  = %d\n", (int) sim_convalescence_time);
+   bots_message("Initial seed        = %d\n", (int) sim_seed);
+   bots_message("Get sick prob.      = %f\n", (float) sim_get_sick_p);
+   bots_message("Convalescence prob. = %f\n", (float) sim_convalescence_p);
+   bots_message("Realloc prob.       = %f\n", (float) sim_realloc_p);
 }
 int check_village(struct Village *top)
 {
@@ -523,19 +523,19 @@ int check_village(struct Village *top)
    if (res_assess != result.total_assess) answer = BOTS_RESULT_UNSUCCESSFUL;
    if (res_inside != result.total_inside) answer = BOTS_RESULT_UNSUCCESSFUL;
 
-   message("\n");
-   message("Sim. Variables      = expect / result\n");
-   message("Total population    = %6d / %6d people\n", (int)   res_population, (int) result.total_patients);
-   message("Hospitals           = %6d / %6d people\n", (int)   res_hospitals, (int) result.hosps_number);
-   message("Personnel           = %6d / %6d people\n", (int)   res_personnel, (int) result.hosps_personnel);
-   message("Check-in's          = %6d / %6d people\n", (int)   res_checkin, (int) result.total_hosps_v);
-   message("In Villages         = %6d / %6d people\n", (int)   res_village, (int) result.total_in_village);
-   message("In Waiting List     = %6d / %6d people\n", (int)   res_waiting, (int) result.total_waiting);
-   message("In Assess           = %6d / %6d people\n", (int)   res_assess, (int) result.total_assess);
-   message("Inside Hospital     = %6d / %6d people\n", (int)   res_inside, (int) result.total_inside);
-   message("Average Stay        = %6f / %6f u/time\n", (float) res_avg_stay,(float) result.total_time/result.total_patients);
+   bots_message("\n");
+   bots_message("Sim. Variables      = expect / result\n");
+   bots_message("Total population    = %6d / %6d people\n", (int)   res_population, (int) result.total_patients);
+   bots_message("Hospitals           = %6d / %6d people\n", (int)   res_hospitals, (int) result.hosps_number);
+   bots_message("Personnel           = %6d / %6d people\n", (int)   res_personnel, (int) result.hosps_personnel);
+   bots_message("Check-in's          = %6d / %6d people\n", (int)   res_checkin, (int) result.total_hosps_v);
+   bots_message("In Villages         = %6d / %6d people\n", (int)   res_village, (int) result.total_in_village);
+   bots_message("In Waiting List     = %6d / %6d people\n", (int)   res_waiting, (int) result.total_waiting);
+   bots_message("In Assess           = %6d / %6d people\n", (int)   res_assess, (int) result.total_assess);
+   bots_message("Inside Hospital     = %6d / %6d people\n", (int)   res_inside, (int) result.total_inside);
+   bots_message("Average Stay        = %6f / %6f u/time\n", (float) res_avg_stay,(float) result.total_time/result.total_patients);
 
-   if (bots_verbose_mode >= BOTS_VERBOSE_DEBUG) my_print(top);
+   my_print(top);
 
    return answer;
 }

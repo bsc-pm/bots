@@ -119,59 +119,37 @@ counter_t  exp_num_leaves = 0;
  *  FUNCTIONS                                              *
  ***********************************************************/
 
-// Interpret 32 bit positive integer as value on [0,1)
-double rng_toProb(int n)
-{
-  if (n < 0) {
-    printf("*** toProb: rand n = %d out of range\n",n);
-  }
-  return ((n<0)? 0.0 : ((double) n)/2147483648.0);
-}
-
 void uts_initRoot(Node * root, int type)
 {
    root->height = 0;
    root->numChildren = -1;      // means not yet determined
    rng_init(root->state.state, rootId);
-
-   printf("Root node of type %d at %p\n",type, root);
 }
 
-
-int uts_numChildren_bin(Node * parent)
-{
-  // distribution is identical everywhere below root
-  int    v = rng_rand(parent->state.state);	
-  double d = rng_toProb(v);
-
-  return (d < nonLeafProb) ? nonLeafBF : 0;
-}
-
-int uts_numChildren(Node *parent)
+int uts_numChildren(Node *node)
 {
   int numChildren = 0;
 
-  /* Determine the number of children */
-  if (parent->height == 0)
-     numChildren = (int) floor(b_0);
-  else 
-     numChildren = uts_numChildren_bin(parent);
-  
-  // limit number of children
-  // only a BIN root can have more than MAXNUMCHILDREN
-  if (parent->height == 0) {
-    int rootBF = (int) ceil(b_0);
-    if (numChildren > rootBF) {
-      message("*** Number of children of root truncated from %d to %d\n", numChildren, rootBF);
-      numChildren = rootBF;
-    }
+  // determine the number of children
+  if (node->height == 0) numChildren = (int) floor(b_0);
+  else
+  {
+    // distribution is identical everywhere below root
+    int    v = rng_rand(node->state.state);	
+    double d = rng_toProb(v);
+    numChildren = (d < nonLeafProb) ? nonLeafBF : 0;
   }
-  else {
+  
+  // limit number of children (only a BIN root can have more than MAXNUMCHILDREN)
+  if (node->height != 0) {
     if (numChildren > MAXNUMCHILDREN) {
-      message("*** Number of children truncated from %d to %d\n", numChildren, MAXNUMCHILDREN);
+      bots_debug("*** Number of children truncated from %d to %d\n", numChildren, MAXNUMCHILDREN);
       numChildren = MAXNUMCHILDREN;
     }
   }
+
+  /* including info into node */
+  node->numChildren = numChildren;
 
   return numChildren;
 }
@@ -180,50 +158,33 @@ int uts_numChildren(Node *parent)
  * Recursive depth-first implementation                    *
  ***********************************************************/
 
-int getNumRootChildren(Node *root)
-{
-  int numChildren;
-
-  numChildren = uts_numChildren(root);
-  root->numChildren = numChildren;
-
-  return numChildren;
-}
-
 counter_t serial_uts ( Node *root )
 {
    counter_t num_nodes;
-   message("Computing Unbalance Tree Search algorithm ");
-   num_nodes = serTreeSearch( 0, root, getNumRootChildren(root) );
-   message(" completed!\n");
+   bots_message("Computing Unbalance Tree Search algorithm ");
+   num_nodes = serTreeSearch( 0, root, uts_numChildren(root) );
+   bots_message(" completed!\n");
    return num_nodes;
 }
 
 counter_t serTreeSearch(int depth, Node *parent, int numChildren) 
 {
-  Node n[numChildren], *nodePtr;
-  int i, j;
   counter_t subtreesize = 1, partialCount[numChildren];
+  Node n[numChildren];
+  int i, j;
 
   // Recurse on the children
   for (i = 0; i < numChildren; i++) {
-     nodePtr = &n[i];
-
-     nodePtr->height = parent->height + 1;
-
+     n[i].height = parent->height + 1;
      // The following line is the work (one or more SHA-1 ops)
      for (j = 0; j < computeGranularity; j++) {
-        rng_spawn(parent->state.state, nodePtr->state.state, i);
+        rng_spawn(parent->state.state, n[i].state.state, i);
      }
-
-     nodePtr->numChildren = uts_numChildren(nodePtr);
-
-        partialCount[i] = serTreeSearch(depth+1, nodePtr, nodePtr->numChildren);
+     partialCount[i] = serTreeSearch(depth+1, &n[i], uts_numChildren(&n[i]));
   }
-
-  for (i = 0; i < numChildren; i++) {
-     subtreesize += partialCount[i];
-  }
+ 
+  // computing total size
+  for (i = 0; i < numChildren; i++) subtreesize += partialCount[i];
   
   return subtreesize;
 }
@@ -233,7 +194,7 @@ void uts_read_file ( char *filename )
    FILE *fin;
 
    if ((fin = fopen(filename, "r")) == NULL) {
-      message( "Could not open input file (%s)\n", filename);
+      bots_message( "Could not open input file (%s)\n", filename);
       exit (-1);
    }
    fscanf(fin,"%lf %lf %d %d %d %llu %d %llu",
@@ -251,16 +212,16 @@ void uts_read_file ( char *filename )
    computeGranularity = max(1,computeGranularity);
 
       // Printing input data
-   message("\n");
-   message("Root branching factor                = %f\n", b_0);
-   message("Root seed (0 <= 2^31)                = %d\n", rootId);
-   message("Probability of non-leaf node         = %f\n", nonLeafProb);
-   message("Number of children for non-leaf node = %d\n", nonLeafBF);
-   message("E(n)                                 = %f\n", (double) ( nonLeafProb * nonLeafBF ) );
-   message("E(s)                                 = %f\n", (double) ( 1.0 / (1.0 - nonLeafProb * nonLeafBF) ) );
-   message("Compute granularity                  = %d\n", computeGranularity);
-   message("Tree type                            = %d (%s)\n", type, uts_trees_str[type]);
-   message("Random number generator              = "); rng_showtype();
+   bots_message("\n");
+   bots_message("Root branching factor                = %f\n", b_0);
+   bots_message("Root seed (0 <= 2^31)                = %d\n", rootId);
+   bots_message("Probability of non-leaf node         = %f\n", nonLeafProb);
+   bots_message("Number of children for non-leaf node = %d\n", nonLeafBF);
+   bots_message("E(n)                                 = %f\n", (double) ( nonLeafProb * nonLeafBF ) );
+   bots_message("E(s)                                 = %f\n", (double) ( 1.0 / (1.0 - nonLeafProb * nonLeafBF) ) );
+   bots_message("Compute granularity                  = %d\n", computeGranularity);
+   bots_message("Tree type                            = %d (%s)\n", type, uts_trees_str[type]);
+   bots_message("Random number generator              = "); rng_showtype();
 }
 
 void uts_show_stats( void )
@@ -268,13 +229,13 @@ void uts_show_stats( void )
    int nPes = atoi(bots_resources);
    int chunkSize = 0;
 
-   message("\n");
-   message("Tree size                            = %llu\n", (unsigned long long) bots_number_of_tasks );
-   message("Maximum tree depth                   = %d\n", maxTreeDepth );
-   message("Chunk size                           = %d\n", chunkSize );
-   message("Number of leaves                     = %llu (%.2f%%)\n", nLeaves, nLeaves/(float)bots_number_of_tasks*100.0 ); 
-   message("Wallclock time                       = %.3f sec\n", bots_time_program );
-   message("Overall performance                  = %.0f nodes/sec\n", (bots_number_of_tasks / bots_time_program) );
+   bots_message("\n");
+   bots_message("Tree size                            = %llu\n", (unsigned long long) bots_number_of_tasks );
+   bots_message("Maximum tree depth                   = %d\n", maxTreeDepth );
+   bots_message("Chunk size                           = %d\n", chunkSize );
+   bots_message("Number of leaves                     = %llu (%.2f%%)\n", nLeaves, nLeaves/(float)bots_number_of_tasks*100.0 ); 
+   bots_message("Wallclock time                       = %.3f sec\n", bots_time_program );
+   bots_message("Overall performance                  = %.0f nodes/sec\n", (bots_number_of_tasks / bots_time_program) );
 }
 
 int uts_check_result ( void )
@@ -283,7 +244,7 @@ int uts_check_result ( void )
 
    if ( bots_number_of_tasks != exp_tree_size ) {
       answer = BOTS_RESULT_UNSUCCESSFUL;
-      message("Tree size value is non valid.\n");
+      bots_message("Tree size value is non valid.\n");
    }
 
    return answer;

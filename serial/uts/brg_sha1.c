@@ -59,7 +59,7 @@ void rng_init(RNG_state *newstate, int seed)
   int i;
 
   for (i=0; i < 16; i++) 
-    gen.state[i] = 0;
+  gen.state[i] = 0;
   gen.state[16] = 0xFF & (seed >> 24);
   gen.state[17] = 0xFF & (seed >> 16);
   gen.state[18] = 0xFF & (seed >> 8);
@@ -86,15 +86,23 @@ void rng_spawn(RNG_state *mystate, RNG_state *newstate, int spawnnumber)
 	sha1_end(newstate, &ctx);
 }
 
-int rng_rand(RNG_state *mystate){
-        int r;
-	uint32 b =  (mystate[16] << 24) | (mystate[17] << 16)
-		| (mystate[18] << 8) | (mystate[19] << 0);
-	b = b & POS_MASK;
-	
-	r = (int) b;
-	debug("b: %d\t, r: %d\n", b, r);
-	return r;
+int rng_rand(RNG_state *mystate)
+{
+   int r;
+   uint32 b =  (mystate[16] << 24) | (mystate[17] << 16) | (mystate[18] << 8) | (mystate[19] << 0);
+   b = b & POS_MASK;
+   r = (int) b;
+   bots_debug("b: %d\t, r: %d\n", b, r);
+   return r;
+}
+
+// Interpret 32 bit positive integer as value on [0,1)
+double rng_toProb(int n)
+{
+  if (n < 0) {
+    printf("*** toProb: rand n = %d out of range\n",n);
+  }
+  return ((n<0)? 0.0 : ((double) n)/2147483648.0);
 }
 
 int rng_nextrand(RNG_state *mystate){
@@ -121,7 +129,7 @@ char * rng_showstate(RNG_state *state, char *s){
 
 /* describe random number generator type into string */
 void rng_showtype( void ) {
-  message("SHA-1 (state size = %luB)\n", sizeof(struct state_t));
+  bots_message("SHA-1 (state size = %luB)\n", sizeof(struct state_t));
 }
 
 /** END: UTS RNG Harness **/
@@ -264,14 +272,12 @@ VOID_RETURN sha1_begin(sha1_ctx ctx[1])
 
 /* SHA1 hash data in an array of bytes into hash buffer and */
 /* call the hash_compile function as required.              */
-
 VOID_RETURN sha1_hash(const unsigned char data[], unsigned long len, sha1_ctx ctx[1])
-{   uint_32t pos = (uint_32t)(ctx->count[0] & SHA1_MASK),
-            space = SHA1_BLOCK_SIZE - pos;
+{
+    uint_32t pos = (uint_32t)(ctx->count[0] & SHA1_MASK), space = SHA1_BLOCK_SIZE - pos;
     const unsigned char *sp = data;
 
-    if((ctx->count[0] += len) < len)
-        ++(ctx->count[1]);
+    if((ctx->count[0] += len) < len) ++(ctx->count[1]);
 
     while(len >= space)     /* tranfer whole blocks if possible  */
     {
@@ -285,9 +291,9 @@ VOID_RETURN sha1_hash(const unsigned char data[], unsigned long len, sha1_ctx ct
 }
 
 /* SHA1 final padding and digest calculation  */
-
 VOID_RETURN sha1_end(unsigned char hval[], sha1_ctx ctx[1])
-{   uint_32t    i = (uint_32t)(ctx->count[0] & SHA1_MASK);
+{
+    uint_32t    i = (uint_32t)(ctx->count[0] & SHA1_MASK);
 
     /* put bytes in the buffer in an order in which references to   */
     /* 32-bit words will put bytes with lower addresses into the    */
@@ -331,8 +337,8 @@ VOID_RETURN sha1_end(unsigned char hval[], sha1_ctx ctx[1])
 }
 
 VOID_RETURN sha1(unsigned char hval[], const unsigned char data[], unsigned long len)
-{   sha1_ctx    cx[1];
-
+{
+    sha1_ctx cx[1];
     sha1_begin(cx); sha1_hash(data, len, cx); sha1_end(hval, cx);
 }
 

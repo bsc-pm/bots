@@ -418,30 +418,30 @@ void sort_init ( void )
 {
      /* Checking arguments */
      if (bots_arg_size < 4) {
-        message("%s can not be less than 4, using 4 as a parameter.\n", BOTS_APP_DESC_ARG_SIZE );
+        bots_message("%s can not be less than 4, using 4 as a parameter.\n", BOTS_APP_DESC_ARG_SIZE );
         bots_arg_size = 4;
      }
 
      if (bots_app_cutoff_value < 2) {
-        message("%s can not be less than 2, using 2 as a parameter.\n", BOTS_APP_DESC_ARG_CUTOFF);
+        bots_message("%s can not be less than 2, using 2 as a parameter.\n", BOTS_APP_DESC_ARG_CUTOFF);
         bots_app_cutoff_value = 2;
      }
      else if (bots_app_cutoff_value > bots_arg_size ) {
-        message("%s can not be greather than vector size, using %d as a parameter.\n", BOTS_APP_DESC_ARG_CUTOFF, bots_arg_size);
+        bots_message("%s can not be greather than vector size, using %d as a parameter.\n", BOTS_APP_DESC_ARG_CUTOFF, bots_arg_size);
         bots_app_cutoff_value = bots_arg_size;
      }
 
      if (bots_app_cutoff_value_1 > bots_arg_size ) {
-        message("%s can not be greather than vector size, using %d as a parameter.\n", BOTS_APP_DESC_ARG_CUTOFF_1, bots_arg_size);
+        bots_message("%s can not be greather than vector size, using %d as a parameter.\n", BOTS_APP_DESC_ARG_CUTOFF_1, bots_arg_size);
         bots_app_cutoff_value_1 = bots_arg_size;
      }
      if (bots_app_cutoff_value_2 > bots_arg_size ) {
-        message("%s can not be greather than vector size, using %d as a parameter.\n", BOTS_APP_DESC_ARG_CUTOFF_2, bots_arg_size);
+        bots_message("%s can not be greather than vector size, using %d as a parameter.\n", BOTS_APP_DESC_ARG_CUTOFF_2, bots_arg_size);
         bots_app_cutoff_value_2 = bots_arg_size;
      }
 
      if (bots_app_cutoff_value_2 > bots_app_cutoff_value_1) {
-        message("%s can not be greather than %s, using %d as a parameter.\n",
+        bots_message("%s can not be greather than %s, using %d as a parameter.\n",
                BOTS_APP_DESC_ARG_CUTOFF_2,
                BOTS_APP_DESC_ARG_CUTOFF_1,
                bots_app_cutoff_value_1
@@ -458,9 +458,9 @@ void sort_init ( void )
 
 void sort ( void )
 {
-        message("Computing multisort algorithm (n=%d) ", bots_arg_size);
+        bots_message("Computing multisort algorithm (n=%d) ", bots_arg_size);
 	cilksort(array, tmp, bots_arg_size);
-	message(" completed!\n");
+	bots_message(" completed!\n");
 }
 
 int sort_verify ( void )
