@@ -21,7 +21,7 @@
 LIBS = -lm
 PROGRAM_OBJS=uts.o brg_sha1.o
 
-CUTOFF_VERSIONS = manual if_clause
+#CUTOFF_VERSIONS = manual if_clause
 TIED_VERSIONS = YES
 
 BASE_DIR = ../../

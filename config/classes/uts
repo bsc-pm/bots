@@ -1,5 +1,5 @@
 [test]
-inputs=test.input
+inputs=t3.input
 
 [small]
 inputs=small.input
