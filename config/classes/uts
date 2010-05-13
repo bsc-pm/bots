@@ -6,6 +6,7 @@ inputs=small.input
 
 [medium]
 inputs=medium.input
+ompenv=OMP_STACKSIZE="55M"
 
 [large]
 inputs=large.input
