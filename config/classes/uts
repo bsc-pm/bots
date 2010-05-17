@@ -1,8 +1,10 @@
 [test]
-inputs=t3.input
+inputs=test.input
+ompenv=OMP_STACKSIZE="1M"
 
 [small]
 inputs=small.input
+ompenv=OMP_STACKSIZE="1M"
 
 [medium]
 inputs=medium.input
@@ -10,4 +12,5 @@ ompenv=OMP_STACKSIZE="55M"
 
 [large]
 inputs=large.input
+ompenv=OMP_STACKSIZE="150M"
 
