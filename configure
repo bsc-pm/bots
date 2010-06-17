@@ -85,13 +85,16 @@ if [ -z "$COMPILER" ]; then
    fi
 fi
 
+
+[ "$debug" = "yes" ] && DEBUG=-DBOTS_DEBUG
+
 if [ "$COMPILER" = "gcc" -a "$GCC" = "yes" ]; then
 	CC=gcc
 	CLINK=$CC
 	OMPC="$CC -fopenmp"
 	OMPLINK="$CC -fopenmp"
 	LABEL=gcc
-	[ "$debug" = "yes" ] && DEBUG=-g
+	[ "$debug" = "yes" ] && DEBUG=$DEBUG -g
 
 	OPT_FLAGS=-O3
 	CC_FLAGS=$DEBUG
@@ -106,7 +109,7 @@ if [ "$COMPILER" = "icc" -a "$ICC" = "yes" ]; then
 	OMPC="$CC -openmp"
 	OMPLINK="$CC -openmp"
 	LABEL=icc
-	[ "$debug" = "yes" ] && DEBUG=-g
+	[ "$debug" = "yes" ] && DEBUG=$DEBUG -g
 
 	OPT_FLAGS=-O2
 	CC_FLAGS=$DEBUG
@@ -127,7 +130,7 @@ if [ "$COMPILER" = "mcc" -a "$MCC" = "yes" ]; then
 	OMPC=$CC
 	OMPLINK=$CC
 	LABEL=mcc
-	[ "$debug" = "yes" ] && DEBUG=-g
+	[ "$debug" = "yes" ] && DEBUG=$DEBUG -g
 
 	OPT_FLAGS=-O3
 	CC_FLAGS="$DEBUG --no-openmp"
@@ -144,7 +147,7 @@ if [ "$COMPILER" = "xlc" -a "$XLC" = "yes" ]; then
 	OMPC="$CC -qsmp=omp"
 	OMPLINK=$OMPC
 	LABEL=xlc
-	[ "$debug" = "yes" ] && DEBUG=-g
+	[ "$debug" = "yes" ] && DEBUG=$DEBUG -g
 
 	OPT_FLAGS=-O3
 	CC_FLAGS=$DEBUG
@@ -159,7 +162,7 @@ if [ "$COMPILER" = "pgi" -a "$PGI" = "yes" ]; then
         OMPC="$CC -mp -Minfo=mp"
         OMPLINK=$OMPC
 	LABEL=pgi
-        [ "$debug" = "yes" ] && DEBUG=-g
+        [ "$debug" = "yes" ] && DEBUG=$DEBUG -g
 
         OPT_FLAGS=-fast
         CC_FLAGS=$DEBUG
@@ -174,7 +177,7 @@ if [ "$COMPILER" = "sunstudio" -a "$SUN" = "yes" ]; then
         OMPC="$CC -xopenmp"           
         OMPLINK=$OMPC                 
 	LABEL=suns
-        [ "$debug" = "yes" ] && DEBUG=-g
+        [ "$debug" = "yes" ] && DEBUG=$DEBUG -g
 
         OPT_FLAGS=-fast
         CC_FLAGS=$DEBUG

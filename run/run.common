@@ -71,14 +71,16 @@ parse_class_file ()
 			done
 		else
 			[ "$skip" ] && continue
-			key=${line%=*}
+			key=${line%%=*}
 			value=${line#*=}
 	
 			case $key in
 				sizes)  eval ${class}_input=$value;;
 				inputs) eval ${class}_input=$value;;
 				cutoff) eval ${class}_cutoff=$value;;
+				ompenv) eval ${class}_ompenv="$value";;
 			esac
+
 		fi
 	done < $file
 }
@@ -242,7 +244,7 @@ exec_external ()
 		EXEC=$(echo $EXEC | sed s@%input%@${basefile}${size}${pair}@ )
 	fi
 
-	$EXEC
+	eval $EXEC
 }
 
 exec_app ()
@@ -337,18 +339,27 @@ case $mode in
 esac
 
 CLASS=
-eval "cutoff=\$${class}_cutoff"
-if [ $cutoff ]; then
-   case $version in
-        omp-tasks-if_clause* | omp-tasks-manual* | omp-tasks-final* | omp-tasks-final_ser*)  
-		CLASS="$CLASS -x $cutoff" ;;
-   esac
+case $version in
+   omp-tasks-if_clause* | omp-tasks-manual* | omp-tasks-final* | omp-tasks-final_ser*)  
+       eval "cutoff=\$${class}_cutoff"
+       if [ $cutoff ]; then
+  	   CLASS="$CLASS -x $cutoff" 
+       fi
+       ;;
+esac
+
+ENV=
+case $version in
+   omp*)
+       eval "ENV=\$${class}_ompenv"
+       ;;
+esac
    
-fi
 
 
 [ "$VERBOSE" ] && echo "Executing $APP ($label,$version) with $cpus CPUS"
-exec_app $APP $label $version $cpus $INPUT $CLASS $VERIFY $EXTRA
+
+eval $ENV exec_app $APP $label $version $cpus $INPUT $CLASS $VERIFY $EXTRA
 
 done
 done
