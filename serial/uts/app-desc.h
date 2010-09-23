@@ -35,6 +35,8 @@
 
 #define KERNEL_INIT uts_initRoot(&root, type);
 
+unsigned long long serial_uts ( Node * );
+
 #define KERNEL_CALL bots_number_of_tasks = serial_uts(&root);
  
 #define KERNEL_FINI uts_show_stats();

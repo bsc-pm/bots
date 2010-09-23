@@ -223,6 +223,7 @@ exec_omp ()
 	shift 2
 
 	OMP_NUM_THREADS=$cpus $command $*
+	return 0
 }
 
 exec_external ()

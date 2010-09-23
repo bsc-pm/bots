@@ -34,6 +34,8 @@
 
 #define KERNEL_INIT uts_initRoot(&root, type);
 
+unsigned long long parallel_uts ( Node *);
+
 #define KERNEL_CALL bots_number_of_tasks = parallel_uts(&root);
  
 #define KERNEL_FINI uts_show_stats();

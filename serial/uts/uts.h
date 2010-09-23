@@ -65,13 +65,11 @@ extern int    computeGranularity;
 extern int    debug;
 extern int    verbose;
 
-typedef unsigned long long counter_t; // for the count
-
 /* Utility Functions */
 #define max(a,b) (((a) > (b)) ? (a) : (b))
 #define min(a,b) (((a) < (b)) ? (a) : (b))
 
-counter_t serTreeSearch(int depth, Node *parent, int numChildren);
+unsigned long long serTreeSearch(int depth, Node *parent, int numChildren);
 
 int    uts_paramsToStr(char *strBuf, int ind);
 void   uts_read_file(char *file);

@@ -71,7 +71,7 @@
 /***********************************************************
  *  Global state                                           *
  ***********************************************************/
-counter_t nLeaves = 0;
+unsigned long long nLeaves = 0;
 int maxTreeDepth = 0;
 /***********************************************************
  *  tree generation and search parameters                  *
@@ -112,9 +112,9 @@ int computeGranularity = 1;
 /***********************************************************
  * expected results for execution
  ***********************************************************/
-counter_t  exp_tree_size = 0;
+unsigned long long  exp_tree_size = 0;
 int        exp_tree_depth = 0;
-counter_t  exp_num_leaves = 0;
+unsigned long long  exp_num_leaves = 0;
 /***********************************************************
  *  FUNCTIONS                                              *
  ***********************************************************/
@@ -188,9 +188,9 @@ int getNumRootChildren(Node *root)
   return numChildren;
 }
 
-counter_t parallel_uts ( Node *root )
+unsigned long long parallel_uts ( Node *root )
 {
-   counter_t num_nodes;
+   unsigned long long num_nodes = 0 ;
 
    bots_message("Computing Unbalance Tree Search algorithm ");
    #pragma omp parallel  
@@ -202,11 +202,11 @@ counter_t parallel_uts ( Node *root )
    return num_nodes;
 }
 
-counter_t parTreeSearch(int depth, Node *parent, int numChildren) 
+unsigned long long parTreeSearch(int depth, Node *parent, int numChildren) 
 {
   Node n[numChildren], *nodePtr;
   int i, j;
-  counter_t subtreesize = 1, partialCount[numChildren];
+  unsigned long long subtreesize = 1, partialCount[numChildren];
 
   // Recurse on the children
   for (i = 0; i < numChildren; i++) {
@@ -239,7 +239,7 @@ void uts_read_file ( char *filename )
    FILE *fin;
 
    if ((fin = fopen(filename, "r")) == NULL) {
-      bots_message( "Could not open input file (%s)\n", filename);
+      bots_message("Could not open input file (%s)\n", filename);
       exit (-1);
    }
    fscanf(fin,"%lf %lf %d %d %d %llu %d %llu",
@@ -291,7 +291,7 @@ int uts_check_result ( void )
 
    if ( bots_number_of_tasks != exp_tree_size ) {
       answer = BOTS_RESULT_UNSUCCESSFUL;
-      bots_message("Tree size value is non valid.\n");
+      bots_message("Incorrect tree size result (%llu instead of %llu).\n", bots_number_of_tasks, exp_tree_size);
    }
 
    return answer;

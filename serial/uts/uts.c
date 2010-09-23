@@ -71,7 +71,7 @@
 /***********************************************************
  *  Global state                                           *
  ***********************************************************/
-counter_t nLeaves = 0;
+unsigned long long nLeaves = 0;
 int maxTreeDepth = 0;
 /***********************************************************
  *  tree generation and search parameters                  *
@@ -112,9 +112,9 @@ int computeGranularity = 1;
 /***********************************************************
  * expected results for execution
  ***********************************************************/
-counter_t  exp_tree_size = 0;
+unsigned long long  exp_tree_size = 0;
 int        exp_tree_depth = 0;
-counter_t  exp_num_leaves = 0;
+unsigned long long  exp_num_leaves = 0;
 /***********************************************************
  *  FUNCTIONS                                              *
  ***********************************************************/
@@ -158,18 +158,18 @@ int uts_numChildren(Node *node)
  * Recursive depth-first implementation                    *
  ***********************************************************/
 
-counter_t serial_uts ( Node *root )
+unsigned long long serial_uts ( Node *root )
 {
-   counter_t num_nodes;
+   unsigned long long num_nodes;
    bots_message("Computing Unbalance Tree Search algorithm ");
    num_nodes = serTreeSearch( 0, root, uts_numChildren(root) );
    bots_message(" completed!\n");
    return num_nodes;
 }
 
-counter_t serTreeSearch(int depth, Node *parent, int numChildren) 
+unsigned long long serTreeSearch(int depth, Node *parent, int numChildren) 
 {
-  counter_t subtreesize = 1, partialCount[numChildren];
+  unsigned long long subtreesize = 1, partialCount[numChildren];
   Node n[numChildren];
   int i, j;
 
@@ -244,7 +244,7 @@ int uts_check_result ( void )
 
    if ( bots_number_of_tasks != exp_tree_size ) {
       answer = BOTS_RESULT_UNSUCCESSFUL;
-      bots_message("Tree size value is non valid.\n");
+      bots_message("Incorrect tree size result (%llu instead of %llu).\n", bots_number_of_tasks, exp_tree_size);
    }
 
    return answer;

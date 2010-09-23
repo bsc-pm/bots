@@ -77,7 +77,7 @@ char bots_cutoff[128];
 /* time variables */
 double bots_time_program = 0.0;
 double bots_time_sequential = 0.0;
-int    bots_number_of_tasks = 0;
+unsigned long long bots_number_of_tasks = 0; /* forcing 8 bytes size in -m32 and -m64 */
 
 /*
  * Application dependent info
