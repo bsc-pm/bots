@@ -30,7 +30,7 @@
 #define BOTS_APP_DESC_ARG_SIZE "Matrix Size"
 
 #define BOTS_APP_INIT int i;\
-     COMPLEX *in, *out1, *out2;\
+     COMPLEX *in, *out1=NULL, *out2=NULL;\
      in = malloc(bots_arg_size * sizeof(COMPLEX));\
 
 #define KERNEL_INIT\
