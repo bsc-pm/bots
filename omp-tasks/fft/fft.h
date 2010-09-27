@@ -2,7 +2,7 @@
 #define FFT_H
 
 /* our real numbers */
-typedef float REAL;
+typedef double REAL;
 
 /* Complex numbers and operations */
 typedef struct {
