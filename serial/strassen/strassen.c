@@ -44,9 +44,6 @@
 /*FIXME: change to parameter ???*/
 #define SizeAtWhichNaiveAlgorithmIsMoreEfficient 16
 
-extern int bots_arg_block;
-extern int bots_arg_size;
-
 /***********************************************************************
  * maximum tolerable relative error (for the checking routine)
  **********************************************************************/
