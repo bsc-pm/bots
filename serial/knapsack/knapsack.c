@@ -121,7 +121,7 @@ void knapsack(struct item *e, int c, int n, int v, int *sol)
 
      *sol = best;
 }
-void knapsack_main(struct item *e, int c, int n, int v, int *sol)
+void knapsack_main(struct item *e, int c, int n, int *sol)
 {
      best_so_far = INT_MIN;
      knapsack(e, c, n, 0, sol);

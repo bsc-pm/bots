@@ -293,7 +293,7 @@ void knapsack_seq(struct item *e, int c, int n, int v, int *sol)
 
      *sol = best;
 }
-void knapsack_main_par (struct item *e, int c, int n, int v, int *sol)
+void knapsack_main_par (struct item *e, int c, int n, int *sol)
 {
      best_so_far = INT_MIN;
 
@@ -311,7 +311,7 @@ void knapsack_main_par (struct item *e, int c, int n, int v, int *sol)
      }
      if (bots_verbose_mode) printf("Best value for parallel execution is %d\n\n", *sol);
 }
-void knapsack_main_seq (struct item *e, int c, int n, int v, int *sol)
+void knapsack_main_seq (struct item *e, int c, int n, int *sol)
 {
      best_so_far = INT_MIN;
      number_of_tasks = 0;

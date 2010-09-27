@@ -19,7 +19,7 @@ struct item {
 int compare(struct item *a, struct item *b);
 int read_input(const char *filename, struct item *items, int *capacity, int *n);
 void knapsack(struct item *e, int c, int n, int v, int *sol);
-void knapsack_main (struct item *e, int c, int n, int v, int *sol);
+void knapsack_main (struct item *e, int c, int n, int *sol);
 
 #define BOTS_APP_INIT\
      struct item items[MAX_ITEMS];\
@@ -28,7 +28,7 @@ void knapsack_main (struct item *e, int c, int n, int v, int *sol);
      read_input(bots_arg_file, items, &capacity, &n);
 
 #define KERNEL_INIT 
-#define KERNEL_CALL knapsack_main(items, capacity, n, 0, &sol);
+#define KERNEL_CALL knapsack_main(items, capacity, n, &sol);
 #define KERNEL_FINI
 
 //#define KERNEL_SEQ_INIT 
