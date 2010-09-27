@@ -18,34 +18,16 @@
 /*  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA            */
 /**********************************************************************************************/
 
-#define BOTS_PARAM_TYPE_NONE 0
-#define BOTS_PARAM_TYPE_INT 1
-#define BOTS_PARAM_TYPE_BOOL 2
-#define BOTS_PARAM_TYPE_STR 3
+/* Original code from the Application Kernel Matrix by Cray */
 
-#ifdef _OPENMP
-# include <omp.h>
-#else
-# define omp_get_max_threads()  1
-# define omp_get_thread_num()   0
-# define omp_set_num_threads(x)
+#ifndef SEQUENCE_H
+#define SEQUENCE_H
+
+size_t strlcpy(char *dst, const char *src, size_t size);
+void fill_chartab(char *chartab);
+void encode(char *seq, char *naseq, int l);
+void alloc_aln(int nseqs);
+char * get_seq(char *sname, int *len, char *chartab, FILE *fin);
+int readseqs(char *filename);
+
 #endif
-
-void bots_print_usage(void);
-void bots_print_usage_option(char opt, int type, char* description, char *val, int subc, char **subv);
-
-/***********************************************************************
- * BENCHMARK HEADERS 
- *********************************************************************/
-void bots_initialize();
-void bots_finalize();
-void bots_sequential_ini();
-long bots_sequential();
-void bots_sequential_fini();
-int bots_check_result();
-void bots_print_usage_specific();
-void bots_get_params_specific(int argc, char **argv);
-void bots_set_info();
-
-void bots_get_params_common(int argc, char **argv);
-void bots_get_params(int argc, char **argv);

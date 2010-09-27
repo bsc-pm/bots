@@ -35,19 +35,6 @@
 #include "app-desc.h"
 
 /***********************************************************************
- * BENCHMARK HEADERS 
- *********************************************************************/
-void bots_initialize();
-void bots_finalize();
-void bots_sequential_ini();
-long bots_sequential();
-void bots_sequential_fini();
-int bots_check_result();
-void bots_print_usage_specific();
-void bots_get_params_specific(int argc, char **argv);
-void bots_set_info();
-
-/***********************************************************************
  * DEFAULT VALUES 
  *********************************************************************/
 /* common flags */
