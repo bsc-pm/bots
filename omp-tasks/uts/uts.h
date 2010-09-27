@@ -45,16 +45,7 @@ typedef struct node_t Node;
  *   generated with geometric distributions near the
  *   root and binomial distributions towards the leaves.
  */
-enum   uts_trees_e    { BIN = 0 };
-
-typedef enum uts_trees_e    tree_t;
-
-/* Strings for the above enums */
-extern char * uts_trees_str[];
-
-
 /* Tree  parameters */
-extern tree_t     type;
 extern double     b_0;
 extern int        rootId;
 extern int        nonLeafBF;
@@ -75,15 +66,16 @@ int    uts_paramsToStr(char *strBuf, int ind);
 void   uts_read_file(char *file);
 void   uts_print_params();
 
-void   uts_showStats( void );
-
 double rng_toProb(int n);
 
 /* Common tree routines */
-void   uts_initRoot(Node * root, int type);
+void   uts_initRoot(Node * root);
 int    uts_numChildren(Node *parent);
 int    uts_numChildren_bin(Node * parent);
 int    uts_numChildren_geo(Node * parent);
 int    uts_childType(Node *parent);
+
+void uts_show_stats( void );
+int uts_check_result ( void );
 
 #endif /* _UTS_H */

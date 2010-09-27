@@ -74,26 +74,18 @@
 unsigned long long nLeaves = 0;
 int maxTreeDepth = 0;
 /***********************************************************
- *  tree generation and search parameters                  *
+ * Tree generation strategy is controlled via various      *
+ * parameters set from the command line.  The parameters   *
+ * and their default values are given below.               *
+ * Trees are generated using a Galton-Watson process, in   *
+ * which the branching factor of each node is a random     *
+ * variable.                                               *
  *                                                         *
- *  Tree generation strategy is controlled via various     *
- *  parameters set from the command line.  The parameters  *
- *  and their default values are given below.              *
+ * The random variable follow a binomial distribution.     *
  ***********************************************************/
-char * uts_trees_str[]     = { "Binomial" };
-/***********************************************************
- * Tree type
- *   Trees are generated using a Galton-Watson process, in 
- *   which the branching factor of each node is a random 
- *   variable.
- *   
- *   The random variable follow a binomial distribution.
- ***********************************************************/
-tree_t type  = BIN; // Default tree type
 double b_0   = 4.0; // default branching factor at the root
 int   rootId = 0;   // default seed for RNG state at root
 /***********************************************************
- *  Tree type BIN (BINOMIAL)
  *  The branching factor at the root is specified by b_0.
  *  The branching factor below the root follows an 
  *     identical binomial distribution at all nodes.
@@ -128,13 +120,13 @@ double rng_toProb(int n)
   return ((n<0)? 0.0 : ((double) n)/2147483648.0);
 }
 
-void uts_initRoot(Node * root, int type)
+void uts_initRoot(Node * root)
 {
    root->height = 0;
    root->numChildren = -1;      // means not yet determined
    rng_init(root->state.state, rootId);
 
-   bots_message("Root node of type %d at %p\n",type, root);
+   bots_message("Root node at %p\n", root);
 }
 
 
@@ -178,25 +170,18 @@ int uts_numChildren(Node *parent)
  * Recursive depth-first implementation                    *
  ***********************************************************/
 
-int getNumRootChildren(Node *root)
-{
-  int numChildren;
-
-  numChildren = uts_numChildren(root);
-  root->numChildren = numChildren;
-
-  return numChildren;
-}
-
 unsigned long long parallel_uts ( Node *root )
 {
    unsigned long long num_nodes = 0 ;
+   root->numChildren = uts_numChildren(root);
 
    bots_message("Computing Unbalance Tree Search algorithm ");
+
    #pragma omp parallel  
       #pragma omp single nowait
       #pragma omp task untied
-        num_nodes = parTreeSearch( 0, root, getNumRootChildren(root) );
+        num_nodes = parTreeSearch( 0, root, root->numChildren );
+
    bots_message(" completed!");
 
    return num_nodes;
@@ -265,7 +250,6 @@ void uts_read_file ( char *filename )
    bots_message("E(n)                                 = %f\n", (double) ( nonLeafProb * nonLeafBF ) );
    bots_message("E(s)                                 = %f\n", (double) ( 1.0 / (1.0 - nonLeafProb * nonLeafBF) ) );
    bots_message("Compute granularity                  = %d\n", computeGranularity);
-   bots_message("Tree type                            = %d (%s)\n", type, uts_trees_str[type]);
    bots_message("Random number generator              = "); rng_showtype();
 }
 
