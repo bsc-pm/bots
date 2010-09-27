@@ -30,6 +30,7 @@
 #include <memory.h>
 #include <alloca.h>
 #include "bots.h"
+#include "app-desc.h"
 #include <omp.h>
 
 
@@ -53,8 +54,10 @@ static int solutions[] = {
 };
 #define MAX_SOLUTIONS sizeof(solutions)/sizeof(int)
 
+#ifdef FORCE_TIED_TASKS
 int mycount=0;
 #pragma omp threadprivate(mycount)
+#endif
 
 int total_count;
 
@@ -80,9 +83,16 @@ int ok(int n, char *a)
      return 1;
 }
 
+#ifndef FORCE_TIED_TASKS
 void nqueens_ser (int n, int j, char *a, int *solutions)
+#else
+void nqueens_ser (int n, int j, char *a)
+#endif
 {
-	int i,res;
+#ifndef FORCE_TIED_TASKS
+	int res;
+#endif
+	int i;
 
 	if (n == j) {
 		/* good solution, count it */
@@ -98,16 +108,17 @@ void nqueens_ser (int n, int j, char *a, int *solutions)
 	*solutions = 0;
 #endif
 
-
      	/* try each possible position for queen <j> */
 	for (i = 0; i < n; i++) {
 		{
 	  		/* allocate a temporary array and copy <a> into it */
-	  		a[j] = i;
+	  		a[j] = (char) i;
 	  		if (ok(j + 1, a)) {
-	       			nqueens_ser(n, j + 1, a,&res);
 #ifndef FORCE_TIED_TASKS
+	       			nqueens_ser(n, j + 1, a,&res);
 				*solutions += res;
+#else
+	       			nqueens_ser(n, j + 1, a);
 #endif
 			}
 		}
@@ -116,11 +127,16 @@ void nqueens_ser (int n, int j, char *a, int *solutions)
 
 #if defined(IF_CUTOFF)
 
+#ifndef FORCE_TIED_TASKS
 void nqueens(int n, int j, char *a, int *solutions, int depth)
+#else
+void nqueens(int n, int j, char *a, int depth)
+#endif
 {
-	int i;
+#ifndef FORCE_TIED_TASKS
 	int *csols;
-
+#endif
+	int i;
 
 	if (n == j) {
 		/* good solution, count it */
@@ -146,9 +162,13 @@ void nqueens(int n, int j, char *a, int *solutions, int depth)
 	  		/* allocate a temporary array and copy <a> into it */
 	  		char * b = alloca((j + 1) * sizeof(char));
 	  		memcpy(b, a, j * sizeof(char));
-	  		b[j] = i;
+	  		b[j] = (char) i;
 	  		if (ok(j + 1, b))
+#ifndef FORCE_TIED_TASKS
 	       			nqueens(n, j + 1, b,&csols[i],depth+1);
+#else
+	       			nqueens(n, j + 1, b,depth+1);
+#endif
 		}
 	}
 
@@ -160,10 +180,16 @@ void nqueens(int n, int j, char *a, int *solutions, int depth)
 
 #elif defined(FINAL_CUTOFF)
 
+#ifndef FORCE_TIED_TASKS
 void nqueens(int n, int j, char *a, int *solutions, int depth)
+#else
+void nqueens(int n, int j, char *a, int depth)
+#endif
 {
-	int i;
+#ifndef FORCE_TIED_TASKS
 	int *csols;
+#endif
+	int i;
 
 
 	if (n == j) {
@@ -203,7 +229,11 @@ void nqueens(int n, int j, char *a, int *solutions, int depth)
                         } 
 	  		b[j] = i;
 	  		if (ok(j + 1, b))
+#ifndef FORCE_TIED_TASKS
 	       			nqueens(n, j + 1, b,sol,depth+1);
+#else
+	       			nqueens(n, j + 1, b,depth+1);
+#endif
 		}
 	}
 
@@ -217,10 +247,16 @@ void nqueens(int n, int j, char *a, int *solutions, int depth)
 
 #elif defined(MANUAL_CUTOFF)
 
+#ifndef FORCE_TIED_TASKS
 void nqueens(int n, int j, char *a, int *solutions, int depth)
+#else
+void nqueens(int n, int j, char *a, int depth)
+#endif
 {
-	int i;
+#ifndef FORCE_TIED_TASKS
 	int *csols;
+#endif
+	int i;
 
 
 	if (n == j) {
@@ -248,14 +284,22 @@ void nqueens(int n, int j, char *a, int *solutions, int depth)
 	  			/* allocate a temporary array and copy <a> into it */
 	  			char * b = alloca((j + 1) * sizeof(char));
 	  			memcpy(b, a, j * sizeof(char));
-	  			b[j] = i;
+	  			b[j] = (char) i;
 	  			if (ok(j + 1, b))
+#ifndef FORCE_TIED_TASKS
 	       				nqueens(n, j + 1, b,&csols[i],depth+1);
+#else
+		       			nqueens(n, j + 1, b,depth+1);
+#endif
 			}
 		} else {
-  			a[j] = i;
+  			a[j] = (char) i;
   			if (ok(j + 1, a))
+#ifndef FORCE_TIED_TASKS
        				nqueens_ser(n, j + 1, a,&csols[i]);
+#else
+	       			nqueens_ser(n, j + 1, a);
+#endif
 		}
 	}
 
@@ -268,10 +312,16 @@ void nqueens(int n, int j, char *a, int *solutions, int depth)
 
 #else 
 
+#ifndef FORCE_TIED_TASKS
 void nqueens(int n, int j, char *a, int *solutions, int depth)
+#else
+void nqueens(int n, int j, char *a, int depth)
+#endif
 {
-	int i;
+#ifndef FORCE_TIED_TASKS
 	int *csols;
+#endif
+	int i;
 
 
 	if (n == j) {
@@ -298,9 +348,13 @@ void nqueens(int n, int j, char *a, int *solutions, int depth)
 	  		/* allocate a temporary array and copy <a> into it */
 	  		char * b = alloca((j + 1) * sizeof(char));
 	  		memcpy(b, a, j * sizeof(char));
-	  		b[j] = i;
+	  		b[j] = (char) i;
 	  		if (ok(j + 1, b))
-	       			nqueens(n, j + 1, b,&csols[i],depth);
+#ifndef FORCE_TIED_TASKS
+       				nqueens(n, j + 1, b,&csols[i],depth); //FIXME: depth or depth+1 ???
+#else
+	       			nqueens(n, j + 1, b,depth); //FIXME: see above
+#endif
 		}
 	}
 
@@ -324,7 +378,11 @@ void find_queens (int size)
 			char *a;
 
 			a = alloca(size * sizeof(char));
+#ifndef FORCE_TIED_TASKS
 			nqueens(size, 0, a, &total_count,0);
+#else
+			nqueens(size, 0, a, 0);
+#endif
 		}
 #ifdef FORCE_TIED_TASKS
 		#pragma omp atomic

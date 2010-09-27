@@ -28,6 +28,8 @@
 #define BOTS_APP_DEF_ARG_SIZE 14
 #define BOTS_APP_DESC_ARG_SIZE "Board size"
 
+int ok(int n, char *a);
+void nqueens (int n, int j, char *a, int *solutions);
 int verify_queens(int);
 void find_queens (int);
 

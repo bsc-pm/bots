@@ -28,6 +28,20 @@
 #define BOTS_APP_DEF_ARG_SIZE 14
 #define BOTS_APP_DESC_ARG_SIZE "Board size"
 
+int ok(int n, char *a);
+
+#ifndef FORCE_TIED_TASKS
+void nqueens(int n, int j, char *a, int *solutions, int depth);
+#else
+void nqueens(int n, int j, char *a, int depth);
+#endif
+
+#ifndef FORCE_TIED_TASKS
+void nqueens_ser (int n, int j, char *a, int *solutions);
+#else
+void nqueens_ser (int n, int j, char *a);
+#endif
+
 int verify_queens(int);
 void find_queens (int);
 

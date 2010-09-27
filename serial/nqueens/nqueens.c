@@ -30,6 +30,7 @@
 #include <memory.h>
 #include <alloca.h>
 #include "bots.h"
+#include "app-desc.h"
 
 
 /* Checking information */
@@ -89,7 +90,7 @@ void nqueens (int n, int j, char *a, int *solutions)
 
      	/* try each possible position for queen <j> */
 	for (i = 0; i < n; i++) {
-		a[j] = i;
+		a[j] = (char) i;
 		if (ok(j + 1, a)) {
 		       	nqueens(n, j + 1, a,&res);
 			*solutions += res;
