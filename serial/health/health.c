@@ -436,7 +436,6 @@ void my_print(struct Village *village)
 {
    struct Village *vlist;
    struct Patient *plist;
-   struct Patient *p;
 
    if (village == NULL) return;
 
@@ -450,9 +449,8 @@ void my_print(struct Village *village)
    plist = village->population;
 
    while (plist != NULL) {
-      p = plist;
+      bots_debug("[pid:%d]",plist->id);
       plist = plist->forward; 
-      bots_debug("[pid:%d]",p->id);
    }
    bots_debug("[vid:%d]\n",village->id);
 
