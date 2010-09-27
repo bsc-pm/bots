@@ -17,26 +17,24 @@
 /*  along with this program; if not, write to the Free Software                               */
 /*  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA            */
 /**********************************************************************************************/
+#ifndef FIB_H
+#define FIB_H
+#if defined(IF_CUTOFF)
+int fib (int n,int d);
+#elif defined(FINAL_CUTOFF)
+int fib (int n,int d);
+#elif defined(MANUAL_CUTOFF)
+int fib (int n,int d);
+#else
+int fib (int n);
+#endif
 
-#include "bots.h"
-#include "fib.h"
+int fib_seq (int n);
 
-static int res;
+void fib0 (int n);
+void fib0_seq (int n);
 
-int fib (int n)
-{
-	int x, y;
-	if (n < 2) return n;
-
-	x = fib(n - 1);
-	y = fib(n - 2);
-
-	return x + y;
-}
-
-void fib0 (int n)
-{
-	res = fib(n);
-	bots_message("Fibonacci result for %d is %d\n",n,res);
-}
+int fib_verify (int n);
+int fib_verify_value(int n);
+#endif
 

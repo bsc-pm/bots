@@ -17,26 +17,9 @@
 /*  along with this program; if not, write to the Free Software                               */
 /*  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA            */
 /**********************************************************************************************/
-
-#include "bots.h"
-#include "fib.h"
-
-static int res;
-
-int fib (int n)
-{
-	int x, y;
-	if (n < 2) return n;
-
-	x = fib(n - 1);
-	y = fib(n - 2);
-
-	return x + y;
-}
-
-void fib0 (int n)
-{
-	res = fib(n);
-	bots_message("Fibonacci result for %d is %d\n",n,res);
-}
+#ifndef FIB_H
+#define FIB_H
+int fib (int n);
+void fib0 (int n);
+#endif
 
