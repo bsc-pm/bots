@@ -67,8 +67,6 @@
 #include "bots.h"
 #include "app-desc.h"
 
-typedef long ELM;
-
 static unsigned long rand_nxt = 0;
 
 static inline unsigned long my_rand(void)
@@ -188,8 +186,7 @@ void seqquick(ELM *low, ELM *high)
      insertion_sort(low, high);
 }
 
-void seqmerge(ELM *low1, ELM *high1, ELM *low2, ELM *high2,
-	      ELM *lowdest)
+void seqmerge(ELM *low1, ELM *high1, ELM *low2, ELM *high2, ELM *lowdest)
 {
      ELM a1, a2;
 
@@ -292,8 +289,7 @@ ELM *binsplit(ELM val, ELM *low, ELM *high)
 	  return low;
 }
 
-void cilkmerge(ELM *low1, ELM *high1, ELM *low2,
-		    ELM *high2, ELM *lowdest)
+void cilkmerge(ELM *low1, ELM *high1, ELM *low2, ELM *high2, ELM *lowdest)
 {
      /*
       * Cilkmerge: Merges range [low1, high1] with range [low2, high2] 

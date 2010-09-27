@@ -40,6 +40,19 @@
 #define BOTS_APP_DEF_ARG_CUTOFF_2 (20)
 #define BOTS_APP_DESC_ARG_CUTOFF_2 "Sequential Insertion cutoff value"
 
+typedef long ELM;
+
+void seqquick(ELM *low, ELM *high); 
+void seqmerge(ELM *low1, ELM *high1, ELM *low2, ELM *high2, ELM *lowdest);
+ELM *binsplit(ELM val, ELM *low, ELM *high); 
+void cilkmerge(ELM *low1, ELM *high1, ELM *low2, ELM *high2, ELM *lowdest);
+void cilkmerge_par(ELM *low1, ELM *high1, ELM *low2, ELM *high2, ELM *lowdest);
+void cilksort(ELM *low, ELM *tmp, long size);
+void cilksort_par(ELM *low, ELM *tmp, long size);
+void scramble_array( ELM *array ); 
+void fill_array( ELM *array ); 
+void sort ( void ); 
+
 void sort_par (void);
 void sort_init (void);
 int sort_verify (void);

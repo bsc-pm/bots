@@ -67,8 +67,6 @@
 #include "bots.h"
 #include "app-desc.h"
 
-typedef long ELM;
-
 ELM *array, *tmp;
 
 static unsigned long rand_nxt = 0;
