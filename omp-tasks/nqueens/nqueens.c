@@ -160,7 +160,7 @@ void nqueens(int n, int j, char *a, int depth)
  		#pragma omp task untied if(depth < bots_cutoff_value)
 		{
 	  		/* allocate a temporary array and copy <a> into it */
-	  		char * b = alloca((j + 1) * sizeof(char));
+	  		char * b = alloca(n * sizeof(char));
 	  		memcpy(b, a, j * sizeof(char));
 	  		b[j] = (char) i;
 	  		if (ok(j + 1, b))
@@ -223,7 +223,7 @@ void nqueens(int n, int j, char *a, int depth)
                            sol = solutions;
                         } else {
 	  		/* allocate a temporary array and copy <a> into it */
-	  		   b = alloca((j + 1) * sizeof(char));
+	  		   b = alloca(n * sizeof(char));
 	  		   memcpy(b, a, j * sizeof(char));
                            sol = &csols[i];
                         } 
@@ -282,7 +282,7 @@ void nqueens(int n, int j, char *a, int depth)
  			#pragma omp task untied
 			{
 	  			/* allocate a temporary array and copy <a> into it */
-	  			char * b = alloca((j + 1) * sizeof(char));
+	  			char * b = alloca(n * sizeof(char));
 	  			memcpy(b, a, j * sizeof(char));
 	  			b[j] = (char) i;
 	  			if (ok(j + 1, b))
@@ -346,7 +346,7 @@ void nqueens(int n, int j, char *a, int depth)
  		#pragma omp task untied
 		{
 	  		/* allocate a temporary array and copy <a> into it */
-	  		char * b = alloca((j + 1) * sizeof(char));
+	  		char * b = alloca(n * sizeof(char));
 	  		memcpy(b, a, j * sizeof(char));
 	  		b[j] = (char) i;
 	  		if (ok(j + 1, b))
