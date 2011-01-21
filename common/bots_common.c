@@ -90,8 +90,6 @@ bots_get_date(char *str)
    strftime(str, 32, "%Y/%m/%d;%H:%M", gmtime(&now));
 }
 
-#if defined (__linux)
-/* ****************************************************************** */
 void bots_get_architecture(char *str)
 {
    int ncpus = sysconf(_SC_NPROCESSORS_CONF);
@@ -100,6 +98,9 @@ void bots_get_architecture(char *str)
    uname(&architecture);
    snprintf(str, BOTS_TMP_STR_SZ, "%s-%s;%d" ,architecture.sysname, architecture.machine, ncpus);
 }
+
+#if defined (__linux)
+/* ****************************************************************** */
 void bots_get_load_average(char *str)
 {
    double loadavg[3];
@@ -108,8 +109,6 @@ void bots_get_load_average(char *str)
 }
 #else
 /* ****************************************************************** */
-int bots_get_max_cpus(void) { return 0; }
-void bots_get_architecture(char *str) { sprintf(str,";"); } 
 void bots_get_load_average(char *str) { sprintf(str,";;"); }
 #endif
 
