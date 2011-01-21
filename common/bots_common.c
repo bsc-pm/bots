@@ -98,13 +98,13 @@ void bots_get_architecture(char *str)
    struct utsname architecture;
 
    uname(&architecture);
-   sprintf(str, "%s-%s;%d" ,architecture.sysname, architecture.machine, ncpus);
+   snprintf(str, BOTS_TMP_STR_SZ, "%s-%s;%d" ,architecture.sysname, architecture.machine, ncpus);
 }
 void bots_get_load_average(char *str)
 {
    double loadavg[3];
    getloadavg (loadavg, 3);
-   sprintf(str, "%.2f;%.2f;%.2f",loadavg[0],loadavg[1],loadavg[2]);
+   snprintf(str, BOTS_TMP_STR_SZ, "%.2f;%.2f;%.2f",loadavg[0],loadavg[1],loadavg[2]);
 }
 #else
 /* ****************************************************************** */
@@ -115,27 +115,27 @@ void bots_get_load_average(char *str) { sprintf(str,";;"); }
 
 void bots_print_results()
 {
-   char str_name[128];
-   char str_parameters[128];
-   char str_model[128];
-   char str_resources[128];
+   char str_name[BOTS_TMP_STR_SZ];
+   char str_parameters[BOTS_TMP_STR_SZ];
+   char str_model[BOTS_TMP_STR_SZ];
+   char str_resources[BOTS_TMP_STR_SZ];
    char str_result[15];
    char str_time_program[15];
    char str_time_sequential[15];
    char str_speed_up[15];
    char str_number_of_tasks[15];
    char str_number_of_tasks_per_second[15];
-   char str_exec_date[128];
-   char str_exec_message[128];
-   char str_architecture[128];
-   char str_load_avg[128];
-   char str_comp_date[128];
-   char str_comp_message[128];
-   char str_cc[128];
-   char str_cflags[128];
-   char str_ld[128];
-   char str_ldflags[128];
-   char str_cutoff[128];
+   char str_exec_date[BOTS_TMP_STR_SZ];
+   char str_exec_message[BOTS_TMP_STR_SZ];
+   char str_architecture[BOTS_TMP_STR_SZ];
+   char str_load_avg[BOTS_TMP_STR_SZ];
+   char str_comp_date[BOTS_TMP_STR_SZ];
+   char str_comp_message[BOTS_TMP_STR_SZ];
+   char str_cc[BOTS_TMP_STR_SZ];
+   char str_cflags[BOTS_TMP_STR_SZ];
+   char str_ld[BOTS_TMP_STR_SZ];
+   char str_ldflags[BOTS_TMP_STR_SZ];
+   char str_cutoff[BOTS_TMP_STR_SZ];
 
    /* compute output strings */
    sprintf(str_name, "%s", bots_name);
