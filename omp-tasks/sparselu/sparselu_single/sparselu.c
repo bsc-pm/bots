@@ -40,7 +40,16 @@ int checkmat (float *M, float *N)
       for (j = 0; j < bots_arg_size_1; j++)
       {
          r_err = M[i*bots_arg_size_1+j] - N[i*bots_arg_size_1+j];
+         if ( r_err == 0.0 ) continue;
+
          if (r_err < 0.0 ) r_err = -r_err;
+
+         if ( M[i*bots_arg_size_1+j] == 0 ) 
+         {
+           bots_message("Checking failure: A[%d][%d]=%f  B[%d][%d]=%f; \n",
+                    i,j, M[i*bots_arg_size_1+j], i,j, N[i*bots_arg_size_1+j]);
+           return FALSE;
+         }  
          r_err = r_err / M[i*bots_arg_size_1+j];
          if(r_err > EPSILON)
          {
