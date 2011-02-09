@@ -55,17 +55,14 @@ extern "C"
 #define HIGH_BITS   0x80000000
 
 #define sha1_context sha1_ctx_s
-//#define RNG_state uint8
 typedef u_int8_t RNG_state;
-typedef u_int8_t uint8;
 typedef u_int32_t  uint32;
-//typedef char *   caddr_t;
 
 /**********************************/
 /* random number generator state  */
 /**********************************/
 struct state_t {
-  uint8 state[20];
+  u_int8_t state[20];
 };
 
 

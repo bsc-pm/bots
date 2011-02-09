@@ -47,7 +47,9 @@ extern char bots_ldflags[];
 /* time variables */
 extern double bots_time_program;
 extern double bots_time_sequential;
-extern int    bots_number_of_tasks;
+
+/* number of tasks variable */
+extern unsigned long long bots_number_of_tasks; /* forcing 8 bytes size on -m32 and -m64 */
 
 extern char bots_cutoff[];
 extern int  bots_cutoff_value;
@@ -88,11 +90,18 @@ extern bots_verbose_mode_t bots_verbose_mode;
 #define bots_debug(msg, ...) \
    {\
       if ( bots_verbose_mode >= BOTS_VERBOSE_DEBUG ) {\
+       fprintf(stdout, msg , ##__VA_ARGS__);\
+      }\
+   }
+#define bots_debug_with_location_info(msg, ...) \
+   {\
+      if ( bots_verbose_mode >= BOTS_VERBOSE_DEBUG ) {\
        fprintf(stdout, "%s:%d:%s:" msg ,__FILE__, __LINE__,__func__,##__VA_ARGS__);\
       }\
    }
 #else
 #define bots_debug(msg, ...)
+#define bots_debug_with_location_info(msg, ...)
 #endif
 
 #define FALSE 0

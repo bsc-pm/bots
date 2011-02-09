@@ -8,12 +8,15 @@ show_help ()
    echo "--compiler name    Configures BOTS for given compiler"
    echo "                   Supported compilers: GCC, ICC, SunStudio, PGI, XLC and  Mercurium"
    echo "--debug            Enables debug flags"
+   echo "--warnings         Force warnings to be reported as errors"
    echo "--help             Prints this help"
 }
 
 while [ "$#" -gt 0  ]; do
 	case $1 in
 		--debug) debug=yes
+				;;
+		--warnings) warnings=yes
 				;;
 		--compiler) shift; COMPILER=$1
 				;;
@@ -27,7 +30,7 @@ while [ "$#" -gt 0  ]; do
 	shift
 done
 
-GCC=`gcc -x c -c -fopenmp /dev/null &>/dev/null  && echo "yes"`
+GCC=`gcc -x c -c -fopenmp /dev/null -o /dev/null &>/dev/null  && echo "yes"`
 MCC=`mcc --v &> /dev/null && echo "yes"`
 ICC=`icc -v &> /dev/null && echo "yes"`
 XLC=`xlc -qversion &> /dev/null && echo "yes"`
@@ -87,6 +90,7 @@ fi
 
 
 [ "$debug" = "yes" ] && DEBUG=-DBOTS_DEBUG
+[ "$warnings" = "yes" ] && WARNINGS=
 
 if [ "$COMPILER" = "gcc" -a "$GCC" = "yes" ]; then
 	CC=gcc
@@ -95,10 +99,11 @@ if [ "$COMPILER" = "gcc" -a "$GCC" = "yes" ]; then
 	OMPLINK="$CC -fopenmp"
 	LABEL=gcc
 	[ "$debug" = "yes" ] && DEBUG=$DEBUG -g
+	[ "$warnings" = "yes" ] && WARNINGS="$WARNINGS -Wall -Werror"
 
 	OPT_FLAGS=-O3
-	CC_FLAGS=$DEBUG
-	OMPC_FLAGS=$DEBUG
+	CC_FLAGS="$DEBUG $WARNINGS"
+	OMPC_FLAGS="$DEBUG $WARNINGS"
 	CLINK_FLAGS=$DEBUG
 	OMPLINK_FLAGS=$DEBUG
 fi
@@ -110,10 +115,11 @@ if [ "$COMPILER" = "icc" -a "$ICC" = "yes" ]; then
 	OMPLINK="$CC -openmp"
 	LABEL=icc
 	[ "$debug" = "yes" ] && DEBUG=$DEBUG -g
+	[ "$warnings" = "yes" ] && WARNINGS="$WARNINGS -Wall -Werror"
 
 	OPT_FLAGS=-O2
-	CC_FLAGS=$DEBUG
-	OMPC_FLAGS=$DEBUG
+	CC_FLAGS="$DEBUG $WARNINGS"
+	OMPC_FLAGS="$DEBUG $WARNINGS"
 	CLINK_FLAGS=$DEBUG
 	OMPLINK_FLAGS=$DEBUG
 fi
@@ -131,10 +137,11 @@ if [ "$COMPILER" = "mcc" -a "$MCC" = "yes" ]; then
 	OMPLINK=$CC
 	LABEL=mcc
 	[ "$debug" = "yes" ] && DEBUG=$DEBUG -g
+	[ "$warnings" = "yes" ] && WARNINGS="$WARNINGS -Wall -Werror"
 
 	OPT_FLAGS=-O3
-	CC_FLAGS="$DEBUG --no-openmp"
-	OMPC_FLAGS=$DEBUG
+	CC_FLAGS="$DEBUG $WARNINGS --no-openmp"
+	OMPC_FLAGS="$DEBUG $WARNINGS"
 	CLINK_FLAGS="$DEBUG --no-openmp"
 	OMPLINK_FLAGS=$DEBUG
 
@@ -148,12 +155,13 @@ if [ "$COMPILER" = "xlc" -a "$XLC" = "yes" ]; then
 	OMPLINK=$OMPC
 	LABEL=xlc
 	[ "$debug" = "yes" ] && DEBUG=$DEBUG -g
+	[ "$warnings" = "yes" ] && WARNINGS="$WARNINGS -qflag=w:w -qhalt=w"
 
 	OPT_FLAGS=-O3
-	CC_FLAGS=$DEBUG
-	OMPC_FLAGS=-qthreaded $DEBUG
+	CC_FLAGS="$DEBUG $WARNINGS"
+	OMPC_FLAGS="-qthreaded $DEBUG $WARNINGS"
 	CLINK_FLAGS=$DEBUG
-	OMPLINK_FLAGS=-qthreaded $DEBUG
+	OMPLINK_FLAGS="-qthreaded $DEBUG"
 fi
 
 if [ "$COMPILER" = "pgi" -a "$PGI" = "yes" ]; then
@@ -162,11 +170,16 @@ if [ "$COMPILER" = "pgi" -a "$PGI" = "yes" ]; then
         OMPC="$CC -mp -Minfo=mp"
         OMPLINK=$OMPC
 	LABEL=pgi
-        [ "$debug" = "yes" ] && DEBUG=$DEBUG -g
+        [ "$debug" = "yes" ] && DEBUG="$DEBUG -g"
+	if [ "$warnings" = "yes" ]; then
+		echo "The pgi compiler doesn't support '--warnings' option (skipping it)"
+		echo "Press (Enter) to continue..."
+		read 
+	fi
 
         OPT_FLAGS=-fast
-        CC_FLAGS=$DEBUG
-        OMPC_FLAGS=$DEBUG
+        CC_FLAGS="$DEBUG $WARNINGS"
+        OMPC_FLAGS="$DEBUG $WARNINGS"
         CLINK_FLAGS=$DEBUG
         OMPLINK_FLAGS=$DEBUG
 fi
@@ -178,10 +191,15 @@ if [ "$COMPILER" = "sunstudio" -a "$SUN" = "yes" ]; then
         OMPLINK=$OMPC                 
 	LABEL=suns
         [ "$debug" = "yes" ] && DEBUG=$DEBUG -g
+	if [ "$warnings" = "yes" ]; then
+		echo "The sunstudio compiler doesn't support '--warnings' option (skipping it)"
+		echo "Press (Enter) to continue..."
+		read 
+	fi
 
         OPT_FLAGS=-fast
-        CC_FLAGS=$DEBUG
-        OMPC_FLAGS=$DEBUG
+        CC_FLAGS="$DEBUG $WARNINGS"
+        OMPC_FLAGS="$DEBUG $WARNINGS"
         CLINK_FLAGS=$DEBUG
         OMPLINK_FLAGS=$DEBUG
 fi

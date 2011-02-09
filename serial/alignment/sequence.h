@@ -18,34 +18,16 @@
 /*  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA            */
 /**********************************************************************************************/
 
-#include "omp-tasks-app.h"
+/* Original code from the Application Kernel Matrix by Cray */
 
-#define BOTS_APP_NAME "N Queens"
-#define BOTS_APP_PARAMETERS_DESC "N=%d"
-#define BOTS_APP_PARAMETERS_LIST ,bots_arg_size
+#ifndef SEQUENCE_H
+#define SEQUENCE_H
 
-#define BOTS_APP_USES_ARG_SIZE
-#define BOTS_APP_DEF_ARG_SIZE 14
-#define BOTS_APP_DESC_ARG_SIZE "Board size"
+size_t strlcpy(char *dst, const char *src, size_t size);
+void fill_chartab(char *chartab);
+void encode(char *seq, char *naseq, int l);
+void alloc_aln(int nseqs);
+char * get_seq(char *sname, int *len, char *chartab, FILE *fin);
+int readseqs(char *filename);
 
-int ok(int n, char *a);
-
-#ifndef FORCE_TIED_TASKS
-void nqueens(int n, int j, char *a, int *solutions, int depth);
-#else
-void nqueens(int n, int j, char *a, int depth);
 #endif
-
-#ifndef FORCE_TIED_TASKS
-void nqueens_ser (int n, int j, char *a, int *solutions);
-#else
-void nqueens_ser (int n, int j, char *a);
-#endif
-
-int verify_queens(int);
-void find_queens (int);
-
-#define KERNEL_CALL find_queens(bots_arg_size)
-#define KERNEL_CHECK verify_queens(bots_arg_size)
-
-#define BOTS_CUTOFF_DEF_VALUE 3

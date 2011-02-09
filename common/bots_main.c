@@ -35,19 +35,6 @@
 #include "app-desc.h"
 
 /***********************************************************************
- * BENCHMARK HEADERS 
- *********************************************************************/
-void bots_initialize();
-void bots_finalize();
-void bots_sequential_ini();
-long bots_sequential();
-void bots_sequential_fini();
-int bots_check_result();
-void bots_print_usage_specific();
-void bots_get_params_specific(int argc, char **argv);
-void bots_set_info();
-
-/***********************************************************************
  * DEFAULT VALUES 
  *********************************************************************/
 /* common flags */
@@ -58,26 +45,26 @@ int bots_result = BOTS_RESULT_NOT_REQUESTED;
 int bots_output_format = 1;
 int bots_print_header = FALSE;
 /* common variables */
-char bots_name[128];
-char bots_execname[128];
-char bots_parameters[128];
-char bots_model[128];
-char bots_resources[128];
+char bots_name[BOTS_TMP_STR_SZ];
+char bots_execname[BOTS_TMP_STR_SZ];
+char bots_parameters[BOTS_TMP_STR_SZ];
+char bots_model[BOTS_TMP_STR_SZ];
+char bots_resources[BOTS_TMP_STR_SZ];
 /* compile and execution information */
-char bots_exec_date[128];
-char bots_exec_message[128];
-char bots_comp_date[128];
-char bots_comp_message[128];
-char bots_cc[128];
-char bots_cflags[128];
-char bots_ld[128];
-char bots_ldflags[128];
-char bots_cutoff[128];
+char bots_exec_date[BOTS_TMP_STR_SZ];
+char bots_exec_message[BOTS_TMP_STR_SZ];
+char bots_comp_date[BOTS_TMP_STR_SZ];
+char bots_comp_message[BOTS_TMP_STR_SZ];
+char bots_cc[BOTS_TMP_STR_SZ];
+char bots_cflags[BOTS_TMP_STR_SZ];
+char bots_ld[BOTS_TMP_STR_SZ];
+char bots_ldflags[BOTS_TMP_STR_SZ];
+char bots_cutoff[BOTS_TMP_STR_SZ];
 
 /* time variables */
 double bots_time_program = 0.0;
 double bots_time_sequential = 0.0;
-int    bots_number_of_tasks = 0;
+unsigned long long bots_number_of_tasks = 0; /* forcing 8 bytes size in -m32 and -m64 */
 
 /*
  * Application dependent info
@@ -459,25 +446,25 @@ bots_get_params(int argc, char **argv)
 void bots_set_info ()
 {
    /* program specific info */
-   sprintf(bots_name,BOTS_APP_NAME);
-   sprintf(bots_parameters,BOTS_APP_PARAMETERS_DESC BOTS_APP_PARAMETERS_LIST);
-   sprintf(bots_model,BOTS_MODEL_DESC);
-   sprintf(bots_resources,"%d", omp_get_max_threads());
+   snprintf(bots_name, BOTS_TMP_STR_SZ, BOTS_APP_NAME);
+   snprintf(bots_parameters, BOTS_TMP_STR_SZ, BOTS_APP_PARAMETERS_DESC BOTS_APP_PARAMETERS_LIST);
+   snprintf(bots_model, BOTS_TMP_STR_SZ, BOTS_MODEL_DESC);
+   snprintf(bots_resources, BOTS_TMP_STR_SZ, "%d", omp_get_max_threads());
 
    /* compilation info (do not modify) */
-   strcpy(bots_comp_date,CDATE);
-   strcpy(bots_comp_message,CMESSAGE);
-   strcpy(bots_cc,CC);
-   strcpy(bots_cflags,CFLAGS);
-   strcpy(bots_ld,LD);
-   strcpy(bots_ldflags,LDFLAGS);
+   snprintf(bots_comp_date, BOTS_TMP_STR_SZ, CDATE);
+   snprintf(bots_comp_message, BOTS_TMP_STR_SZ, CMESSAGE);
+   snprintf(bots_cc, BOTS_TMP_STR_SZ, CC);
+   snprintf(bots_cflags, BOTS_TMP_STR_SZ, CFLAGS);
+   snprintf(bots_ld, BOTS_TMP_STR_SZ, LD);
+   snprintf(bots_ldflags, BOTS_TMP_STR_SZ, LDFLAGS);
 
 #if defined(MANUAL_CUTOFF) 
-   sprintf(bots_cutoff,"manual (%d)",bots_cutoff_value);
+   sprintf(bots_cutoff, BOTS_TMP_STR_SZ, "manual (%d)",bots_cutoff_value);
 #elif defined(IF_CUTOFF) 
-   sprintf(bots_cutoff,"pragma-if (%d)",bots_cutoff_value);
+   sprintf(bots_cutoff, BOTS_TMP_STR_SZ, "pragma-if (%d)",bots_cutoff_value);
 #elif defined(FINAL_CUTOFF)
-   sprintf(bots_cutoff,"final (%d)",bots_cutoff_value);
+   sprintf(bots_cutoff, BOTS_TMP_STR_SZ, "final (%d)",bots_cutoff_value);
 #else
    strcpy(bots_cutoff,"none");
 #endif

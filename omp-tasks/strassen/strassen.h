@@ -33,13 +33,6 @@
 /* Below this cut off  strassen uses FastAdditiveNaiveMatrixMultiply algorithm */
 #define SizeAtWhichNaiveAlgorithmIsMoreEfficient 16
 
-extern int bots_arg_block;
-extern int bots_arg_size;
-
-#if defined(MANUAL_CUTOFF) || defined(IF_CUTOFF)
-extern int bots_cutoff_value;
-#endif
-
 /***********************************************************************
  * maximum tolerable relative error (for the checking routine)
  **********************************************************************/

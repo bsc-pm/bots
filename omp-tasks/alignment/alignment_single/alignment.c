@@ -27,10 +27,9 @@
 #include <sys/time.h>
 #include <libgen.h>
 #include "param.h"
+#include "sequence.h"
 #include "alignment.h"
 #include "bots.h"
-
-int readseqs(int first_seq, char *filename);
 
 int ktup, window, signif;
 int prot_ktup, prot_window, prot_signif;
@@ -141,7 +140,7 @@ int get_matrix(int *matptr, int *xref, int scale)
 
    av1 /= (maxres*maxres)/2;
    av2 /= maxres;
-   av3 /= ((double)(maxres*maxres-maxres))/2;
+   av3 /= (int) (((double)(maxres*maxres-maxres))/2);
    mat_avscore = -av3;
 
    min = max = matrix[0][0];
@@ -384,7 +383,7 @@ int diff (int A, int B, int M, int N, int tb, int te, int *print_ptr, int *last_
 /***********************************************************************
  * : 
  **********************************************************************/
-double tracepath(int tsb1, int tsb2, int *print_ptr, int *last_print, int *displ, int seq1, int seq2)
+double tracepath(int tsb1, int tsb2, int *print_ptr, int *displ, int seq1, int seq2)
 {
    int  i, k;
    int i1    = tsb1;
@@ -414,7 +413,7 @@ double tracepath(int tsb1, int tsb2, int *print_ptr, int *last_print, int *displ
 }
 
 
-int pairalign(int istart, int iend, int jstart, int jend)
+int pairalign()
 {
    int i, n, m, si, sj;
    int len1, len2, maxres;
@@ -454,9 +453,9 @@ int pairalign(int istart, int iend, int jstart, int jend)
                      if ((c != gap_pos1) && (c != gap_pos2)) len2++;
                   }
 
-                  gh = 10 * pw_ge_penalty;
+                  gh = (int) (10 * pw_ge_penalty);
                   gg = pw_go_penalty + log((double) MIN(n, m));
-                  g  = (mat_avscore <= 0) ? 20 * gg : 2 * mat_avscore * gg;
+                  g  = (int) ((mat_avscore <= 0) ? 20 * gg : 2 * mat_avscore * gg);
 
                   seq1 = si + 1;
                   seq2 = sj + 1;
@@ -468,12 +467,12 @@ int pairalign(int istart, int iend, int jstart, int jend)
                   last_print = 0;
 
                   diff(sb1-1, sb2-1, se1-sb1+1, se2-sb2+1, 0, 0, &print_ptr, &last_print, displ, seq1, seq2, g, gh);
-                  mm_score = tracepath(sb1, sb2, &print_ptr, &last_print, displ, seq1, seq2);
+                  mm_score = tracepath(sb1, sb2, &print_ptr, displ, seq1, seq2);
 
                   if (len1 == 0 || len2 == 0) mm_score  = 0.0;
                   else                        mm_score /= (double) MIN(len1,len2);
 
-                  bench_output[si*nseqs+sj] = mm_score;
+                  bench_output[si*nseqs+sj] = (int) mm_score;
                   }
                }
             }
@@ -484,7 +483,7 @@ int pairalign(int istart, int iend, int jstart, int jend)
    return 0;
 }
 
-int pairalign_seq(int istart, int iend, int jstart, int jend)
+int pairalign_seq()
 {
    int i, n, m, si, sj;
    int len1, len2, maxres;
@@ -514,9 +513,9 @@ int pairalign_seq(int istart, int iend, int jstart, int jend)
                   if ((c != gap_pos1) && (c != gap_pos2)) len2++;
                }
 
-               gh = 10 * pw_ge_penalty;
+               gh = (int) (10 * pw_ge_penalty);
                gg = pw_go_penalty + log((double) MIN(n, m));
-               g  = (mat_avscore <= 0) ? 20 * gg : 2 * mat_avscore * gg;
+               g  = (int) ((mat_avscore <= 0) ? 20 * gg : 2 * mat_avscore * gg);
 
                seq1 = si + 1;
                seq2 = sj + 1;
@@ -528,12 +527,12 @@ int pairalign_seq(int istart, int iend, int jstart, int jend)
                last_print = 0;
 
                diff(sb1-1, sb2-1, se1-sb1+1, se2-sb2+1, 0, 0, &print_ptr, &last_print, displ, seq1, seq2, g, gh);
-               mm_score = tracepath(sb1, sb2, &print_ptr, &last_print, displ, seq1, seq2);
+               mm_score = tracepath(sb1, sb2, &print_ptr, displ, seq1, seq2);
 
                if (len1 == 0 || len2 == 0) mm_score  = 0.0;
                else                        mm_score /= (double) MIN(len1,len2);
 
-               seq_output[si*nseqs+sj] = mm_score;
+               seq_output[si*nseqs+sj] = (int) mm_score;
             }
          }
       }
@@ -572,7 +571,7 @@ void pairalign_init (char *filename)
    init_matrix();
 
 
-   nseqs = readseqs(1,filename);
+   nseqs = readseqs(filename);
 
         bots_message("Multiple Pairwise Alignment (%d sequences)\n",nseqs);
 
@@ -600,7 +599,7 @@ void align_init ()
 
 void align()
 {
-   pairalign(0, nseqs,0, nseqs);
+   pairalign();
 }
 
 void align_seq_init ()
@@ -616,7 +615,7 @@ void align_seq_init ()
 
 void align_seq()
 {
-   pairalign_seq(0, nseqs,0, nseqs);
+   pairalign_seq();
 }
 
 

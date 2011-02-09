@@ -1,10 +1,10 @@
 [test]
 inputs=test.input
-ompenv=OMP_STACKSIZE="1M"
+ompenv=OMP_STACKSIZE="2M"
 
 [small]
 inputs=small.input
-ompenv=OMP_STACKSIZE="1M"
+ompenv=OMP_STACKSIZE="16M"
 
 [medium]
 inputs=medium.input

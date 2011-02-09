@@ -33,3 +33,19 @@
 
 void bots_print_usage(void);
 void bots_print_usage_option(char opt, int type, char* description, char *val, int subc, char **subv);
+
+/***********************************************************************
+ * BENCHMARK HEADERS 
+ *********************************************************************/
+void bots_initialize();
+void bots_finalize();
+void bots_sequential_ini();
+long bots_sequential();
+void bots_sequential_fini();
+int bots_check_result();
+void bots_print_usage_specific();
+void bots_get_params_specific(int argc, char **argv);
+void bots_set_info();
+
+void bots_get_params_common(int argc, char **argv);
+void bots_get_params(int argc, char **argv);

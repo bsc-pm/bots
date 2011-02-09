@@ -436,27 +436,23 @@ void my_print(struct Village *village)
 {
    struct Village *vlist;
    struct Patient *plist;
-   struct Patient *p;
 
    if (village == NULL) return;
 
    /* Traverse village hierarchy (lower level first)*/
    vlist = village->forward;
-   while(vlist)
-   {
+   while(vlist) {
       my_print(vlist);
       vlist = vlist->next;
    }
 
    plist = village->population;
 
-   while (plist != NULL) 
-   {
-      p = plist;
+   while (plist != NULL) {
+      bots_debug("[pid:%d]",plist->id);
       plist = plist->forward; 
-      bots_message("[pid:%d]",p->id);
    }
-   bots_message("[vid:%d]\n",village->id);
+   bots_debug("[vid:%d]\n",village->id);
 
 }
 /**********************************************************************/

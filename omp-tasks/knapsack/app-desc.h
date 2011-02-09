@@ -47,8 +47,8 @@ int compare(struct item *a, struct item *b);
 int read_input(const char *filename, struct item *items, int *capacity, int *n);
 void knapsack_seq(struct item *e, int c, int n, int v, int *sol);
 void knapsack_par(struct item *e, int c, int n, int v, int *sol, int l);
-void knapsack_main_seq (struct item *e, int c, int n, int v, int *sol);
-void knapsack_main_par (struct item *e, int c, int n, int v, int *sol);
+void knapsack_main_seq (struct item *e, int c, int n, int *sol);
+void knapsack_main_par (struct item *e, int c, int n, int *sol);
 int  knapsack_check (int sol_seq, int sol_par);
 
 #define BOTS_APP_INIT\
@@ -58,11 +58,11 @@ int  knapsack_check (int sol_seq, int sol_par);
      read_input(bots_arg_file, items, &capacity, &n);
 
 #define KERNEL_INIT 
-#define KERNEL_CALL knapsack_main_par(items, capacity, n, 0, &sol_par);
+#define KERNEL_CALL knapsack_main_par(items, capacity, n, &sol_par);
 #define KERNEL_FINI
 
 #define KERNEL_SEQ_INIT 
-#define KERNEL_SEQ_CALL knapsack_main_seq(items, capacity, n, 0, &sol_seq);
+#define KERNEL_SEQ_CALL knapsack_main_seq(items, capacity, n, &sol_seq);
 #define KERNEL_SEQ_FINI
 
 #define KERNEL_CHECK  knapsack_check(sol_seq, sol_par)

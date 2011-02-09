@@ -18,34 +18,13 @@
 /*  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA            */
 /**********************************************************************************************/
 
-#include "omp-tasks-app.h"
+/* Original code from the Application Kernel Matrix by Cray */
 
-#define BOTS_APP_NAME "N Queens"
-#define BOTS_APP_PARAMETERS_DESC "N=%d"
-#define BOTS_APP_PARAMETERS_LIST ,bots_arg_size
+#ifndef SEQUENCE_EXTERN_H
+#define SEQUENCE_EXTERN_H
 
-#define BOTS_APP_USES_ARG_SIZE
-#define BOTS_APP_DEF_ARG_SIZE 14
-#define BOTS_APP_DESC_ARG_SIZE "Board size"
+extern int *seqlen_array;
+extern int nseqs, gap_pos2;
+extern char **args, **names, **seq_array, *amino_acid_codes;
 
-int ok(int n, char *a);
-
-#ifndef FORCE_TIED_TASKS
-void nqueens(int n, int j, char *a, int *solutions, int depth);
-#else
-void nqueens(int n, int j, char *a, int depth);
 #endif
-
-#ifndef FORCE_TIED_TASKS
-void nqueens_ser (int n, int j, char *a, int *solutions);
-#else
-void nqueens_ser (int n, int j, char *a);
-#endif
-
-int verify_queens(int);
-void find_queens (int);
-
-#define KERNEL_CALL find_queens(bots_arg_size)
-#define KERNEL_CHECK verify_queens(bots_arg_size)
-
-#define BOTS_CUTOFF_DEF_VALUE 3

@@ -24,13 +24,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include "sequence.h"
+#include "sequence_extern.h"
 #include "alignment.h"
 #include "bots.h"
-
-extern int *seqlen_array;
-extern int nseqs, gap_pos2;
-
-extern char **args, **names, **seq_array, *amino_acid_codes;
 
 /***********************************************************************
  * :
@@ -85,13 +82,13 @@ void encode(char *seq, char *naseq, int l)
 
    for (i = 1; i <= l; i++)
       if (seq[i] == '-') {
-         naseq[i] = gap_pos2;
+         naseq[i] = (char) gap_pos2;
       } else {
          j = 0;
          c = seq[i];
          t = amino_acid_codes;
          naseq[i] = -1;
-         while (t[j]) {if (t[j] == c) {naseq[i] = j; break;} j++;}
+         while (t[j]) {if (t[j] == c) {naseq[i] = (char) j; break;} j++;}
       }
 
    naseq[l + 1] = -3;
@@ -151,7 +148,7 @@ char * get_seq(char *sname, int *len, char *chartab, FILE *fin)
    return seq;
 }
 
-int readseqs(int first_seq, char *filename)
+int readseqs(char *filename)
 {
    int  i, l1, no_seqs;
    FILE *fin;

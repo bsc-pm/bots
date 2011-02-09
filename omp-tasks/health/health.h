@@ -28,15 +28,15 @@
 #define MASK 123459876
 
 struct Results {
-   float hosps_number;
-   float hosps_personnel;
-   float total_patients;
-   float total_in_village;
-   float total_waiting;
-   float total_assess;
-   float total_inside;
-   float total_time;
-   float total_hosps_v;
+   long hosps_number;
+   long hosps_personnel;
+   long total_patients;
+   long total_in_village;
+   long total_waiting;
+   long total_assess;
+   long total_inside;
+   long total_time;
+   long total_hosps_v;
 };
 
 extern int sim_level;
@@ -98,5 +98,9 @@ void sim_village_main_par(struct Village *top);
 void sim_village_par(struct Village *village);
 int check_village(struct Village *top);
 
+void check_patients_assess(struct Village *village);
+void check_patients_population(struct Village *village);
+void sim_village(struct Village *village);
+void my_print(struct Village *village);
 
 #endif

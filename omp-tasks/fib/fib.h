@@ -17,35 +17,24 @@
 /*  along with this program; if not, write to the Free Software                               */
 /*  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA            */
 /**********************************************************************************************/
-
-#include "omp-tasks-app.h"
-
-#define BOTS_APP_NAME "N Queens"
-#define BOTS_APP_PARAMETERS_DESC "N=%d"
-#define BOTS_APP_PARAMETERS_LIST ,bots_arg_size
-
-#define BOTS_APP_USES_ARG_SIZE
-#define BOTS_APP_DEF_ARG_SIZE 14
-#define BOTS_APP_DESC_ARG_SIZE "Board size"
-
-int ok(int n, char *a);
-
-#ifndef FORCE_TIED_TASKS
-void nqueens(int n, int j, char *a, int *solutions, int depth);
+#ifndef FIB_H
+#define FIB_H
+#if defined(IF_CUTOFF)
+int fib (int n,int d);
+#elif defined(FINAL_CUTOFF)
+int fib (int n,int d);
+#elif defined(MANUAL_CUTOFF)
+int fib (int n,int d);
 #else
-void nqueens(int n, int j, char *a, int depth);
+int fib (int n);
 #endif
 
-#ifndef FORCE_TIED_TASKS
-void nqueens_ser (int n, int j, char *a, int *solutions);
-#else
-void nqueens_ser (int n, int j, char *a);
+int fib_seq (int n);
+
+void fib0 (int n);
+void fib0_seq (int n);
+
+int fib_verify (int n);
+int fib_verify_value(int n);
 #endif
 
-int verify_queens(int);
-void find_queens (int);
-
-#define KERNEL_CALL find_queens(bots_arg_size)
-#define KERNEL_CHECK verify_queens(bots_arg_size)
-
-#define BOTS_CUTOFF_DEF_VALUE 3
