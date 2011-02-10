@@ -51,10 +51,20 @@ char **args, **names, **seq_array;
 
 int matrix[NUMRES][NUMRES];
 
+double gap_open_scale;
+double gap_extend_scale;
+
+// dnaFlag default value is false
+int dnaFlag = FALSE;
+
+// clustalw default value is false
+int clustalw = FALSE;
+
+#define INT_SCALE 100
+
 #define MIN(a,b) ((a)<(b)?(a):(b))
 #define tbgap(k) ((k) <= 0 ? 0 : tb + gh * (k))
 #define tegap(k) ((k) <= 0 ? 0 : te + gh * (k))
-
 
 /***********************************************************************
  * : 
@@ -425,25 +435,27 @@ int pairalign()
    maxres = get_matrix(matptr, mat_xref, 10);
    if (maxres == 0) return(-1);
 
-        bots_message("Start aligning ");
+   bots_message("Start aligning ");
+
    #pragma omp parallel
    {
    #pragma omp for schedule(dynamic) private(i,n,si,sj,len1,m)
       for (si = 0; si < nseqs; si++) {
-         if ((n = seqlen_array[si+1]) != 0){
-            for (i = 1, len1 = 0; i <= n; i++) {
-               char c = seq_array[si+1][i];
-               if ((c != gap_pos1) && (c != gap_pos2)) len1++;
-            }
-
-            for (sj = si + 1; sj < nseqs; sj++) 
-            {
-               if ((m = seqlen_array[sj+1]) != 0)
+         n = seqlen_array[si+1];
+         for (i = 1, len1 = 0; i <= n; i++) {
+            char c = seq_array[si+1][i];
+            if ((c != gap_pos1) && (c != gap_pos2)) len1++;
+         }
+         for (sj = si + 1; sj < nseqs; sj++) 
+         {
+            m = seqlen_array[sj+1];
+            if ( n == 0 || m == 0 ) {
+               bench_output[si*nseqs+sj] = (int) 1.0;
+            } else {
+               #pragma omp task untied \
+               private(i,gg,len2,mm_score) firstprivate(m,n,si,sj,len1) \
+               shared(nseqs, bench_output,seqlen_array,seq_array,gap_pos1,gap_pos2,pw_ge_penalty,pw_go_penalty,mat_avscore)
                {
-                  #pragma omp task untied \
-                  private(i,gg,len2,mm_score) firstprivate(m,n,si,sj,len1) \
-                  shared(nseqs, bench_output,seqlen_array,seq_array,gap_pos1,gap_pos2,pw_ge_penalty,pw_go_penalty,mat_avscore)
-                  {
                   int se1, se2, sb1, sb2, maxscore, seq1, seq2, g, gh;
                   int displ[2*MAX_ALN_LENGTH+1];
                   int print_ptr, last_print;
@@ -453,9 +465,14 @@ int pairalign()
                      if ((c != gap_pos1) && (c != gap_pos2)) len2++;
                   }
 
-                  gh = (int) (10 * pw_ge_penalty);
-                  gg = pw_go_penalty + log((double) MIN(n, m));
-                  g  = (int) ((mat_avscore <= 0) ? 20 * gg : 2 * mat_avscore * gg);
+                  if ( dnaFlag == TRUE ) {
+                     g  = (int) ( 2 * INT_SCALE * pw_go_penalty * gap_open_scale ); // gapOpen
+                     gh = (int) (INT_SCALE * pw_ge_penalty * gap_extend_scale); //gapExtend
+                  } else {
+                     gg = pw_go_penalty + log((double) MIN(n, m)); // temporary value
+                     g  = (int) ((mat_avscore <= 0) ? (2 * INT_SCALE * gg) : (2 * mat_avscore * gg * gap_open_scale) ); // gapOpen
+                     gh = (int) (INT_SCALE * pw_ge_penalty); //gapExtend
+                  }
 
                   seq1 = si + 1;
                   seq2 = sj + 1;
@@ -473,13 +490,12 @@ int pairalign()
                   else                        mm_score /= (double) MIN(len1,len2);
 
                   bench_output[si*nseqs+sj] = (int) mm_score;
-                  }
-               }
-            }
-         }
-      }
-   }
-        bots_message(" completed!\n");
+               } // end task
+            } // end if (n == 0 || m == 0)
+         } // for (j)
+      } // end parallel for (i)
+   } // end parallel
+   bots_message(" completed!\n");
    return 0;
 }
 
@@ -496,44 +512,51 @@ int pairalign_seq()
    if (maxres == 0) return(-1);
 
    for (si = 0; si < nseqs; si++) {
-      if ((n = seqlen_array[si+1]) != 0){
-         for (i = 1, len1 = 0; i <= n; i++) {
-            char c = seq_array[si+1][i];
-            if ((c != gap_pos1) && (c != gap_pos2)) len1++;
-         }
+      n = seqlen_array[si+1];
+      for (i = 1, len1 = 0; i <= n; i++) {
+         char c = seq_array[si+1][i];
+         if ((c != gap_pos1) && (c != gap_pos2)) len1++;
+      }
 
-         for (sj = si + 1; sj < nseqs; sj++) {
-            if ((m = seqlen_array[sj+1]) != 0){
-               int se1, se2, sb1, sb2, maxscore, seq1, seq2, g, gh;
-               int displ[2*MAX_ALN_LENGTH+1];
-               int print_ptr, last_print;
+      for (sj = si + 1; sj < nseqs; sj++) {
+         m = seqlen_array[sj+1];
+         if ( n == 0 || m == 0) {
+            seq_output[si*nseqs+sj] = (int) 1.0;
+         } else {
+            int se1, se2, sb1, sb2, maxscore, seq1, seq2, g, gh;
+            int displ[2*MAX_ALN_LENGTH+1];
+            int print_ptr, last_print;
 
-               for (i = 1, len2 = 0; i <= m; i++) {
-                  char c = seq_array[sj+1][i];
-                  if ((c != gap_pos1) && (c != gap_pos2)) len2++;
-               }
-
-               gh = (int) (10 * pw_ge_penalty);
-               gg = pw_go_penalty + log((double) MIN(n, m));
-               g  = (int) ((mat_avscore <= 0) ? 20 * gg : 2 * mat_avscore * gg);
-
-               seq1 = si + 1;
-               seq2 = sj + 1;
-
-               forward_pass(&seq_array[seq1][0], &seq_array[seq2][0], n, m, &se1, &se2, &maxscore, g, gh);
-               reverse_pass(&seq_array[seq1][0], &seq_array[seq2][0], se1, se2, &sb1, &sb2, maxscore, g, gh);
-
-               print_ptr  = 1;
-               last_print = 0;
-
-               diff(sb1-1, sb2-1, se1-sb1+1, se2-sb2+1, 0, 0, &print_ptr, &last_print, displ, seq1, seq2, g, gh);
-               mm_score = tracepath(sb1, sb2, &print_ptr, displ, seq1, seq2);
-
-               if (len1 == 0 || len2 == 0) mm_score  = 0.0;
-               else                        mm_score /= (double) MIN(len1,len2);
-
-               seq_output[si*nseqs+sj] = (int) mm_score;
+            for (i = 1, len2 = 0; i <= m; i++) {
+               char c = seq_array[sj+1][i];
+               if ((c != gap_pos1) && (c != gap_pos2)) len2++;
             }
+
+            if ( dnaFlag == TRUE ) {
+               g  = (int) ( 2 * INT_SCALE * pw_go_penalty * gap_open_scale ); // gapOpen
+               gh = (int) (INT_SCALE * pw_ge_penalty * gap_extend_scale); //gapExtend
+            } else {
+               gg = pw_go_penalty + log((double) MIN(n, m)); // temporary value
+               g  = (int) ((mat_avscore <= 0) ? (2 * INT_SCALE * gg) : (2 * mat_avscore * gg * gap_open_scale) ); // gapOpen
+               gh = (int) (INT_SCALE * pw_ge_penalty); //gapExtend
+            }
+
+            seq1 = si + 1;
+            seq2 = sj + 1;
+
+            forward_pass(&seq_array[seq1][0], &seq_array[seq2][0], n, m, &se1, &se2, &maxscore, g, gh);
+            reverse_pass(&seq_array[seq1][0], &seq_array[seq2][0], se1, se2, &sb1, &sb2, maxscore, g, gh);
+
+            print_ptr  = 1;
+            last_print = 0;
+
+            diff(sb1-1, sb2-1, se1-sb1+1, se2-sb2+1, 0, 0, &print_ptr, &last_print, displ, seq1, seq2, g, gh);
+            mm_score = tracepath(sb1, sb2, &print_ptr, displ, seq1, seq2);
+
+            if (len1 == 0 || len2 == 0) mm_score  = 0.0;
+            else                        mm_score /= (double) MIN(len1,len2);
+
+            seq_output[si*nseqs+sj] = (int) mm_score;
          }
       }
    }
@@ -570,21 +593,40 @@ void pairalign_init (char *filename)
 
    init_matrix();
 
-
    nseqs = readseqs(filename);
 
-   bots_message("Multiple Pairwise Alignment (%d sequences)\n",nseqs);
+   bots_message("Multiple Pairwise Alignment (%d sequences)\n", nseqs);
 
    for (i = 1; i <= nseqs; i++)
       bots_debug("Sequence %d: %s %6.d aa\n", i, names[i], seqlen_array[i]);
 
-   ktup          =  1;
-   window        =  5;
-   signif        =  5;
-   gap_open      = 10.0;
-   gap_extend    =  0.2;
-   pw_go_penalty = 10.0;
-   pw_ge_penalty =  0.1;
+   if ( clustalw == TRUE ) {
+      gap_open_scale = 0.6667;
+      gap_extend_scale = 0.751;
+   } else {
+      gap_open_scale = 1.0;
+      gap_extend_scale = 1.0;
+   }
+
+   if ( dnaFlag == TRUE ) {
+      // Using DNA parameters
+      ktup          =  2;
+      window        =  4;
+      signif        =  4;
+      gap_open      = 15.00;
+      gap_extend    =  6.66;
+      pw_go_penalty = 15.00;
+      pw_ge_penalty =  6.66;
+   } else {
+      // Using protein parameters
+      ktup          =  1;
+      window        =  5;
+      signif        =  5;
+      gap_open      = 10.0;
+      gap_extend    =  0.2;
+      pw_go_penalty = 10.0;
+      pw_ge_penalty =  0.1;
+   }
 }
 
 void align_init ()
