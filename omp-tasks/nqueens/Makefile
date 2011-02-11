@@ -21,7 +21,7 @@
 #LIBS = 
 #PROGRAM_OBJS=
 
-CUTOFF_VERSIONS = manual if_clause final final_ser
+CUTOFF_VERSIONS = manual if_clause final 
 TIED_VERSIONS = yes
 
 BASE_DIR = ../../

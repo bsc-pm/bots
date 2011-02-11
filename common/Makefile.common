@@ -97,11 +97,10 @@ ifdef CUTOFF_VERSIONS
 	MANUAL_PROGRAM_OBJS := $(PROGRAM_OBJS:%.o=%-manual.o)
 	IF_PROGRAM_OBJS := $(PROGRAM_OBJS:%.o=%-if.o)
 	FINAL_PROGRAM_OBJS := $(PROGRAM_OBJS:%.o=%-final.o)
-	FINAL_SER_PROGRAM_OBJS := $(PROGRAM_OBJS:%.o=%-final_ser.o)
 
 	MANUAL_FLAGS = -DMANUAL_CUTOFF
 	IF_FLAGS = -DIF_CUTOFF
-	FINAL_FLAGS = -DFINAL_CUTOFF
+	FINAL_FLAGS = -DFINAL_CUTOFF $(OMPC_FINAL_FLAGS)
 endif
 
 ifdef TIED_VERSIONS
@@ -111,6 +110,7 @@ ifdef TIED_VERSIONS
 	TIED_PROGRAM_OBJS := $(PROGRAM_OBJS:%.o=%-tied.o)
 	TIED_MANUAL_PROGRAM_OBJS := $(MANUAL_PROGRAM_OBJS:%.o=%-tied.o)
 	TIED_IF_PROGRAM_OBJS := $(IF_PROGRAM_OBJS:%.o=%-tied.o)
+	TIED_FINAL_PROGRAM_OBJS := $(FINAL_PROGRAM_OBJS:%.o=%-tied.o)
 
 	TIED_FLAGS = -DFORCE_TIED_TASKS
 endif
@@ -126,9 +126,6 @@ all: $(TARGETS)
 
 %-final.o: %.c Makefile $(COMMON_DIR)/Makefile.common 
 	$(OMPC) $(OMPC_ALL_FLAGS) $(FINAL_FLAGS) -o $@ $<
-
-%-final_ser.o: %.c Makefile $(COMMON_DIR)/Makefile.common 
-	$(OMPC) $(OMPC_ALL_FLAGS) --serialize $(FINAL_FLAGS) -o $@ $<
 
 %-manual.o: %.c Makefile $(COMMON_DIR)/Makefile.common 
 	$(OMPC) $(OMPC_ALL_FLAGS) $(MANUAL_FLAGS) -o $@ $<
@@ -152,6 +149,11 @@ all: $(TARGETS)
 	$(OMPC) $(OMPC_ALL_FLAGS) $(MANUAL_FLAGS) $(TIED_FLAGS) -o $@ $<;\
 	rm tied-$<
 
+%-final-tied.o: %.c Makefile $(COMMON_DIR)/Makefile.common
+	cat $< | sed -e "s/task \{1,\}untied/task/g" > tied-$< ;\
+	$(OMPC) $(OMPC_ALL_FLAGS) $(FINAL_FLAGS) $(TIED_FLAGS) -o $@ $<;\
+	rm tied-$<
+
 INFO_FLAGS_OMP=-DCDATE="\"$(TODAY)\"" -DCC="\"$(OMPC)\"" -DLD="\"$(OMPLINK)\"" -DCMESSAGE="\"$(CMESSAGE)\"" \
                -DLDFLAGS="\"$(OMPLINK_ALL_FLAGS) $(LIBS)\""
 
@@ -163,10 +165,6 @@ main-if.o: $(COMMON_DIR)/bots_main.c app-desc.h Makefile $(COMMON_DIR)/Makefile.
 
 main-final.o: $(COMMON_DIR)/bots_main.c app-desc.h Makefile $(COMMON_DIR)/Makefile.common
 	$(OMPC) $(OMPC_ALL_FLAGS) $(FINAL_FLAGS) -I. -o $@ $< $(INFO_FLAGS_OMP) -DCFLAGS="\"$(OMPC_ALL_FLAGS) $(FINAL_FLAGS)-I.\""
-
-main-final_ser.o: $(COMMON_DIR)/bots_main.c app-desc.h Makefile $(COMMON_DIR)/Makefile.common
-	$(OMPC) $(OMPC_ALL_FLAGS) $(FINAL_FLAGS) -I. -o $@ $< $(INFO_FLAGS_OMP) -DCFLAGS="\"$(OMPC_ALL_FLAGS) --serialize $(FINAL_FLAGS)-I.\""
-
 
 main-manual.o: $(COMMON_DIR)/bots_main.c app-desc.h Makefile $(COMMON_DIR)/Makefile.common
 	$(OMPC) $(OMPC_ALL_FLAGS) $(MANUAL_FLAGS) -I. -o $@ $< $(INFO_FLAGS_OMP) -DCFLAGS="\"$(OMPC_ALL_FLAGS) $(MANUAL_FLAGS) -I.\""
@@ -180,6 +178,8 @@ main-if-tied.o: $(COMMON_DIR)/bots_main.c app-desc.h Makefile $(COMMON_DIR)/Make
 main-manual-tied.o: $(COMMON_DIR)/bots_main.c app-desc.h Makefile $(COMMON_DIR)/Makefile.common
 	$(OMPC) $(OMPC_ALL_FLAGS) $(TIED_FLAGS) $(MANUAL_FLAGS) -I. -o $@ $< $(INFO_FLAGS_OMP) -DCFLAGS="\"$(OMPC_ALL_FLAGS) $(TIED_FLAGS) $(MANUAL_FLAGS) -I.\""
 
+main-final-tied.o: $(COMMON_DIR)/bots_main.c app-desc.h Makefile $(COMMON_DIR)/Makefile.common
+	$(OMPC) $(OMPC_ALL_FLAGS) $(TIED_FLAGS) $(FINAL_FLAGS) -I. -o $@ $< $(INFO_FLAGS_OMP) -DCFLAGS="\"$(OMPC_ALL_FLAGS) $(TIED_FLAGS) $(FINAL_FLAGS) -I.\""
 
 $(BIN_DIR)/$(PROGRAM).$(LABEL).$(SUB)$(VERSION): main.o $(PROGRAM_OBJS) Makefile $(COMMON_DIR)/Makefile.common $(COMMON_OBJS)
 	$(OMPLINK) $(OMPLINK_ALL_FLAGS) -o $@ main.o $(PROGRAM_OBJS) $(LIBS) $(COMMON_OBJS)
@@ -203,18 +203,14 @@ ifdef USE_FINAL_CLAUSE
 
 $(BIN_DIR)/$(PROGRAM).$(LABEL).$(SUB)$(VERSION)-final: main-final.o $(FINAL_PROGRAM_OBJS) Makefile $(COMMON_DIR)/Makefile.common $(COMMON_OBJS) 
 	$(OMPLINK) $(OMPLINK_ALL_FLAGS) -o $@ main-final.o $(FINAL_PROGRAM_OBJS) $(LIBS) $(COMMON_OBJS)
-$(BIN_DIR)/$(PROGRAM).$(LABEL).$(SUB)$(VERSION)-final_ser: main-final_ser.o $(FINAL_SER_PROGRAM_OBJS) Makefile $(COMMON_DIR)/Makefile.common $(COMMON_OBJS) 
-	$(OMPLINK) $(OMPLINK_ALL_FLAGS) -o $@ main-final_ser.o $(FINAL_SER_PROGRAM_OBJS) $(LIBS) $(COMMON_OBJS)
 
-$(BIN_DIR)/$(PROGRAM).$(LABEL).$(SUB)$(VERSION)-final-tied: 
-$(BIN_DIR)/$(PROGRAM).$(LABEL).$(SUB)$(VERSION)-final_ser-tied: 
+$(BIN_DIR)/$(PROGRAM).$(LABEL).$(SUB)$(VERSION)-final-tied: main-final-tied.o $(TIED_FINAL_PROGRAM_OBJS) Makefile $(COMMON_DIR)/Makefile.common $(COMMON_OBJS)
+	$(OMPLINK) $(OMPLINK_ALL_FLAGS) -o $@ main-if-tied.o $(TIED_FINAL_PROGRAM_OBJS) $(LIBS) $(COMMON_OBJS)
 
 else
 
 $(BIN_DIR)/$(PROGRAM).$(LABEL).$(SUB)$(VERSION)-final: 
-$(BIN_DIR)/$(PROGRAM).$(LABEL).$(SUB)$(VERSION)-final_ser: 
 $(BIN_DIR)/$(PROGRAM).$(LABEL).$(SUB)$(VERSION)-final-tied: 
-$(BIN_DIR)/$(PROGRAM).$(LABEL).$(SUB)$(VERSION)-final_ser-tied: 
 
 endif
 

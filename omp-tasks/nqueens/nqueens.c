@@ -220,12 +220,16 @@ void nqueens(int n, int j, char *a, int depth)
                         int *sol;
 			if ( omp_in_final() && depth+1 > bots_cutoff_value ) {
 		           b = a;
+#ifndef FORCE_TIED_TASKS
                            sol = solutions;
+#endif
                         } else {
 	  		/* allocate a temporary array and copy <a> into it */
 	  		   b = alloca(n * sizeof(char));
 	  		   memcpy(b, a, j * sizeof(char));
+#ifndef FORCE_TIED_TASKS
                            sol = &csols[i];
+#endif
                         } 
 	  		b[j] = i;
 	  		if (ok(j + 1, b))
