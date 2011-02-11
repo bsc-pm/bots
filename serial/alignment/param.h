@@ -19,6 +19,7 @@
 /**********************************************************************************************/
 
 /* Original code from the Application Kernel Matrix by Cray */
+/* that was based on the ClustalW application */
 
 char *amino_acid_order = "ABCDEFGHIKLMNPQRSTVWXYZ";
 char *amino_acid_codes = "ABCDEFGHIKLMNPQRSTUVWXYZ-";
