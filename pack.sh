@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION=1.2a
+VERSION=1.1.1
 
 make clean
 mkdir bots
