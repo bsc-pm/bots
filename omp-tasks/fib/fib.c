@@ -59,10 +59,10 @@ int fib (int n,int d)
 	int x, y;
 	if (n < 2) return n;
 
-	#pragma omp task untied shared(x) firstprivate(n) final(d+1 >= bots_cutoff_value)
+	#pragma omp task untied shared(x) firstprivate(n) final(d+1 >= bots_cutoff_value) mergeable
 	x = fib(n - 1,d+1);
 
-	#pragma omp task untied shared(y) firstprivate(n) final(d+1 >= bots_cutoff_value)
+	#pragma omp task untied shared(y) firstprivate(n) final(d+1 >= bots_cutoff_value) mergeable
 	y = fib(n - 2,d+1);
 
 	#pragma omp taskwait

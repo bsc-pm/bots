@@ -214,7 +214,7 @@ void nqueens(int n, int j, char *a, int depth)
 
      	/* try each possible position for queen <j> */
 	for (i = 0; i < n; i++) {
- 		#pragma omp task untied final(depth+1 >= bots_cutoff_value)
+ 		#pragma omp task untied final(depth+1 >= bots_cutoff_value) mergeable
 		{
                         char *b;
                         int *sol;

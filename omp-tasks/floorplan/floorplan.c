@@ -364,7 +364,7 @@ static int add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS,int l
 #pragma omp task untied private(footprint,area) \
 firstprivate(NWS,i,j,id,nn,level,bots_cutoff_value) \
 shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD,nnc,bots_verbose_mode) \
-final(level >= bots_cutoff_value)
+final(level >= bots_cutoff_value) mergeable
 {
           ibrd board;
           struct cell *cells;
