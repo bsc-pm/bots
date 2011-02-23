@@ -19,6 +19,7 @@
 /**********************************************************************************************/
 
 /* Original code from the Application Kernel Matrix by Cray */
+/* that was based on the ClustalW application */
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -19,6 +19,7 @@
 /**********************************************************************************************/
 
 /* Original code from the Application Kernel Matrix by Cray */
+/* that was based on the ClustalW application */
 
 #ifndef SEQUENCE_H
 #define SEQUENCE_H
