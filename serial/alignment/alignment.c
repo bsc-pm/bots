@@ -41,7 +41,7 @@ int nseqs, max_aa;
 
 int *seqlen_array, def_aa_xref[NUMRES+1];
 
-int *bench_output, *seq_output;
+int *bench_output;
 
 double gap_open,      gap_extend;
 double prot_gap_open, prot_gap_extend;
@@ -450,7 +450,7 @@ int pairalign()
             {
                m = seqlen_array[sj+1];
                if ( n == 0 || m == 0 ) {
-                  seq_output[si*nseqs+sj] = (int) 1.0;
+                  bench_output[si*nseqs+sj] = (int) 1.0;
                } else {
                   int se1, se2, sb1, sb2, maxscore, seq1, seq2, g, gh;
                   int displ[2*MAX_ALN_LENGTH+1];
