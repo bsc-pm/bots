@@ -460,11 +460,11 @@ void bots_set_info ()
    snprintf(bots_ldflags, BOTS_TMP_STR_SZ, LDFLAGS);
 
 #if defined(MANUAL_CUTOFF) 
-   sprintf(bots_cutoff, BOTS_TMP_STR_SZ, "manual (%d)",bots_cutoff_value);
+   snprintf(bots_cutoff, BOTS_TMP_STR_SZ, "manual (%d)",bots_cutoff_value);
 #elif defined(IF_CUTOFF) 
-   sprintf(bots_cutoff, BOTS_TMP_STR_SZ, "pragma-if (%d)",bots_cutoff_value);
+   snprintf(bots_cutoff, BOTS_TMP_STR_SZ, "pragma-if (%d)",bots_cutoff_value);
 #elif defined(FINAL_CUTOFF)
-   sprintf(bots_cutoff, BOTS_TMP_STR_SZ, "final (%d)",bots_cutoff_value);
+   snprintf(bots_cutoff, BOTS_TMP_STR_SZ, "final (%d)",bots_cutoff_value);
 #else
    strcpy(bots_cutoff,"none");
 #endif
