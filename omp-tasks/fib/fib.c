@@ -150,13 +150,13 @@ int fib_verify (int n)
 	if (bots_sequential_flag)
 	{
 		if (par_res == seq_res) result = BOTS_RESULT_SUCCESSFUL;
-		else result = BOTS_RESULT_SUCCESSFUL;
+		else result = BOTS_RESULT_UNSUCCESSFUL;
 	}
 	else
 	{
 		seq_res = fib_verify_value(n);
 		if (par_res == seq_res) result = BOTS_RESULT_SUCCESSFUL;
-		else result = BOTS_RESULT_SUCCESSFUL;
+		else result = BOTS_RESULT_UNSUCCESSFUL;
 	}
 
 	return result;
