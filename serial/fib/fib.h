@@ -19,7 +19,7 @@
 /**********************************************************************************************/
 #ifndef FIB_H
 #define FIB_H
-int fib (int n);
+long long fib (int n);
 void fib0 (int n);
 #endif
 

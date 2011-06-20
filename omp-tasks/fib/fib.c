@@ -22,9 +22,9 @@
 #include "fib.h"
 
 #define FIB_RESULTS_PRE 41
-int fib_results[FIB_RESULTS_PRE] = {0,1,1,2,3,5,8,13,21,34,55,89,144,233,377,610,987,1597,2584,4181,6765,10946,17711,28657,46368,75025,121393,196418,317811,514229,832040,1346269,2178309,3524578,5702887,9227465,14930352,24157817,39088169,63245986,102334155};
+long long fib_results[FIB_RESULTS_PRE] = {0,1,1,2,3,5,8,13,21,34,55,89,144,233,377,610,987,1597,2584,4181,6765,10946,17711,28657,46368,75025,121393,196418,317811,514229,832040,1346269,2178309,3524578,5702887,9227465,14930352,24157817,39088169,63245986,102334155};
 
-int fib_seq (int n)
+long long fib_seq (int n)
 {
 	int x, y;
 	if (n < 2) return n;
@@ -37,9 +37,9 @@ int fib_seq (int n)
 
 #if defined(IF_CUTOFF)
 
-int fib (int n,int d)
+long long fib (int n,int d)
 {
-	int x, y;
+	long long x, y;
 	if (n < 2) return n;
 
 	#pragma omp task untied shared(x) firstprivate(n) if(d < bots_cutoff_value)
@@ -54,9 +54,9 @@ int fib (int n,int d)
 
 #elif defined(FINAL_CUTOFF)
 
-int fib (int n,int d)
+long long fib (int n,int d)
 {
-	int x, y;
+	long long x, y;
 	if (n < 2) return n;
 
 	#pragma omp task untied shared(x) firstprivate(n) final(d+1 >= bots_cutoff_value) mergeable
@@ -71,9 +71,9 @@ int fib (int n,int d)
 
 #elif defined(MANUAL_CUTOFF)
 
-int fib (int n, int d)
+long long fib (int n, int d)
 {
-	int x, y;
+	long long x, y;
 	if (n < 2) return n;
 
 	if ( d < bots_cutoff_value ) {
@@ -94,9 +94,9 @@ int fib (int n, int d)
 
 #else
 
-int fib (int n)
+long long fib (int n)
 {
-	int x, y;
+	long long x, y;
 	if (n < 2) return n;
 
 	#pragma omp task untied shared(x) firstprivate(n)
@@ -110,7 +110,7 @@ int fib (int n)
 
 #endif
 
-static int par_res, seq_res;
+static long long par_res, seq_res;
 
 void fib0 (int n)
 {
@@ -121,26 +121,19 @@ void fib0 (int n)
 #else
 	par_res = fib(n);
 #endif
-	bots_message("Fibonacci result for %d is %d\n",n,par_res);
+	bots_message("Fibonacci result for %d is %lld\n",n,par_res);
 }
 
 void fib0_seq (int n)
 {
 	seq_res = fib_seq(n);
-	bots_message("Fibonacci result for %d is %d\n",n,seq_res);
+	bots_message("Fibonacci result for %d is %lld\n",n,seq_res);
 }
 
-int fib_verify_value(int n)
+long long fib_verify_value(int n)
 {
-	int result = 1;
 	if (n < FIB_RESULTS_PRE) return fib_results[n];
-
-	while ( n > 1 ) {
-		result += n-1 + n-2;
-		n--;
-	}
-		
-	return result;
+	return ( fib_verify_value(n-1) + fib_verify_value(n-2));
 }
 
 int fib_verify (int n)

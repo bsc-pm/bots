@@ -21,11 +21,11 @@
 #include "bots.h"
 #include "fib.h"
 
-static int res;
+static long long res;
 
-int fib (int n)
+long long fib (int n)
 {
-	int x, y;
+	long long x, y;
 	if (n < 2) return n;
 
 	x = fib(n - 1);
@@ -37,6 +37,6 @@ int fib (int n)
 void fib0 (int n)
 {
 	res = fib(n);
-	bots_message("Fibonacci result for %d is %d\n",n,res);
+	bots_message("Fibonacci result for %d is %lld\n",n,res);
 }
 

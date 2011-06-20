@@ -20,21 +20,21 @@
 #ifndef FIB_H
 #define FIB_H
 #if defined(IF_CUTOFF)
-int fib (int n,int d);
+long long fib (int n,int d);
 #elif defined(FINAL_CUTOFF)
-int fib (int n,int d);
+long long fib (int n,int d);
 #elif defined(MANUAL_CUTOFF)
-int fib (int n,int d);
+long long fib (int n,int d);
 #else
-int fib (int n);
+long long fib (int n);
 #endif
 
-int fib_seq (int n);
+long long fib_seq (int n);
 
 void fib0 (int n);
 void fib0_seq (int n);
 
 int fib_verify (int n);
-int fib_verify_value(int n);
+long long fib_verify_value(int n);
 #endif
 
