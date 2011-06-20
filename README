@@ -63,6 +63,12 @@ file `./config/make.config'.
 
 OTHER ISSUES TO TAKE INTO ACCOUNT
 
+Some benchmarks are coded following a recursive model which makes an intensive use of stack
+frames. It is usually needed to increase default stack sizes when working with high recursion
+levels. Main stack size can be increased using `ulimit -s' linux command. Thread stacks are
+usually controlled through runtime specific environment variable (e.g. Intel C Compiler uses
+KMP_STACKSIZE=`value' for this purpose).
+
 Developer activities and documentation are centralized in http://nanos.ac.upc.edu
 
 Mail suggestions and bug reports to xxxxxxxx@bsc.es, or using our ticket system in the web
