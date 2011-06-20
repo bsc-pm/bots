@@ -206,7 +206,7 @@ unsigned long long parTreeSearch(int depth, Node *parent, int numChildren)
 
      nodePtr->numChildren = uts_numChildren(nodePtr);
 
-     #pragma omp task firstprivate(i, nodePtr) shared(partialCount) untied
+     #pragma omp task untied firstprivate(i, nodePtr) shared(partialCount)
         partialCount[i] = parTreeSearch(depth+1, nodePtr, nodePtr->numChildren);
   }
 
