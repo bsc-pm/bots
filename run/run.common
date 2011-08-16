@@ -15,7 +15,8 @@ print_help()
 	echo "-l label_list		List of labels (compilers) to use for executions"
 	echo "-v versions_list		List of versions of the benchmark to use for execution"
 	echo "-verbose 0|1|2		Set application verbosity"
-	echo "-of			Output format (TODO)"
+	echo "-of [0..4]		Set output format (see benchmark help to further details)"
+
 }
 
 parse_args ()
@@ -42,6 +43,8 @@ parse_args ()
 			"-verbose")
 				shift; EXTRA="$EXTRA -v $1"
 				;;
+                        "-of")  shift; EXTRA="$EXTRA -o $1"
+                                ;;
 			*)
 				echo "Unkown option $1"; print_help $0; exit
 				;;
