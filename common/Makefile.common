@@ -205,7 +205,7 @@ $(BIN_DIR)/$(PROGRAM).$(LABEL).$(SUB)$(VERSION)-final: main-final.o $(FINAL_PROG
 	$(OMPLINK) $(OMPLINK_ALL_FLAGS) -o $@ main-final.o $(FINAL_PROGRAM_OBJS) $(LIBS) $(COMMON_OBJS)
 
 $(BIN_DIR)/$(PROGRAM).$(LABEL).$(SUB)$(VERSION)-final-tied: main-final-tied.o $(TIED_FINAL_PROGRAM_OBJS) Makefile $(COMMON_DIR)/Makefile.common $(COMMON_OBJS)
-	$(OMPLINK) $(OMPLINK_ALL_FLAGS) -o $@ main-if-tied.o $(TIED_FINAL_PROGRAM_OBJS) $(LIBS) $(COMMON_OBJS)
+	$(OMPLINK) $(OMPLINK_ALL_FLAGS) -o $@ main-final-tied.o $(TIED_FINAL_PROGRAM_OBJS) $(LIBS) $(COMMON_OBJS)
 
 else
 
