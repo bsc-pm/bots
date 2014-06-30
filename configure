@@ -13,21 +13,20 @@ show_help ()
 }
 
 while [ "$#" -gt 0  ]; do
-	case $1 in
-		--debug) debug=yes
-				;;
-		--warnings) warnings=yes
-				;;
-		--compiler) shift; COMPILER=$1
-				;;
-		--help) 
-			show_help
-			exit
-                        ;;
-		*) echo "Unknown option $1 (skipping)"
-			;;
-	esac
-	shift
+   case $1 in
+      --debug) debug=yes
+         ;;
+      --warnings) warnings=yes
+         ;;
+      --compiler) shift; COMPILER=$1
+         ;;
+      --help) 
+         show_help
+         exit
+      *) echo "Unknown option $1 (skipping)"
+         ;;
+   esac
+   shift
 done
 
 GCC=`gcc -x c -c -fopenmp /dev/null -o /dev/null &>/dev/null  && echo "yes"`
@@ -42,49 +41,48 @@ nc=0
 if [ -z "$COMPILER" ]; then
 
    if [ "$GCC" = "yes" ]; then
-	let nc=nc+1
-	COMPILERS[nc]="gcc"
+      let nc=nc+1
+      COMPILERS[nc]="gcc"
    fi
 
    if [ "$MCC" = "yes" ]; then
-	let nc=nc+1
-	COMPILERS[nc]="mcc"
+      let nc=nc+1
+      COMPILERS[nc]="mcc"
    fi
 
    if [ "$ICC" = "yes" ]; then
-	let nc=nc+1
-	COMPILERS[nc]="icc"
+      let nc=nc+1
+      COMPILERS[nc]="icc"
    fi
 
    if [ "$XLC" = "yes" ]; then
-	let nc=nc+1
-	COMPILERS[nc]="xlc"
+      let nc=nc+1
+      COMPILERS[nc]="xlc"
    fi
 
    if [ "$PGI" = "yes" ]; then
-        let nc=nc+1
-        COMPILERS[nc]="pgi"
+      let nc=nc+1
+      COMPILERS[nc]="pgi"
    fi
 
    if [ "$SUN" = "yes" ]; then
-        let nc=nc+1        
-        COMPILERS[nc]="sunstudio"
+      let nc=nc+1        
+      COMPILERS[nc]="sunstudio"
    fi     
 
    if [ "$nc" -gt "0" ]; then
-	echo "The following compilers are recognized: "
-	n=1
-	for comp in ${COMPILERS[*]}; do
- 	 	echo "  $n. $comp"
-  		let n=n+1
-	done
-	echo -n "Choose one to use:"
-	read 
-
-	COMPILER=${COMPILERS[$REPLY]}
+      echo "The following compilers are recognized: "
+      n=1
+      for comp in ${COMPILERS[*]}; do
+         echo "  $n. $comp"
+         let n=n+1
+      done
+      echo -n "Choose one to use:"
+      read 
+      COMPILER=${COMPILERS[$REPLY]}
    else
-	echo "No suitable compiler was detected"
-	echo "An empty $OUTPUT will be generated"
+      echo "No suitable compiler was detected"
+      echo "An empty $OUTPUT will be generated"
    fi
 fi
 
@@ -93,125 +91,132 @@ fi
 [ "$warnings" = "yes" ] && WARNINGS=
 
 if [ "$COMPILER" = "gcc" -a "$GCC" = "yes" ]; then
-	CC=gcc
-	CLINK=$CC
-	OMPC="$CC -fopenmp"
-	OMPLINK="$CC -fopenmp"
-	LABEL=gcc
-	[ "$debug" = "yes" ] && DEBUG=$DEBUG -g
-	[ "$warnings" = "yes" ] && WARNINGS="$WARNINGS -Wall -Werror"
+   CC=gcc
+   CLINK=$CC
+   OMPC="$CC -fopenmp"
+   OMPLINK="$CC -fopenmp"
+   LABEL=gcc
+   [ "$debug" = "yes" ] && DEBUG=$DEBUG -g
+   [ "$warnings" = "yes" ] && WARNINGS="$WARNINGS -Wall -Werror"
 
-	OPT_FLAGS=-O3
-	CC_FLAGS="$DEBUG $WARNINGS"
-	OMPC_FLAGS="$DEBUG $WARNINGS"
-	CLINK_FLAGS=$DEBUG
-	OMPLINK_FLAGS=$DEBUG
+   OPT_FLAGS=-O3
+   CC_FLAGS="$DEBUG $WARNINGS"
+   OMPC_FLAGS="$DEBUG $WARNINGS"
+   CLINK_FLAGS=$DEBUG
+   OMPLINK_FLAGS=$DEBUG
 fi
 
 if [ "$COMPILER" = "icc" -a "$ICC" = "yes" ]; then
-	CC=icc
-	CLINK=$CC
-	OMPC="$CC -openmp"
-	OMPLINK="$CC -openmp"
-	LABEL=icc
-	[ "$debug" = "yes" ] && DEBUG=$DEBUG -g
-	[ "$warnings" = "yes" ] && WARNINGS="$WARNINGS -Wall -Werror"
+   CC=icc
+   CLINK=$CC
+   OMPC="$CC -openmp"
+   OMPLINK="$CC -openmp"
+   LABEL=icc
+   [ "$debug" = "yes" ] && DEBUG=$DEBUG -g
+   [ "$warnings" = "yes" ] && WARNINGS="$WARNINGS -Wall -Werror"
 
-	OPT_FLAGS=-O2
-	CC_FLAGS="$DEBUG $WARNINGS"
-	OMPC_FLAGS="$DEBUG $WARNINGS"
-	CLINK_FLAGS=$DEBUG
-	OMPLINK_FLAGS=$DEBUG
+   OPT_FLAGS=-O2
+   CC_FLAGS="$DEBUG $WARNINGS"
+   OMPC_FLAGS="$DEBUG $WARNINGS"
+   CLINK_FLAGS=$DEBUG
+   OMPLINK_FLAGS=$DEBUG
 fi
 
 
 if [ "$COMPILER" = "mcc" -a "$MCC" = "yes" ]; then
-	case $(uname -i) in
-		x86_64) extras="-m32"
-                        ;;
-        esac
+   case $(uname -i) in
+      x86_64) extras="-m32"
+      ;;
+   esac
 
-	CC="mcc $extras"
-	CLINK=$CC
-	OMPC=$CC
-	OMPLINK=$CC
-	LABEL=mcc
-	[ "$debug" = "yes" ] && DEBUG=$DEBUG -g
-	[ "$warnings" = "yes" ] && WARNINGS="$WARNINGS -Wall -Werror"
+   CC="mcc $extras"
+   CLINK=$CC
+   OMPC=$CC
+   OMPLINK=$CC
+   LABEL=mcc
+   [ "$debug" = "yes" ] && DEBUG=$DEBUG -g
+   [ "$warnings" = "yes" ] && WARNINGS="$WARNINGS -Wall -Werror"
 
-	OPT_FLAGS=-O3
-	CC_FLAGS="$DEBUG $WARNINGS --no-openmp"
-	OMPC_FLAGS="$DEBUG $WARNINGS"
-	CLINK_FLAGS="$DEBUG --no-openmp"
-	OMPLINK_FLAGS=$DEBUG
-        OMPC_FINAL_FLAGS="--serialize"
+   OPT_FLAGS=-O3
+   CC_FLAGS="$DEBUG $WARNINGS --no-openmp"
+   OMPC_FLAGS="$DEBUG $WARNINGS"
+   CLINK_FLAGS="$DEBUG --no-openmp"
+   OMPLINK_FLAGS=$DEBUG
+   OMPC_FINAL_FLAGS="--serialize"
 
-	supports_final_clause=yes
+   ENABLE_OMPSS=yes
+
+   OMPSSC=mcc
+   OMPSSLINK=mcc
+   OMPSSC_FLAGS=--ompss
+   OMPSSLINK_FLAGS=--ompss
+
+   supports_final_clause=yes
 fi
 
 if [ "$COMPILER" = "xlc" -a "$XLC" = "yes" ]; then
-	CC=xlc_r
-	CLINK=$CC
-	OMPC="$CC -qsmp=omp"
-	OMPLINK=$OMPC
-	LABEL=xlc
-	[ "$debug" = "yes" ] && DEBUG=$DEBUG -g
-	[ "$warnings" = "yes" ] && WARNINGS="$WARNINGS -qflag=w:w -qhalt=w"
+   CC=xlc_r
+   CLINK=$CC
+   OMPC="$CC -qsmp=omp"
+   OMPLINK=$OMPC
+   LABEL=xlc
+   [ "$debug" = "yes" ] && DEBUG=$DEBUG -g
+   [ "$warnings" = "yes" ] && WARNINGS="$WARNINGS -qflag=w:w -qhalt=w"
 
-	OPT_FLAGS=-O3
-	CC_FLAGS="$DEBUG $WARNINGS"
-	OMPC_FLAGS="-qthreaded $DEBUG $WARNINGS"
-	CLINK_FLAGS=$DEBUG
-	OMPLINK_FLAGS="-qthreaded $DEBUG"
+   OPT_FLAGS=-O3
+   CC_FLAGS="$DEBUG $WARNINGS"
+   OMPC_FLAGS="-qthreaded $DEBUG $WARNINGS"
+   CLINK_FLAGS=$DEBUG
+   OMPLINK_FLAGS="-qthreaded $DEBUG"
 fi
 
 if [ "$COMPILER" = "pgi" -a "$PGI" = "yes" ]; then
-        CC=pgcc
-        CLINK=$CC
-        OMPC="$CC -mp -Minfo=mp"
-        OMPLINK=$OMPC
-	LABEL=pgi
-        [ "$debug" = "yes" ] && DEBUG="$DEBUG -g"
-	if [ "$warnings" = "yes" ]; then
-		echo "The pgi compiler doesn't support '--warnings' option (skipping it)"
-		echo "Press (Enter) to continue..."
-		read 
-	fi
+   CC=pgcc
+   CLINK=$CC
+   OMPC="$CC -mp -Minfo=mp"
+   OMPLINK=$OMPC
+   LABEL=pgi
+   [ "$debug" = "yes" ] && DEBUG="$DEBUG -g"
+   if [ "$warnings" = "yes" ]; then
+      echo "The pgi compiler doesn't support '--warnings' option (skipping it)"
+      echo "Press (Enter) to continue..."
+      read 
+   fi
 
-        OPT_FLAGS=-fast
-        CC_FLAGS="$DEBUG $WARNINGS"
-        OMPC_FLAGS="$DEBUG $WARNINGS"
-        CLINK_FLAGS=$DEBUG
-        OMPLINK_FLAGS=$DEBUG
+   OPT_FLAGS=-fast
+   CC_FLAGS="$DEBUG $WARNINGS"
+   OMPC_FLAGS="$DEBUG $WARNINGS"
+   CLINK_FLAGS=$DEBUG
+   OMPLINK_FLAGS=$DEBUG
 fi
 
 if [ "$COMPILER" = "sunstudio" -a "$SUN" = "yes" ]; then
-        CC=cc                         
-        CLINK=$CC                     
-        OMPC="$CC -xopenmp"           
-        OMPLINK=$OMPC                 
-	LABEL=suns
-        [ "$debug" = "yes" ] && DEBUG=$DEBUG -g
-	if [ "$warnings" = "yes" ]; then
-		echo "The sunstudio compiler doesn't support '--warnings' option (skipping it)"
-		echo "Press (Enter) to continue..."
-		read 
-	fi
+   CC=cc                         
+   CLINK=$CC                     
+   OMPC="$CC -xopenmp"           
+   OMPLINK=$OMPC                 
+   LABEL=suns
+   [ "$debug" = "yes" ] && DEBUG=$DEBUG -g
+   if [ "$warnings" = "yes" ]; then
+      echo "The sunstudio compiler doesn't support '--warnings' option (skipping it)"
+      echo "Press (Enter) to continue..."
+      read 
+   fi
 
-        OPT_FLAGS=-fast
-        CC_FLAGS="$DEBUG $WARNINGS"
-        OMPC_FLAGS="$DEBUG $WARNINGS"
-        CLINK_FLAGS=$DEBUG
-        OMPLINK_FLAGS=$DEBUG
+   OPT_FLAGS=-fast
+   CC_FLAGS="$DEBUG $WARNINGS"
+   OMPC_FLAGS="$DEBUG $WARNINGS"
+   CLINK_FLAGS=$DEBUG
+   OMPLINK_FLAGS=$DEBUG
 fi
 
 if [ -z "$CC" ]; then
-  echo "Wrong compiler configuration"
-  exit 1
+   echo "Wrong compiler configuration"
+   exit 1
 fi
 
 if [ "$debug" = "yes" ]; then
-	LABEL="$LABEL-debug"
+   LABEL="$LABEL-debug"
 fi
 
 [ -f $OUTPUT ] && replacing_config=true
@@ -223,9 +228,13 @@ cat > $OUTPUT << EOF
 #config name
 LABEL=$LABEL
 
+ENABLE_OMPSS=$ENABLE_OMPSS
+
 #compilers
+OMPSSC=$OMPSSC
 OMPC=$OMPC
 CC=$CC
+OMPSSLINK=$OMPSSLINK
 OMPLINK=$OMPLINK
 CLINK=$CLINK
 
@@ -235,10 +244,13 @@ OPT_FLAGS=$OPT_FLAGS
 
 CC_FLAGS=$CC_FLAGS
 OMPC_FLAGS=$OMPC_FLAGS
+OMPSSC_FLAGS=$OMPSSC_FLAGS
 OMPC_FINAL_FLAGS=$OMPC_FINAL_FLAGS
+OMPSSC_FINAL_FLAG=$OMPSSC_FINAL_FLAGS
 
 CLINK_FLAGS=$CLINK_FLAGS
 OMPLINK_FLAGS=$OMPLINK_FLAGS
+OMPSSLINK_FLAGS=$OMPSSLINK_FLAGS
 
 EOF
 
@@ -248,18 +260,18 @@ EOF
 echo "make.config generated"
 
 if [ "$replacing_config" ]; then
-	echo "Configuration was changed. Cleaning up"
-	make clean
+   echo "Configuration was changed. Cleaning up"
+   make clean
 fi 
 
 [ -d bin ] || mkdir -p bin
 
 if make -v | grep GNU &> /dev/null; then
-	echo "Run make to compile the benchmarks"
+   echo "Run make to compile the benchmarks"
 elif gmake -v | grep GNU &> /dev/null; then 
-	echo "Run gmake to compile the benchmarks"
+   echo "Run gmake to compile the benchmarks"
 else
-	echo "I didn't find a GNU-compatible make. You'll need it to compile the benchmarks"
+   echo "I didn't find a GNU-compatible make. You'll need it to compile the benchmarks"
 fi
 
 echo "You can further refine your configuration in config/make.config"
