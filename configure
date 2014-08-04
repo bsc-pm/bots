@@ -23,6 +23,7 @@ while [ "$#" -gt 0  ]; do
       --help) 
          show_help
          exit
+         ;;
       *) echo "Unknown option $1 (skipping)"
          ;;
    esac
