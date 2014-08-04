@@ -69,9 +69,8 @@ levels. Main stack size can be increased using `ulimit -s' linux command. Thread
 usually controlled through runtime specific environment variable (e.g. Intel C Compiler uses
 KMP_STACKSIZE=`value' for this purpose).
 
-Developer activities and documentation are centralized in http://nanos.ac.upc.edu
-
-Mail suggestions and bug reports to xxxxxxxx@bsc.es, or using our ticket system in the web
-site: http://nanos.ac.upc.edu/projects/bots
-
-
+Developer activities and documentation are centralized in https://pm.bsc.es/projects/bots
+ 
+Mail suggestions and bug reports to pm-tools@bsc.es, or using our ticket system in the web
+site: http://pm.bsc.es/projects/bots
+ 
