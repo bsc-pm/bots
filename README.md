@@ -33,30 +33,30 @@ The package directory is organized as follows:
 SUITE COMPILATION
 =================
 
-Briefly, the shell commands `./configure' and  `make' should configure and build this package.
+Briefly, the shell commands `./configure` and  `make` should configure and build this package.
 
-The `./configure' shell script attempts to guess correct values for various system-dependent
+The `./configure` shell script attempts to guess correct values for various system-dependent
 variables used during compilation (compiler and OpenMP specific flags). The shell script
 examines the compilers installed in the system and let the user choose among them.  It uses
-those values to create a `make.config' in `./config' directory which will be used during
+those values to create a `make.config` in `./config` directory which will be used during
 the suite compilation.
 
 If you need to change compilers, linkers or compilation options you can change manually the
-file `./config/make.config'.
+file `./config/make.config`.
 
 OTHER ISSUES TO TAKE INTO ACCOUNT
 =================================
 
 Some benchmarks are coded following a recursive model which makes an intensive use of stack
 frames. It is usually needed to increase default stack sizes when working with high recursion
-levels. Main stack size can be increased using `ulimit -s' linux command. Thread stacks are
+levels. Main stack size can be increased using `ulimit -s` linux command. Thread stacks are
 usually controlled through runtime specific environment variable (e.g. Intel C Compiler uses
-KMP_STACKSIZE=`value' for this purpose).
+`KMP_STACKSIZE=value` for this purpose).
 
-Developer activities and documentation are centralized in https://pm.bsc.es/projects/bots
+Developer activities and documentation are centralized in https://pm.bsc.es/gitlab/benchmarks/bots
  
-Mail suggestions and bug reports to **pm-tools**, or using our gitlab issues in the web
-site: http://pm.bsc.es/projects/bots
+Mail suggestions and bug reports to **pm-tools**, or using the web site:
+https://pm.bsc.es/gitlab/benchmarks/bots/issues
  
 ***
 
