@@ -1,24 +1,5 @@
-/**********************************************************************************************/
-/*  This program is part of the Barcelona OpenMP Tasks Suite                                  */
-/*  Copyright (C) 2009 Barcelona Supercomputing Center - Centro Nacional de Supercomputacion  */
-/*  Copyright (C) 2009 Universitat Politecnica de Catalunya                                   */
-/*                                                                                            */
-/*  This program is free software; you can redistribute it and/or modify                      */
-/*  it under the terms of the GNU General Public License as published by                      */
-/*  the Free Software Foundation; either version 2 of the License, or                         */
-/*  (at your option) any later version.                                                       */
-/*                                                                                            */
-/*  This program is distributed in the hope that it will be useful,                           */
-/*  but WITHOUT ANY WARRANTY; without even the implied warranty of                            */
-/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                             */
-/*  GNU General Public License for more details.                                              */
-/*                                                                                            */
-/*  You should have received a copy of the GNU General Public License                         */
-/*  along with this program; if not, write to the Free Software                               */
-/*  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA            */
-/**********************************************************************************************/
-
 SUITE DESCRIPTION
+=================
 
 The objective of the suite is to provide a collection of applications that allow to test
 OpenMP tasking implementations. Most of the kernels come from existing ones from other
@@ -36,6 +17,7 @@ etc). It currently comes with the following kernels:
    + Strassen: Computes a matrix multiply with Strassen's method.
 
 FILE DESCRIPTION
+================
 
 The package directory is organized as follows:
 
@@ -49,6 +31,7 @@ The package directory is organized as follows:
    + ./templates: template directory.
 
 SUITE COMPILATION
+=================
 
 Briefly, the shell commands `./configure' and  `make' should configure and build this package.
 
@@ -62,6 +45,7 @@ If you need to change compilers, linkers or compilation options you can change m
 file `./config/make.config'.
 
 OTHER ISSUES TO TAKE INTO ACCOUNT
+=================================
 
 Some benchmarks are coded following a recursive model which makes an intensive use of stack
 frames. It is usually needed to increase default stack sizes when working with high recursion
@@ -71,6 +55,9 @@ KMP_STACKSIZE=`value' for this purpose).
 
 Developer activities and documentation are centralized in https://pm.bsc.es/projects/bots
  
-Mail suggestions and bug reports to pm-tools@bsc.es, or using our ticket system in the web
+Mail suggestions and bug reports to **pm-tools**, or using our gitlab issues in the web
 site: http://pm.bsc.es/projects/bots
  
+***
+
+(\*) All our email accounts are hosted at **bsc.es** (i.e. \<account-name\>@bsc.es).
