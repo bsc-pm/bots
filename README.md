@@ -53,10 +53,10 @@ levels. Main stack size can be increased using `ulimit -s` linux command. Thread
 usually controlled through runtime specific environment variable (e.g. Intel C Compiler uses
 `KMP_STACKSIZE=value` for this purpose).
 
-Developer activities and documentation are centralized in https://pm.bsc.es/gitlab/benchmarks/bots
- 
-Mail suggestions and bug reports to **pm-tools**, or using the web site:
-https://pm.bsc.es/gitlab/benchmarks/bots/issues
+Developer activities and documentation are centralized in our
+[repository](https://pm.bsc.es/gitlab/benchmarks/bots).
+Mail suggestions, comments and bug reports to **pm-tools**\*. You can also write a bug report 
+[here](https://pm.bsc.es/gitlab/benchmarks/bots/issues).
  
 ***
 
