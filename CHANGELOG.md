@@ -1,12 +1,12 @@
-*_BOTS version 1.1.2*_ (released 2011-11-23)
+# _BOTS version 1.1.2_ (released 2011-11-23)
 
-The following new features/information were added:
+## The following new features/information were added:
 
   * Choose output format option from run scripts (#132)
   * New Health's large and test inputs (#123)
   * Tied version for UTS benchmark (#131)
 
-In addition, the following items were fixed and/or added:
+## In addition, the following items were fixed and/or added:
 
   * Health results in unsuccessful when compiled with -m 32 (#124)
   * UTS benchmark seg faults with medium data set (#128)
@@ -15,9 +15,9 @@ In addition, the following items were fixed and/or added:
   * Wrong use of arrays in alignment benchmark (#126 an #127)
   * String overflows problem in common files (#122)
 
-*_BOTS version 1.1.1*_ (released 2011-2-11)
+# _BOTS version 1.1.1_ (released 2011-2-11)
 
-The following new features/information were added:
+## The following new features/information were added:
 
   * Several benchmarks using the final OpenMP 3.1 final clause (#96)
   * Alignment benchmark has been adapted to clustalw implementation (#119)
@@ -26,7 +26,7 @@ The following new features/information were added:
   * A new version with single has been implemented for alignment benchmark (#63)
   * Verbosity in "run-health.sh -check" has been reduced (#112)
 
-In addition, the following items were fixed and/or added:
+## In addition, the following items were fixed and/or added:
 
   * Script run-nqueens.sh no-shell bug fixed (#115)
   * sparselu: divison by zero in checkmat() fixed (#118)
@@ -37,9 +37,9 @@ In addition, the following items were fixed and/or added:
   * Sort benchmark when seqmerge() is running for just one element bug fixed(#65)
   * All warnings has been removed from compilation (#114)
 
-*_BOTS version 1.1*_ (released 2010-5-17)
+# _BOTS version 1.1_ (released 2010-5-17)
 
-The following new features/information were added:
+## The following new features/information were added:
 
   * A new benchmark has been added: Unbalanceed Tree Search (UTS) (#3, #98, #99, #102, #103, #105 & #106)
   * A README file has been added (#55)
@@ -53,7 +53,7 @@ The following new features/information were added:
   * An abrigded list format has been included (#42)
   * Fibonacci uses pre-computed values for testing purposes (#24)
 
-In addition, the following items were fixed and/or added:
+## In addition, the following items were fixed and/or added:
 
   * Verbose modes have been reviewed and synchronized with configure '--debug' option (#79, #104, #107 & #108)
   * Common compiler warning have been solved (using icc #100 and xlc #101 compilers)
@@ -80,4 +80,4 @@ In addition, the following items were fixed and/or added:
   * SparseLU checking were too strict and has been relaxed (#59)
 
 
-*_BOTS version 1.0*_ (released 2009-5-29)
+# _BOTS version 1.0_ (released 2009-5-29)
