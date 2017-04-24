@@ -47,7 +47,7 @@ int sim_population_ratio;
 int sim_time;
 int sim_assess_time;
 int sim_convalescence_time;
-int32_t sim_seed;
+int sim_seed;
 float sim_get_sick_p;
 float sim_convalescence_p;
 float sim_realloc_p;
@@ -558,7 +558,7 @@ void read_input_data(char *filename)
       bots_message("Could not open sequence file (%s)\n", filename);
       exit (-1);
    }
-   res = fscanf(fin,"%d %d %d %d %d %d %ld %f %f %f %d %d %d %d %d %d %d %d %f", 
+   res = fscanf(fin,"%d %d %d %d %d %d %d %f %f %f %d %d %d %d %d %d %d %d %f", 
              &sim_level,
              &sim_cities,
              &sim_population_ratio,
