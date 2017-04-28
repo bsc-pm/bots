@@ -88,7 +88,7 @@ void genmat (float *M[])
          /* allocating matrix */
          if (null_entry == FALSE){
             M[ii*bots_arg_size+jj] = (float *) malloc(bots_arg_size_1*bots_arg_size_1*sizeof(float));
-	    if ((M[ii*bots_arg_size+jj] == NULL))
+	    if (M[ii*bots_arg_size+jj] == NULL)
             {
                bots_message("Error: Out of memory\n");
                exit(101);
