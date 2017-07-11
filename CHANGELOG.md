@@ -1,6 +1,6 @@
 # BOTS ChangeLog
 
-## _BOTS unreleased_ 
+## _BOTS current version_ (unreleased)
 
 ### The following new features/information were added:
 
