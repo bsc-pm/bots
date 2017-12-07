@@ -1,4 +1,4 @@
 *.o
-bin
+bin/*
 config/make.config
 bots-*.tar.gz
