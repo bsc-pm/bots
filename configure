@@ -67,9 +67,9 @@ if [ -z "$COMPILER" ]; then
    fi
 
    if [ "$SUN" = "yes" ]; then
-      let nc=nc+1        
+      let nc=nc+1
       COMPILERS[nc]="sunstudio"
-   fi     
+   fi
 
    if [ "$nc" -gt "0" ]; then
       echo "The following compilers are recognized: "
@@ -79,7 +79,7 @@ if [ -z "$COMPILER" ]; then
          let n=n+1
       done
       echo -n "Choose one to use:"
-      read 
+      read
       COMPILER=${COMPILERS[$REPLY]}
    else
       echo "No suitable compiler was detected"
@@ -192,16 +192,16 @@ if [ "$COMPILER" = "pgi" -a "$PGI" = "yes" ]; then
 fi
 
 if [ "$COMPILER" = "sunstudio" -a "$SUN" = "yes" ]; then
-   CC=cc                         
-   CLINK=$CC                     
-   OMPC="$CC -xopenmp"           
-   OMPLINK=$OMPC                 
+   CC=cc
+   CLINK=$CC
+   OMPC="$CC -xopenmp"
+   OMPLINK=$OMPC
    LABEL=suns
    [ "$debug" = "yes" ] && DEBUG=$DEBUG -g
    if [ "$warnings" = "yes" ]; then
       echo "The sunstudio compiler doesn't support '--warnings' option (skipping it)"
       echo "Press (Enter) to continue..."
-      read 
+      read
    fi
 
    OPT_FLAGS=-fast
