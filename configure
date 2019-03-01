@@ -6,7 +6,7 @@ show_help ()
 {
    echo "$0 options:"
    echo "--compiler name    Configures BOTS for given compiler"
-   echo "                   Supported compilers: GCC, ICC, SunStudio, PGI, XLC and  Mercurium"
+   echo "                   Supported compilers: GCC, ICC, SunStudio, PGI, XLC, CLANG and  Mercurium"
    echo "--debug            Enables debug flags"
    echo "--warnings         Force warnings to be reported as errors"
    echo "--help             Prints this help"
@@ -36,6 +36,7 @@ ICC=`icc -v &> /dev/null && echo "yes"`
 XLC=`xlc -qversion &> /dev/null && echo "yes"`
 PGI=`pgcc &> /dev/null && echo "yes"`
 SUN=`cc -xopenmp &> /dev/null && echo "yes"`
+CLANG=`clang -v &> /dev/null && echo "yes"`
 
 nc=0
 
@@ -69,6 +70,11 @@ if [ -z "$COMPILER" ]; then
    if [ "$SUN" = "yes" ]; then
       let nc=nc+1
       COMPILERS[nc]="sunstudio"
+   fi
+
+   if [ "$CLANG" = "yes" ]; then
+      let nc=nc+1
+      COMPILERS[nc]="clang"
    fi
 
    if [ "$nc" -gt "0" ]; then
@@ -205,6 +211,22 @@ if [ "$COMPILER" = "sunstudio" -a "$SUN" = "yes" ]; then
    fi
 
    OPT_FLAGS=-fast
+   CC_FLAGS="$DEBUG $WARNINGS"
+   OMPC_FLAGS="$DEBUG $WARNINGS"
+   CLINK_FLAGS=$DEBUG
+   OMPLINK_FLAGS=$DEBUG
+fi
+
+if [ "$COMPILER" = "clang" -a "$CLANG" = "yes" ]; then
+   CC=clang
+   CLINK=$CC
+   OMPC="$CC -fopenmp"
+   OMPLINK="$CC -fopenmp"
+   LABEL=clang
+   [ "$debug" = "yes" ] && DEBUG=$DEBUG -g
+   [ "$warnings" = "yes" ] && WARNINGS="$WARNINGS -Wall -Werror"
+
+   OPT_FLAGS=-O3
    CC_FLAGS="$DEBUG $WARNINGS"
    OMPC_FLAGS="$DEBUG $WARNINGS"
    CLINK_FLAGS=$DEBUG
