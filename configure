@@ -37,6 +37,7 @@ ICC=`icc -v &> /dev/null && echo "yes"`
 XLC=`xlc -qversion &> /dev/null && echo "yes"`
 PGI=`pgcc &> /dev/null && echo "yes"`
 SUN=`cc -xopenmp &> /dev/null && echo "yes"`
+CLANG=`clang -v &> /dev/null && echo "yes"`
 
 nc=0
 
@@ -73,9 +74,14 @@ if [ -z "$COMPILER" ]; then
    fi
 
    if [ "$SUN" = "yes" ]; then
-      let nc=nc+1        
+      let nc=nc+1
       COMPILERS[nc]="sunstudio"
-   fi     
+   fi
+
+   if [ "$CLANG" = "yes" ]; then
+      let nc=nc+1
+      COMPILERS[nc]="clang"
+   fi
 
    if [ "$nc" -gt "0" ]; then
       echo "The following compilers are recognized: "
@@ -85,7 +91,7 @@ if [ -z "$COMPILER" ]; then
          let n=n+1
       done
       echo -n "Choose one to use:"
-      read 
+      read
       COMPILER=${COMPILERS[$REPLY]}
    else
       echo "No suitable compiler was detected"
@@ -214,19 +220,35 @@ if [ "$COMPILER" = "pgi" -a "$PGI" = "yes" ]; then
 fi
 
 if [ "$COMPILER" = "sunstudio" -a "$SUN" = "yes" ]; then
-   CC=cc                         
-   CLINK=$CC                     
-   OMPC="$CC -xopenmp"           
-   OMPLINK=$OMPC                 
+   CC=cc
+   CLINK=$CC
+   OMPC="$CC -xopenmp"
+   OMPLINK=$OMPC
    LABEL=suns
    [ "$debug" = "yes" ] && DEBUG=$DEBUG -g
    if [ "$warnings" = "yes" ]; then
       echo "The sunstudio compiler doesn't support '--warnings' option (skipping it)"
       echo "Press (Enter) to continue..."
-      read 
+      read
    fi
 
    OPT_FLAGS=-fast
+   CC_FLAGS="$DEBUG $WARNINGS"
+   OMPC_FLAGS="$DEBUG $WARNINGS"
+   CLINK_FLAGS=$DEBUG
+   OMPLINK_FLAGS=$DEBUG
+fi
+
+if [ "$COMPILER" = "clang" -a "$CLANG" = "yes" ]; then
+   CC=clang
+   CLINK=$CC
+   OMPC="$CC -fopenmp"
+   OMPLINK="$CC -fopenmp"
+   LABEL=clang
+   [ "$debug" = "yes" ] && DEBUG=$DEBUG -g
+   [ "$warnings" = "yes" ] && WARNINGS="$WARNINGS -Wall -Werror"
+
+   OPT_FLAGS=-O3
    CC_FLAGS="$DEBUG $WARNINGS"
    OMPC_FLAGS="$DEBUG $WARNINGS"
    CLINK_FLAGS=$DEBUG

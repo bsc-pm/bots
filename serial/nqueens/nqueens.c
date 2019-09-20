@@ -103,7 +103,7 @@ void find_queens (int size)
 	char *a;
 
 	total_count=0;
-	a = alloca(size * sizeof(char));
+	a = (char *)alloca(size * sizeof(char));
 	bots_message("Computing N-Queens algorithm (n=%d) ", size);
 	nqueens(size, 0, a, &total_count);
         bots_message(" completed!\n");

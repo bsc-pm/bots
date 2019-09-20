@@ -423,7 +423,7 @@ void OptimizedStrassenMultiply_seq(REAL *C, REAL *A, REAL *B, unsigned MatrixSiz
   C22 = C21 + QuadrantSize;
 
   /* Allocate Heap Space Here */
-  StartHeap = Heap = malloc(QuadrantSizeInBytes * NumberOfVariables);
+  StartHeap = Heap = (char *)malloc(QuadrantSizeInBytes * NumberOfVariables);
   /* ensure that heap is on cache boundary */
   if ( ((PTR) Heap) & 31)
      Heap = (char*) ( ((PTR) Heap) + 32 - ( ((PTR) Heap) & 31) );
@@ -622,7 +622,7 @@ void OptimizedStrassenMultiply_par(REAL *C, REAL *A, REAL *B, unsigned MatrixSiz
   C22 = C21 + QuadrantSize;
 
   /* Allocate Heap Space Here */
-  StartHeap = Heap = malloc(QuadrantSizeInBytes * NumberOfVariables);
+  StartHeap = Heap = (char *)malloc(QuadrantSizeInBytes * NumberOfVariables);
   /* ensure that heap is on cache boundary */
   if ( ((PTR) Heap) & 31)
      Heap = (char*) ( ((PTR) Heap) + 32 - ( ((PTR) Heap) & 31) );
@@ -832,7 +832,7 @@ void OptimizedStrassenMultiply_par(REAL *C, REAL *A, REAL *B, unsigned MatrixSiz
   C22 = C21 + QuadrantSize;
 
   /* Allocate Heap Space Here */
-  StartHeap = Heap = malloc(QuadrantSizeInBytes * NumberOfVariables);
+  StartHeap = Heap = (char *)malloc(QuadrantSizeInBytes * NumberOfVariables);
   /* ensure that heap is on cache boundary */
   if ( ((PTR) Heap) & 31)
      Heap = (char*) ( ((PTR) Heap) + 32 - ( ((PTR) Heap) & 31) );
@@ -1063,7 +1063,7 @@ void OptimizedStrassenMultiply_par(REAL *C, REAL *A, REAL *B, unsigned MatrixSiz
   C22 = C21 + QuadrantSize;
 
   /* Allocate Heap Space Here */
-  StartHeap = Heap = malloc(QuadrantSizeInBytes * NumberOfVariables);
+  StartHeap = Heap = (char *)malloc(QuadrantSizeInBytes * NumberOfVariables);
   /* ensure that heap is on cache boundary */
   if ( ((PTR) Heap) & 31)
      Heap = (char*) ( ((PTR) Heap) + 32 - ( ((PTR) Heap) & 31) );
@@ -1261,7 +1261,7 @@ int compare_matrix(int n, REAL *A, int an, REAL *B, int bn)
  */
 REAL *alloc_matrix(int n) 
 {
-     return malloc(n * n * sizeof(REAL));
+     return (REAL *)malloc(n * n * sizeof(REAL));
 }
 
 void strassen_main_par(REAL *A, REAL *B, REAL *C, int n)
