@@ -451,7 +451,7 @@ shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD,bots_verbose_mo
 {
 	  struct cell *cells;
           
-          cells = alloca(sizeof(struct cell)*(N+1));
+          cells = (struct cell *)alloca(sizeof(struct cell)*(N+1));
 	  memcpy(cells,CELLS,sizeof(struct cell)*(N+1));
 
 /* extent of shape */

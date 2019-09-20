@@ -31,10 +31,10 @@
 
 #define BOTS_APP_INIT int i;\
      COMPLEX *in, *out1=NULL, *out2=NULL;\
-     in = malloc(bots_arg_size * sizeof(COMPLEX));\
+     in = (COMPLEX *)malloc(bots_arg_size * sizeof(COMPLEX));\
 
 #define KERNEL_INIT\
-     out1 = malloc(bots_arg_size * sizeof(COMPLEX));\
+     out1 = (COMPLEX *)malloc(bots_arg_size * sizeof(COMPLEX));\
      for (i = 0; i < bots_arg_size; ++i) {\
           c_re(in[i]) = 1.0;\
           c_im(in[i]) = 1.0;\
@@ -43,7 +43,7 @@
 #define KERNEL_FINI 
 
 #define KERNEL_SEQ_INIT\
-     out2 = malloc(bots_arg_size * sizeof(COMPLEX));\
+     out2 = (COMPLEX *)malloc(bots_arg_size * sizeof(COMPLEX));\
      for (i = 0; i < bots_arg_size; ++i) {\
           c_re(in[i]) = 1.0;\
           c_im(in[i]) = 1.0;\
